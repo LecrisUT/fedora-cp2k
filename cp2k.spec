@@ -2,7 +2,7 @@
 
 Name: cp2k
 Version: 2.1
-Release: 3.%{snapshot}%{?dist}
+Release: 4.%{snapshot}%{?dist}
 Group: Applications/Engineering
 Summary: A molecular dynamics engine capable of classical and Car-Parrinello simulations
 License: GPLv2+
@@ -116,6 +116,9 @@ popd
 %{_bindir}/cp2k.ssmp
 
 %changelog
+* Thu Jan 12 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.1-4.20101006
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+
 * Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.1-3.20101006
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
