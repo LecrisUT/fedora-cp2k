@@ -15,7 +15,7 @@ DFLAGS   = -D__GFORTRAN -D__FFTSG -D__FFTW3 -D__parallel -D__BLACS -D__SCALAPACK
 FCFLAGS  = $(OPTFLAGS) -ftree-vectorize -ffree-form $(DFLAGS)
 LDFLAGS  = $(FCFLAGS) 
 #LIBS     = -llapack -lblas -lfftw3
-LIBS     = -lstdc++ -lblas -llapack -lscalapack -lint -lderiv -lmpiblacsF77init -lmpiblacs -lmpiblacsCinit -lfftw3
+LIBS     = -lstdc++ -llapack -lscalapack -lint -lderiv -lmpiblacsF77init -lmpiblacs -lmpiblacsCinit -lfftw3
 #          -lstdc++ -lscalapack -lint -lderiv -lblacsF77 -lblacs -lblacsC -lfftw3
 
 OBJECTS_ARCHITECTURE = machine_gfortran.o
