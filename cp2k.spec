@@ -53,6 +53,7 @@ This package contains the multi-threaded version (using OpenMP).
 %package openmpi
 Group: Applications/Engineering
 Summary: Molecular simulations software - openmpi version
+BuildRequires:  openmpi-devel
 BuildRequires:  blacs-openmpi-devel
 BuildRequires:  scalapack-openmpi-devel
 Requires: %{name}-common = %{version}-%{release}
@@ -65,6 +66,7 @@ This package contains the multi-threaded version (using OpenMPI).
 %package mpich2
 Group: Applications/Engineering
 Summary: Molecular simulations software - mpich2 version
+BuildRequires:  mpich2-devel
 BuildRequires:  blacs-mpich2-devel
 BuildRequires:  scalapack-mpich2-devel
 Requires: %{name}-common = %{version}-%{release}
