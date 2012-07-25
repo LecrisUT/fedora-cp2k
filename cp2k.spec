@@ -2,7 +2,7 @@
 
 Name: cp2k
 Version: 2.1
-Release: 6.%{snapshot}%{?dist}
+Release: 7.%{snapshot}%{?dist}
 Group: Applications/Engineering
 Summary: A molecular dynamics engine capable of classical and Car-Parrinello simulations
 License: GPLv2+
@@ -164,6 +164,9 @@ popd
 %{_libdir}/mpich2%{?_opt_cc_suffix}/bin/cp2k.popt_mpich2
 
 %changelog
+* Wed Jul 25 2012 Jussi Lehtola <jussilehtola@fedoraproject.org> - 2.1-7.20101006
+- Rebuild due to changed libint.
+
 * Tue Jul 24 2012 Thomas Spura <tomspur@fedoraproject.org> - 2.1-6.20101006
 - don't run testsuite as it is only usefull when comparing to old outputs
   (which we don't have at buildtime)
