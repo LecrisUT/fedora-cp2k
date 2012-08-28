@@ -1,54 +1,6 @@
-diff -up cp2k/arch/Linux-i686-gfortran.sopt.r cp2k/arch/Linux-i686-gfortran.sopt
---- cp2k/arch/Linux-i686-gfortran.sopt.r	2010-12-06 23:06:30.000000000 +0100
-+++ cp2k/arch/Linux-i686-gfortran.sopt	2010-12-06 23:48:08.000000000 +0100
-@@ -0,0 +1,20 @@
-+#
-+# gfortran arch file, currently for testing gfortran (svn version 4.3)
-+# status on http://gcc.gnu.org/bugzilla/show_bug.cgi?id=29975
-+#
-+CC       = cc
-+CPP      = 
-+
-+FC       = gfortran
-+LD       = gfortran
-+
-+AR       = ar -r
-+
-+CPPFLAGS = 
-+DFLAGS   = -D__GFORTRAN -D__FFTSG -D__FFTW3 -D__LIBINT -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6
-+OPTFLAGS = -O2 -ffast-math -funroll-loops -ftree-vectorize -march=native
-+FCFLAGS  = $(OPTFLAGS) -ffree-form $(DFLAGS)
-+LDFLAGS  = $(FCFLAGS) 
-+LIBS     = -llapack -lf77blas -latlas -lfftw3 -lint -lderiv
-+
-+OBJECTS_ARCHITECTURE = machine_gfortran.o
-diff -up cp2k/arch/Linux-i686-gfortran.ssmp.r cp2k/arch/Linux-i686-gfortran.ssmp
---- cp2k/arch/Linux-i686-gfortran.ssmp.r	2010-12-06 23:06:30.000000000 +0100
-+++ cp2k/arch/Linux-i686-gfortran.ssmp	2010-12-06 23:48:15.000000000 +0100
-@@ -0,0 +1,20 @@
-+#
-+# gfortran arch file, currently for testing gfortran (svn version 4.3)
-+# status on http://gcc.gnu.org/bugzilla/show_bug.cgi?id=29975
-+#
-+CC       = cc
-+CPP      = 
-+
-+FC       = gfortran
-+LD       = gfortran
-+
-+AR       = ar -r
-+
-+CPPFLAGS = 
-+DFLAGS   = -D__GFORTRAN -D__FFTSG -D__FFTW3 -D__LIBINT -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6
-+OPTFLAGS = -O2 -ffast-math -funroll-loops -ftree-vectorize -march=native
-+FCFLAGS  = $(OPTFLAGS) -ffree-form -fopenmp $(DFLAGS)
-+LDFLAGS  = $(FCFLAGS) 
-+LIBS     = -llapack -lf77blas -latlas -lfftw3 -lint -lderiv
-+
-+OBJECTS_ARCHITECTURE = machine_gfortran.o
-diff -up cp2k/arch/Linux-x86-64-gfortran.sopt.r cp2k/arch/Linux-x86-64-gfortran.sopt
---- cp2k/arch/Linux-x86-64-gfortran.sopt.r	2007-10-27 21:05:41.000000000 +0200
-+++ cp2k/arch/Linux-x86-64-gfortran.sopt	2010-12-06 23:48:21.000000000 +0100
+diff -up cp2k-2.3/arch/Linux-x86-64-gfortran.sopt.r cp2k-2.3/arch/Linux-x86-64-gfortran.sopt
+--- cp2k-2.3/arch/Linux-x86-64-gfortran.sopt.r	2010-12-22 17:46:11.000000000 +0100
++++ cp2k-2.3/arch/Linux-x86-64-gfortran.sopt	2012-08-26 00:34:48.000000000 +0200
 @@ -11,9 +11,10 @@ LD       = gfortran
  AR       = ar -r
  
@@ -63,72 +15,52 @@ diff -up cp2k/arch/Linux-x86-64-gfortran.sopt.r cp2k/arch/Linux-x86-64-gfortran.
 +LIBS     = -llapack -lf77blas -latlas -lfftw3 -lint -lderiv
  
  OBJECTS_ARCHITECTURE = machine_gfortran.o
-diff -up cp2k/arch/Linux-x86-64-gfortran.ssmp.r cp2k/arch/Linux-x86-64-gfortran.ssmp
---- cp2k/arch/Linux-x86-64-gfortran.ssmp.r	2010-12-06 23:06:30.000000000 +0100
-+++ cp2k/arch/Linux-x86-64-gfortran.ssmp	2010-12-06 23:48:27.000000000 +0100
-@@ -0,0 +1,20 @@
-+#
-+# gfortran arch file, currently for testing gfortran (svn version 4.3)
-+# status on http://gcc.gnu.org/bugzilla/show_bug.cgi?id=29975
-+#
-+CC       = cc
-+CPP      = 
-+
-+FC       = gfortran
-+LD       = gfortran
-+
-+AR       = ar -r
-+
-+CPPFLAGS = 
-+DFLAGS   = -D__GFORTRAN -D__FFTSG -D__FFTW3 -D__LIBINT -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6
-+OPTFLAGS = -O2 -ffast-math -funroll-loops -ftree-vectorize -march=native
-+FCFLAGS  = $(OPTFLAGS) -ffree-form -fopenmp $(DFLAGS)
-+LDFLAGS  = $(FCFLAGS) 
-+LIBS     = -llapack -lf77blas -latlas -lfftw3 -lint -lderiv
-+
-+OBJECTS_ARCHITECTURE = machine_gfortran.o
-diff -up cp2k/makefiles/Makefile.r cp2k/makefiles/Makefile
---- cp2k/makefiles/Makefile.r	2010-06-14 14:46:46.000000000 +0200
-+++ cp2k/makefiles/Makefile	2010-12-06 23:06:30.000000000 +0100
-@@ -66,15 +66,15 @@ CLEAN_TARGETS = $(addsuffix /clean ,$(VE
+diff -up cp2k-2.3/makefiles/Makefile.r cp2k-2.3/makefiles/Makefile
+--- cp2k-2.3/makefiles/Makefile.r	2012-08-21 13:35:17.000000000 +0200
++++ cp2k-2.3/makefiles/Makefile	2012-08-26 00:34:48.000000000 +0200
+@@ -90,11 +90,11 @@ CLEAN_TARGETS = $(addsuffix /clean ,$(VE
  # lists the targets that are not files
  #
  .PHONY : _all libs _progr _lib build clean realclean distclean $(CLEAN_TARGETS)\
--         $(ALL_TARGETS) $(LIB_TARGETS) $(VERSION_TARGETS) fes dirs deptool
-+         $(ALL_TARGETS) $(LIB_TARGETS) $(VERSION_TARGETS) fes dirs
+-         $(ALL_TARGETS) $(LIB_TARGETS) $(VERSION_TARGETS) fes dirs deptool\
++         $(ALL_TARGETS) $(LIB_TARGETS) $(VERSION_TARGETS) fes dirs\
+          dbcsr_test dbcsr_perf mrproper
  
  ### Master rules ###
 -build: dirs deptool
 +build: dirs
- 	$(MAKE) -C $(SRCDIR) -f $(MAKEFILE) all.dep
- 	$(MAKE) -C $(SRCDIR)/lib -f $(MAKEFILE) lib.dep
- 	$(MAKE) -C $(OBJDIR)/$(VERSION) -f $(MAKEFILE) $(WHAT)
+ 	+$(MAKE) -C $(SRCDIR) -f $(MAKEFILE) all.dep
+ 	+$(MAKE) -C $(SRCDIR)/lib -f $(MAKEFILE) lib.dep
+ 	+$(MAKE) -C $(SRCDIR)/dbcsr_lib -f $(MAKEFILE) dbcsr.dep
+@@ -104,7 +104,7 @@ build: dirs deptool
+ 	+cp $(LIBMA_DEPENDENCIES) $(OBJDIR)/$(VERSION)/libc_ma.dep
+ 	+$(MAKE) -C $(OBJDIR)/$(VERSION) -f $(MAKEFILE) $(WHAT)
  
 -fes: dirs deptool
 +fes: dirs
- 	$(MAKE) -C $(TOOLSRC)/metadyn/  -f $(MAKEFILE) fes.dep
- 	$(MAKE) -C $(OBJDIR)/$(VERSION) -f $(MAKEFILE) VERSION=$(VERSION) $(FES) 
+ 	+$(MAKE) -C $(TOOLSRC)/metadyn/  -f $(MAKEFILE) fes.dep
+ 	+$(MAKE) -C $(OBJDIR)/$(VERSION) -f $(MAKEFILE) HACKLIBDEP=yes VERSION=$(VERSION) $(FES) 
  
-@@ -91,9 +91,6 @@ pretty: dirs
- 	$(MAKE) -C $(SRCDIR) -f $(MAKEFILE) _pretty
- 	$(MAKE) -C $(SRCDIR)/lib -f $(MAKEFILE) _pretty_lib3
+@@ -124,9 +124,6 @@ pretty: dirs
+ 	+$(MAKE) -C $(SRCDIR)/dbcsr_lib -f $(MAKEFILE) _pretty_lib3
+ 	+$(MAKE) -C $(SRCDIR)/arch_lib  -f $(MAKEFILE) _pretty_lib4
  
 -deptool: dirs
--	$(MAKE) -C $(TOOLDIR) -f $(MAKEFILE) makedepf90
+-	+$(MAKE) LDFLAGS=$(MAKDEPF90_LDFLAGS) -C $(TOOLDIR) -f $(MAKEFILE) makedepf90
 -
  libs:
- 	$(MAKE) -f $(MAKEFILE) VERSION=$(VERSION) WHAT=_lib build
+ 	+$(MAKE) -f $(MAKEFILE) VERSION=$(VERSION) WHAT=_lib build
  all:
-@@ -106,7 +103,7 @@ cpshell:
+@@ -145,7 +142,7 @@ dbcsr_perf:
  #
  # on a parallel build only one task should go a build the deptool
  #
 -$(VERSION_TARGETS): dirs deptool
 +$(VERSION_TARGETS): dirs
- 	$(MAKE) -f $(MAKEFILE) VERSION=$@ build
+ 	+$(MAKE) -f $(MAKEFILE) VERSION=$@ build
  
  $(CLEAN_TARGETS):
-@@ -191,15 +188,15 @@ all.dep: $(OBJECTS:.o=.F) cp_common_uses
+@@ -245,24 +242,24 @@ all.dep: $(OBJECTS:.o=.F) $(LIB1_OBJECTS
  ifeq ($(HACKDEP),yes)
  	echo $^ | awk '{for (i=1;i<=NF;i++) {obj=$$(i) ; sub(".F",".o",obj); if ($$(i)!=obj) print obj,":",$$(i) }}' > $(OBJDIR)/$(VERSION)/all.dep
  else
@@ -136,9 +68,21 @@ diff -up cp2k/makefiles/Makefile.r cp2k/makefiles/Makefile
 +	makedepf90 $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/all.dep || ( rm -f $(OBJDIR)/$(VERSION)/all.dep  ; exit 1 )
  endif
  
- lib.dep: $(LIB1_OBJECTS:.o=.F) $(LIB2_OBJECTS:.o=.F)  $(LIB3_OBJECTS:.o=.F)
+ lib.dep: $(LIB1_OBJECTS:.o=.F)
 -	$(TOOLDIR)/makedepf90 $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/lib.dep || ( rm -f $(OBJDIR)/$(VERSION)/lib.dep ; exit 1 )
 +	makedepf90 $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/lib.dep || ( rm -f $(OBJDIR)/$(VERSION)/lib.dep ; exit 1 )
+ 
+ fft.dep: $(LIB2_OBJECTS:.o=.F)
+-	$(TOOLDIR)/makedepf90 $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/fft.dep || ( rm -f $(OBJDIR)/$(VERSION)/fft.dep ; exit 1 )
++	makedepf90 $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/fft.dep || ( rm -f $(OBJDIR)/$(VERSION)/fft.dep ; exit 1 )
+ 
+ dbcsr.dep: $(LIB3_OBJECTS:.o=.F) $(LIB4_OBJECTS:.o=.F)
+-	$(TOOLDIR)/makedepf90 $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/dbcsr.dep || ( rm -f $(OBJDIR)/$(VERSION)/dbcsr.dep ; exit 1 )
++	makedepf90 $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/dbcsr.dep || ( rm -f $(OBJDIR)/$(VERSION)/dbcsr.dep ; exit 1 )
+ 
+ ma.dep: $(LIB4_OBJECTS:.o=.F) machine.F message_passing.F mathlib.F
+-	$(TOOLDIR)/makedepf90 $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/ma.dep || ( rm -f $(OBJDIR)/$(VERSION)/ma.dep ; exit 1 )
++	makedepf90 $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/ma.dep || ( rm -f $(OBJDIR)/$(VERSION)/ma.dep ; exit 1 )
  
  # this is kind of a hack, fes depends on files in other directories, hence the -I and the -b.
  fes.dep: $(FESOBJS:.o=.F) 
@@ -147,20 +91,20 @@ diff -up cp2k/makefiles/Makefile.r cp2k/makefiles/Makefile
  
  #
  # and the rules doing the actual work
-@@ -263,9 +260,6 @@ $(CP2KSHELL): $(ALL_LIB) cp2k_shell.o
+@@ -370,9 +367,6 @@ dbcsr_performance_driver.o: $(LIB3_ARCHI
  #
  # these are tools, but their integration in the build is ugly at least (e.g. see dependencies).
  #
 -makedepf90:
--	-test -d $(TOOLDIR)/makedepf90-build || cp -r $(TOOLSRC)/makedepf90 makedepf90-build
+-	-test -d $(TOOLDIR)/makedepf90-build || ( mkdir makedepf90-build ; cp $(TOOLSRC)/makedepf90/* makedepf90-build )
 -	{ cd makedepf90-build ; ./configure --prefix=$(TOOLDIR) --bindir=$(TOOLDIR) ; $(MAKE) VERSION="2.8.8cp2k" ; $(MAKE) install ; }
  
- $(FES): $(FESOBJS)
- 	$(LD) $(LDFLAGS) -o $(FES) $(FESOBJS)
-diff -up cp2k/tools/do_regtest.r cp2k/tools/do_regtest
---- cp2k/tools/do_regtest.r	2010-09-07 14:47:23.000000000 +0200
-+++ cp2k/tools/do_regtest	2010-12-06 23:06:30.000000000 +0100
-@@ -351,9 +351,6 @@ if [[ ${quick} != "quick" ]]; then
+ #
+ # the rule how to generate the .o from the .F
+diff -up cp2k-2.3/tools/do_regtest.r cp2k-2.3/tools/do_regtest
+--- cp2k-2.3/tools/do_regtest.r	2012-08-21 10:25:41.000000000 +0200
++++ cp2k-2.3/tools/do_regtest	2012-08-26 00:34:48.000000000 +0200
+@@ -353,9 +353,6 @@ if [[ ${quick} != "quick" ]]; then
     else
        echo "make realclean VERSION=${cp2k_version} went fine"
     fi
@@ -170,7 +114,7 @@ diff -up cp2k/tools/do_regtest.r cp2k/tools/do_regtest
  
  # *** from here failures are likely to be bugs in cp2k
  echo "-------------------------compiling cp2k-----------------------------------"
-@@ -370,6 +367,10 @@ else
+@@ -372,6 +369,10 @@ else
  compile_warnings=`grep "Warning:" out | wc | tail -1 |  ${awk} '{print $1}'`
  echo "make VERSION=${cp2k_version} went fine (${compile_warnings} warnings)"
  fi
@@ -181,3 +125,12 @@ diff -up cp2k/tools/do_regtest.r cp2k/tools/do_regtest
  echo "-------------------------regtesting cp2k----------------------------------"
  
  ###################################################################################
+diff -up cp2k-2.3/tools/get_revision_number.r cp2k-2.3/tools/get_revision_number
+--- cp2k-2.3/tools/get_revision_number.r	2011-12-13 11:54:21.000000000 +0100
++++ cp2k-2.3/tools/get_revision_number	2012-08-26 01:41:36.000000000 +0200
+@@ -2,4 +2,4 @@
+ export LANG=C
+ export LC_MESSAGES=C
+ export LC_ALL=C
+-svn info $1 | grep "Last Changed Rev: " | cut -d: -f2
++cat $1/REVISION

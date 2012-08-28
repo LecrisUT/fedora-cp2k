@@ -1,17 +1,21 @@
-%define snapshot 20101006
+%define snapshot 20120825
 
 Name: cp2k
-Version: 2.1
-Release: 7.%{snapshot}%{?dist}
+Version: 2.3
+Release: 0.%{snapshot}%{?dist}
 Group: Applications/Engineering
 Summary: A molecular dynamics engine capable of classical and Car-Parrinello simulations
 License: GPLv2+
 URL: http://cp2k.org/
-Source0: ftp://ftp.berlios.de/pub/cp2k/cp2k-2_1-branch.tar.gz
+# run cp2k-snapshot.sh to produce this
+Source0: cp2k-%{version}-%{snapshot}.tar.bz2
 # custom openmpi arch file
 # also works for mpich2 and possibly others
 # only assumption for mpi library: fortran compiler is named mpif90
 Source1: Linux-gfortran-openmpi.popt
+Source2: Linux-gfortran.ssmp
+Source3: Linux-i686-gfortran.sopt
+Source4: cp2k-snapshot.sh
 # patch to:
 # use rpm optflags
 # link with atlas instead of vanilla blas/lapack
@@ -86,9 +90,12 @@ Summary: Molecular simulations software - common files
 This package contains the documentation and the manual.
 
 %prep
-%setup -q -n %{name}
-cp %{SOURCE1} arch/
-cp %{SOURCE1} arch/Linux-gfortran-mpich2.popt
+%setup -q
+cp -p %{SOURCE1} arch/
+cp -p %{SOURCE1} arch/Linux-gfortran-mpich2.popt
+cp -p %{SOURCE2} arch/Linux-i686-gfortran.ssmp
+cp -p %{SOURCE2} arch/Linux-x86-64-gfortran.ssmp
+cp -p %{SOURCE3} arch/
 %patch0 -p1 -b .r
 rm -r tools/makedepf90
 chmod -x src/harris_{functional,{env,energy}_types}.F
@@ -164,6 +171,12 @@ popd
 %{_libdir}/mpich2%{?_opt_cc_suffix}/bin/cp2k.popt_mpich2
 
 %changelog
+* Sun Aug 26 2012 Dominik Mierzejewski <rpm@greysector.net> - 2.3-0.20120825
+- updated to current 2.3 branch (trunk)
+- added snapshot creator script
+- moved new files out of -rpm patch and into separate SourceN entries
+- dropped non-standard compiler flags from MPI builds
+
 * Wed Jul 25 2012 Jussi Lehtola <jussilehtola@fedoraproject.org> - 2.1-7.20101006
 - Rebuild due to changed libint.
 

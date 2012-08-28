@@ -11,8 +11,9 @@ LD       = mpif90
 AR       = ar -r
 
 CPPFLAGS = 
-DFLAGS   = -D__GFORTRAN -D__FFTSG -D__FFTW3 -D__parallel -D__BLACS -D__SCALAPACK -D__FFTW3 -D__LIBINT 
-FCFLAGS  = $(OPTFLAGS) -ftree-vectorize -ffree-form $(DFLAGS)
+DFLAGS   = -D__GFORTRAN -D__FFTSG -D__FFTW3 -D__parallel -D__BLACS -D__SCALAPACK -D__LIBINT -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6
+OPTFLAGS = -O2 -ffast-math -funroll-loops -ftree-vectorize -march=native
+FCFLAGS  = $(OPTFLAGS) -ffree-form $(DFLAGS)
 LDFLAGS  = $(FCFLAGS) 
 #LIBS     = -llapack -lblas -lfftw3
 LIBS     = -lstdc++ -llapack -lscalapack -lint -lderiv -lmpiblacsF77init -lmpiblacs -lmpiblacsCinit -lfftw3
