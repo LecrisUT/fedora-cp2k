@@ -1,14 +1,19 @@
+%define svn 0
 %define snapshot 20120825
 
 Name: cp2k
 Version: 2.3
-Release: 0.%{snapshot}%{?dist}
+Release: 1%{?dist}
 Group: Applications/Engineering
 Summary: A molecular dynamics engine capable of classical and Car-Parrinello simulations
 License: GPLv2+
 URL: http://cp2k.org/
+%if %{svn}
 # run cp2k-snapshot.sh to produce this
 Source0: cp2k-%{version}-%{snapshot}.tar.bz2
+%else
+Source0: http://downloads.sourceforge.net/project/cp2k/cp2k-%{version}.tar.bz2
+%endif
 # custom openmpi arch file
 # also works for mpich2 and possibly others
 # only assumption for mpi library: fortran compiler is named mpif90
@@ -23,6 +28,8 @@ Source4: cp2k-snapshot.sh
 # use external makedepf90
 # skip compilation during regtests
 Patch0: %{name}-rpm.patch
+# hardcode version in get_revision_number script to work with snapshots
+Patch1: %{name}-svn.patch
 BuildRequires: atlas-devel
 BuildRequires: fftw-devel
 BuildRequires: gcc-gfortran
@@ -97,6 +104,9 @@ cp -p %{SOURCE2} arch/Linux-i686-gfortran.ssmp
 cp -p %{SOURCE2} arch/Linux-x86-64-gfortran.ssmp
 cp -p %{SOURCE3} arch/
 %patch0 -p1 -b .r
+%if %{svn}
+%patch1 -p1 -b .svn
+%endif
 rm -r tools/makedepf90
 chmod -x src/harris_{functional,{env,energy}_types}.F
 
@@ -171,6 +181,9 @@ popd
 %{_libdir}/mpich2%{?_opt_cc_suffix}/bin/cp2k.popt_mpich2
 
 %changelog
+* Wed Sep 05 2012 Dominik Mierzejewski <rpm@greysector.net> - 2.3-1
+- updated to 2.3 release
+
 * Sun Aug 26 2012 Dominik Mierzejewski <rpm@greysector.net> - 2.3-0.20120825
 - updated to current 2.3 branch (trunk)
 - added snapshot creator script

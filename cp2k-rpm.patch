@@ -125,12 +125,3 @@ diff -up cp2k-2.3/tools/do_regtest.r cp2k-2.3/tools/do_regtest
  echo "-------------------------regtesting cp2k----------------------------------"
  
  ###################################################################################
-diff -up cp2k-2.3/tools/get_revision_number.r cp2k-2.3/tools/get_revision_number
---- cp2k-2.3/tools/get_revision_number.r	2011-12-13 11:54:21.000000000 +0100
-+++ cp2k-2.3/tools/get_revision_number	2012-08-26 01:41:36.000000000 +0200
-@@ -2,4 +2,4 @@
- export LANG=C
- export LC_MESSAGES=C
- export LC_ALL=C
--svn info $1 | grep "Last Changed Rev: " | cut -d: -f2
-+cat $1/REVISION
