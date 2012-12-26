@@ -3,7 +3,7 @@
 
 Name: cp2k
 Version: 2.3
-Release: 1%{?dist}
+Release: 2%{?dist}
 Group: Applications/Engineering
 Summary: A molecular dynamics engine capable of classical and Car-Parrinello simulations
 License: GPLv2+
@@ -181,6 +181,9 @@ popd
 %{_libdir}/mpich2%{?_opt_cc_suffix}/bin/cp2k.popt_mpich2
 
 %changelog
+* Wed Dec 26 2012 Kevin Fenzi <kevin@scrye.com> 2.3-2
+- Rebuild for new libmpich
+
 * Wed Sep 05 2012 Dominik Mierzejewski <rpm@greysector.net> - 2.3-1
 - updated to 2.3 release
 
