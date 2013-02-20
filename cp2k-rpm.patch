@@ -1,24 +1,24 @@
-diff -up cp2k-2.3/arch/Linux-x86-64-gfortran.sopt.r cp2k-2.3/arch/Linux-x86-64-gfortran.sopt
---- cp2k-2.3/arch/Linux-x86-64-gfortran.sopt.r	2010-12-22 17:46:11.000000000 +0100
-+++ cp2k-2.3/arch/Linux-x86-64-gfortran.sopt	2012-08-26 00:34:48.000000000 +0200
+diff -up cp2k-2.4/arch/Linux-x86-64-gfortran.sopt.r cp2k-2.4/arch/Linux-x86-64-gfortran.sopt
+--- cp2k-2.4/arch/Linux-x86-64-gfortran.sopt.r	2010-12-22 17:46:11.000000000 +0100
++++ cp2k-2.4/arch/Linux-x86-64-gfortran.sopt	2013-01-29 11:37:44.000000000 +0100
 @@ -11,9 +11,10 @@ LD       = gfortran
  AR       = ar -r
  
  CPPFLAGS = 
 -DFLAGS   = -D__GFORTRAN -D__FFTSG -D__FFTW3 
 -FCFLAGS  = -O2 -ffast-math -funroll-loops -ftree-vectorize -march=native -ffree-form $(DFLAGS)
-+DFLAGS   = -D__GFORTRAN -D__FFTSG -D__FFTW3 -D__LIBINT -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6
++DFLAGS   = -D__GFORTRAN -D__FFTSG -D__FFTW3 -D__LIBINT -D__LIBINT_MAX_AM=8 -D__LIBDERIV_MAX_AM1=6 -D__LIBXC
 +OPTFLAGS = -O2 -ffast-math -funroll-loops -ftree-vectorize -march=native
-+FCFLAGS  = $(OPTFLAGS) -ffree-form $(DFLAGS)
++FCFLAGS  = $(OPTFLAGS) -ffree-form -ffree-line-length-none $(DFLAGS)
  LDFLAGS  = $(FCFLAGS) 
 -LIBS     = -llapack -lblas -lfftw3
-+LIBS     = -llapack -lf77blas -latlas -lfftw3 -lint -lderiv
++LIBS     = -llapack -lf77blas -latlas -lfftw3 -lint -lderiv -lxc
  
  OBJECTS_ARCHITECTURE = machine_gfortran.o
-diff -up cp2k-2.3/makefiles/Makefile.r cp2k-2.3/makefiles/Makefile
---- cp2k-2.3/makefiles/Makefile.r	2012-08-21 13:35:17.000000000 +0200
-+++ cp2k-2.3/makefiles/Makefile	2012-08-26 00:34:48.000000000 +0200
-@@ -90,11 +90,11 @@ CLEAN_TARGETS = $(addsuffix /clean ,$(VE
+diff -up cp2k-2.4/makefiles/Makefile.r cp2k-2.4/makefiles/Makefile
+--- cp2k-2.4/makefiles/Makefile.r	2012-11-02 13:12:37.000000000 +0100
++++ cp2k-2.4/makefiles/Makefile	2013-01-29 11:37:44.000000000 +0100
+@@ -93,11 +93,11 @@ CLEAN_TARGETS = $(addsuffix /clean ,$(VE
  # lists the targets that are not files
  #
  .PHONY : _all libs _progr _lib build clean realclean distclean $(CLEAN_TARGETS)\
@@ -32,7 +32,7 @@ diff -up cp2k-2.3/makefiles/Makefile.r cp2k-2.3/makefiles/Makefile
  	+$(MAKE) -C $(SRCDIR) -f $(MAKEFILE) all.dep
  	+$(MAKE) -C $(SRCDIR)/lib -f $(MAKEFILE) lib.dep
  	+$(MAKE) -C $(SRCDIR)/dbcsr_lib -f $(MAKEFILE) dbcsr.dep
-@@ -104,7 +104,7 @@ build: dirs deptool
+@@ -108,7 +108,7 @@ build: dirs deptool
  	+cp $(LIBMA_DEPENDENCIES) $(OBJDIR)/$(VERSION)/libc_ma.dep
  	+$(MAKE) -C $(OBJDIR)/$(VERSION) -f $(MAKEFILE) $(WHAT)
  
@@ -41,9 +41,9 @@ diff -up cp2k-2.3/makefiles/Makefile.r cp2k-2.3/makefiles/Makefile
  	+$(MAKE) -C $(TOOLSRC)/metadyn/  -f $(MAKEFILE) fes.dep
  	+$(MAKE) -C $(OBJDIR)/$(VERSION) -f $(MAKEFILE) HACKLIBDEP=yes VERSION=$(VERSION) $(FES) 
  
-@@ -124,9 +124,6 @@ pretty: dirs
- 	+$(MAKE) -C $(SRCDIR)/dbcsr_lib -f $(MAKEFILE) _pretty_lib3
+@@ -129,9 +129,6 @@ pretty: dirs
  	+$(MAKE) -C $(SRCDIR)/arch_lib  -f $(MAKEFILE) _pretty_lib4
+ 	+$(MAKE) -C $(SRCDIR)/elpa_lib  -f $(MAKEFILE) _pretty_lib5
  
 -deptool: dirs
 -	+$(MAKE) LDFLAGS=$(MAKDEPF90_LDFLAGS) -C $(TOOLDIR) -f $(MAKEFILE) makedepf90
@@ -51,7 +51,7 @@ diff -up cp2k-2.3/makefiles/Makefile.r cp2k-2.3/makefiles/Makefile
  libs:
  	+$(MAKE) -f $(MAKEFILE) VERSION=$(VERSION) WHAT=_lib build
  all:
-@@ -145,7 +142,7 @@ dbcsr_perf:
+@@ -150,7 +147,7 @@ dbcsr_perf:
  #
  # on a parallel build only one task should go a build the deptool
  #
@@ -60,7 +60,7 @@ diff -up cp2k-2.3/makefiles/Makefile.r cp2k-2.3/makefiles/Makefile
  	+$(MAKE) -f $(MAKEFILE) VERSION=$@ build
  
  $(CLEAN_TARGETS):
-@@ -245,24 +242,24 @@ all.dep: $(OBJECTS:.o=.F) $(LIB1_OBJECTS
+@@ -251,28 +248,28 @@ all.dep: $(OBJECTS:.o=.F) $(LIB1_OBJECTS
  ifeq ($(HACKDEP),yes)
  	echo $^ | awk '{for (i=1;i<=NF;i++) {obj=$$(i) ; sub(".F",".o",obj); if ($$(i)!=obj) print obj,":",$$(i) }}' > $(OBJDIR)/$(VERSION)/all.dep
  else
@@ -84,6 +84,11 @@ diff -up cp2k-2.3/makefiles/Makefile.r cp2k-2.3/makefiles/Makefile
 -	$(TOOLDIR)/makedepf90 $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/ma.dep || ( rm -f $(OBJDIR)/$(VERSION)/ma.dep ; exit 1 )
 +	makedepf90 $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/ma.dep || ( rm -f $(OBJDIR)/$(VERSION)/ma.dep ; exit 1 )
  
+ elpa.dep: $(LIB5_OBJECTS:.o=.F)
+-	$(TOOLDIR)/makedepf90 $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/elpa.dep || ( rm -f $(OBJDIR)/$(VERSION)/elpa.dep ; exit 1 )
++	makedepf90 $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/elpa.dep || ( rm -f $(OBJDIR)/$(VERSION)/elpa.dep ; exit 1 )
+ 
+ 
  # this is kind of a hack, fes depends on files in other directories, hence the -I and the -b.
  fes.dep: $(FESOBJS:.o=.F) 
 -	$(TOOLDIR)/makedepf90 -I$(SRCDIR) -b. $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/fes.dep || ( rm -f $(OBJDIR)/$(VERSION)/fes.dep  ; exit 1 )
@@ -91,7 +96,7 @@ diff -up cp2k-2.3/makefiles/Makefile.r cp2k-2.3/makefiles/Makefile
  
  #
  # and the rules doing the actual work
-@@ -370,9 +367,6 @@ dbcsr_performance_driver.o: $(LIB3_ARCHI
+@@ -387,9 +384,6 @@ dbcsr_performance_driver.o: $(LIB3_ARCHI
  #
  # these are tools, but their integration in the build is ugly at least (e.g. see dependencies).
  #
@@ -101,9 +106,20 @@ diff -up cp2k-2.3/makefiles/Makefile.r cp2k-2.3/makefiles/Makefile
  
  #
  # the rule how to generate the .o from the .F
-diff -up cp2k-2.3/tools/do_regtest.r cp2k-2.3/tools/do_regtest
---- cp2k-2.3/tools/do_regtest.r	2012-08-21 10:25:41.000000000 +0200
-+++ cp2k-2.3/tools/do_regtest	2012-08-26 00:34:48.000000000 +0200
+diff -up cp2k-2.4/tools/do_regtest.r cp2k-2.4/tools/do_regtest
+--- cp2k-2.4/tools/do_regtest.r	2012-08-21 10:25:41.000000000 +0200
++++ cp2k-2.4/tools/do_regtest	2013-01-29 21:38:47.000000000 +0100
+@@ -103,8 +103,8 @@ leakcheck="NO"
+ 
+ # *** how to execute an input file [ cp2k_prefix input cp2k_postfix ]
+ # Leave empty for serial, uncomment for parallel
+-cp2k_run_prefix="mpiexec -np 2"
+-#cp2k_run_prefix=""
++#cp2k_run_prefix="mpiexec -np 2"
++cp2k_run_prefix=""
+ cp2k_run_postfix=
+ #cp2k_prefix="( ulimit -t 300; ${dir_base}/${cp2k_dir}/exe/${dir_triplet}/cp2k.${cp2k_version}"
+ #cp2k_postfix=" )"
 @@ -353,9 +353,6 @@ if [[ ${quick} != "quick" ]]; then
     else
        echo "make realclean VERSION=${cp2k_version} went fine"
@@ -125,3 +141,11 @@ diff -up cp2k-2.3/tools/do_regtest.r cp2k-2.3/tools/do_regtest
  echo "-------------------------regtesting cp2k----------------------------------"
  
  ###################################################################################
+@@ -518,6 +518,7 @@
+      input_file=`grep -v "#" TEST_FILES | ${awk} -v itest=$itest '{c=c+1;if (c==itest) print $1}'`
+      # just one test right now, but this should generalize
+      test_types=`grep -v "#" TEST_FILES | ${awk} -v itest=$itest '{c=c+1;if (c==itest) print $2}'`
++     echo "Running ${input_file}"
+      output_file=${dir_out}/${dir}/${input_file}.out
+      output_last=${dir_last}/${dir}/${input_file}.out
+      ( ulimit -t ${job_max_time} -v 2000000 ; ${cp2k_prefix} ${input_file} ${cp2k_postfix} &> ${output_file} )

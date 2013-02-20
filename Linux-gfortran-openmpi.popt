@@ -11,12 +11,10 @@ LD       = mpif90
 AR       = ar -r
 
 CPPFLAGS = 
-DFLAGS   = -D__GFORTRAN -D__FFTSG -D__FFTW3 -D__parallel -D__BLACS -D__SCALAPACK -D__LIBINT -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6
+DFLAGS   = -D__GFORTRAN -D__FFTSG -D__FFTW3 -D__parallel -D__BLACS -D__SCALAPACK -D__LIBINT -D__LIBINT_MAX_AM=8 -D__LIBDERIV_MAX_AM1=6 -D__LIBXC
 OPTFLAGS = -O2 -ffast-math -funroll-loops -ftree-vectorize -march=native
-FCFLAGS  = $(OPTFLAGS) -ffree-form $(DFLAGS)
+FCFLAGS  = $(OPTFLAGS) -ffree-form -ffree-line-length-none $(DFLAGS)
 LDFLAGS  = $(FCFLAGS) 
-#LIBS     = -llapack -lblas -lfftw3
-LIBS     = -lstdc++ -llapack -lscalapack -lint -lderiv -lmpiblacsF77init -lmpiblacs -lmpiblacsCinit -lfftw3
-#          -lstdc++ -lscalapack -lint -lderiv -lblacsF77 -lblacs -lblacsC -lfftw3
+LIBS     = -lstdc++ -llapack -lscalapack -lmpiblacsF77init -lmpiblacs -lmpiblacsCinit -lfftw3 -lint -lderiv -lxc
 
 OBJECTS_ARCHITECTURE = machine_gfortran.o
