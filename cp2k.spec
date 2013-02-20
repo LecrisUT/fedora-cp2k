@@ -180,7 +180,7 @@ popd
 %{_libdir}/mpich2%{?_opt_cc_suffix}/bin/cp2k.popt_mpich2
 
 %changelog
-* Tue Feb 19 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.4-0.1.20130217
+* Wed Feb 20 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.4-0.1.20130220
 - re-enable regtests
 - update to current SVN trunk (2.4)
 - drop svn patch (no longer needed)
