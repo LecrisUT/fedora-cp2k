@@ -1,9 +1,9 @@
-%define svn 0
-%define snapshot 20120825
+%define svn 1
+%define snapshot 20130220
 
 Name: cp2k
 Version: 2.3
-Release: 1%{?dist}
+Release: 2.%{?snapshot}%{?dist}
 Group: Applications/Engineering
 Summary: A molecular dynamics engine capable of classical and Car-Parrinello simulations
 License: GPLv2+
@@ -28,13 +28,14 @@ Source4: cp2k-snapshot.sh
 # use external makedepf90
 # skip compilation during regtests
 Patch0: %{name}-rpm.patch
-# hardcode version in get_revision_number script to work with snapshots
-Patch1: %{name}-svn.patch
 BuildRequires: atlas-devel
+# for regtests
+BuildRequires: bc
 BuildRequires: fftw-devel
 BuildRequires: gcc-gfortran
 BuildRequires: libint-devel >= 1.1.4
 BuildRequires: makedepf90
+BuildRequires: /bin/hostname
 Requires: %{name}-common = %{version}-%{release}
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -104,9 +105,6 @@ cp -p %{SOURCE2} arch/Linux-i686-gfortran.ssmp
 cp -p %{SOURCE2} arch/Linux-x86-64-gfortran.ssmp
 cp -p %{SOURCE3} arch/
 %patch0 -p1 -b .r
-%if %{svn}
-%patch1 -p1 -b .svn
-%endif
 rm -r tools/makedepf90
 chmod -x src/harris_{functional,{env,energy}_types}.F
 
@@ -141,7 +139,7 @@ install -pm755 exe/`tools/get_arch_code`/cp2k.ssmp %{buildroot}%{_bindir}
 %clean
 rm -rf %{buildroot}
 
-%if 0
+%if 1
 %check
 export FORT_C_NAME=gfortran
 cat > tests/fedora.config << __EOF__
@@ -150,7 +148,7 @@ export FORT_C_NAME=gfortran
 dir_base=%{_builddir}
 cp2k_version=sopt
 dir_triplet=`tools/get_arch_code`
-cp2k_dir=cp2k
+cp2k_dir=cp2k-%{version}
 maxtasks=`getconf _NPROCESSORS_ONLN`
 emptycheck="NO"
 leakcheck="NO"
@@ -181,6 +179,16 @@ popd
 %{_libdir}/mpich2%{?_opt_cc_suffix}/bin/cp2k.popt_mpich2
 
 %changelog
+* Wed Feb 20 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.3-2.20130220
+- update to current SVN 2.3 stable branch
+- re-enable regtests
+- drop svn patch (no longer needed)
+- link with libfftw3_omp for ssmp build
+- reorder libraries in LDFLAGS per M. Guidon's cp2k installation primer
+- add -ffree-line-length-none to Fortran flags
+- add a patch to echo the name of reach test (from Debian package)
+- update libint/libderiv options to match current builds
+
 * Wed Sep 05 2012 Dominik Mierzejewski <rpm@greysector.net> - 2.3-1
 - updated to 2.3 release
 

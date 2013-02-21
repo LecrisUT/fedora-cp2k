@@ -1,15 +1,15 @@
 diff -up cp2k-2.3/arch/Linux-x86-64-gfortran.sopt.r cp2k-2.3/arch/Linux-x86-64-gfortran.sopt
 --- cp2k-2.3/arch/Linux-x86-64-gfortran.sopt.r	2010-12-22 17:46:11.000000000 +0100
-+++ cp2k-2.3/arch/Linux-x86-64-gfortran.sopt	2012-08-26 00:34:48.000000000 +0200
++++ cp2k-2.3/arch/Linux-x86-64-gfortran.sopt	2013-02-20 23:48:26.058052003 +0100
 @@ -11,9 +11,10 @@ LD       = gfortran
  AR       = ar -r
  
  CPPFLAGS = 
 -DFLAGS   = -D__GFORTRAN -D__FFTSG -D__FFTW3 
 -FCFLAGS  = -O2 -ffast-math -funroll-loops -ftree-vectorize -march=native -ffree-form $(DFLAGS)
-+DFLAGS   = -D__GFORTRAN -D__FFTSG -D__FFTW3 -D__LIBINT -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6
++DFLAGS   = -D__GFORTRAN -D__FFTSG -D__FFTW3 -D__LIBINT -D__LIBINT_MAX_AM=8 -D__LIBDERIV_MAX_AM1=6
 +OPTFLAGS = -O2 -ffast-math -funroll-loops -ftree-vectorize -march=native
-+FCFLAGS  = $(OPTFLAGS) -ffree-form $(DFLAGS)
++FCFLAGS  = $(OPTFLAGS) -ffree-form -ffree-line-length-none $(DFLAGS)
  LDFLAGS  = $(FCFLAGS) 
 -LIBS     = -llapack -lblas -lfftw3
 +LIBS     = -llapack -lf77blas -latlas -lfftw3 -lint -lderiv
@@ -17,7 +17,7 @@ diff -up cp2k-2.3/arch/Linux-x86-64-gfortran.sopt.r cp2k-2.3/arch/Linux-x86-64-g
  OBJECTS_ARCHITECTURE = machine_gfortran.o
 diff -up cp2k-2.3/makefiles/Makefile.r cp2k-2.3/makefiles/Makefile
 --- cp2k-2.3/makefiles/Makefile.r	2012-08-21 13:35:17.000000000 +0200
-+++ cp2k-2.3/makefiles/Makefile	2012-08-26 00:34:48.000000000 +0200
++++ cp2k-2.3/makefiles/Makefile	2013-02-20 23:50:10.898183206 +0100
 @@ -90,11 +90,11 @@ CLEAN_TARGETS = $(addsuffix /clean ,$(VE
  # lists the targets that are not files
  #
@@ -103,7 +103,18 @@ diff -up cp2k-2.3/makefiles/Makefile.r cp2k-2.3/makefiles/Makefile
  # the rule how to generate the .o from the .F
 diff -up cp2k-2.3/tools/do_regtest.r cp2k-2.3/tools/do_regtest
 --- cp2k-2.3/tools/do_regtest.r	2012-08-21 10:25:41.000000000 +0200
-+++ cp2k-2.3/tools/do_regtest	2012-08-26 00:34:48.000000000 +0200
++++ cp2k-2.3/tools/do_regtest	2013-02-20 23:48:26.059052004 +0100
+@@ -103,8 +103,8 @@ leakcheck="NO"
+ 
+ # *** how to execute an input file [ cp2k_prefix input cp2k_postfix ]
+ # Leave empty for serial, uncomment for parallel
+-cp2k_run_prefix="mpiexec -np 2"
+-#cp2k_run_prefix=""
++#cp2k_run_prefix="mpiexec -np 2"
++cp2k_run_prefix=""
+ cp2k_run_postfix=
+ #cp2k_prefix="( ulimit -t 300; ${dir_base}/${cp2k_dir}/exe/${dir_triplet}/cp2k.${cp2k_version}"
+ #cp2k_postfix=" )"
 @@ -353,9 +353,6 @@ if [[ ${quick} != "quick" ]]; then
     else
        echo "make realclean VERSION=${cp2k_version} went fine"
@@ -125,3 +136,11 @@ diff -up cp2k-2.3/tools/do_regtest.r cp2k-2.3/tools/do_regtest
  echo "-------------------------regtesting cp2k----------------------------------"
  
  ###################################################################################
+@@ -519,6 +520,7 @@ do
+      input_file=`grep -v "#" TEST_FILES | ${awk} -v itest=$itest '{c=c+1;if (c==itest) print $1}'`
+      # just one test right now, but this should generalize
+      test_types=`grep -v "#" TEST_FILES | ${awk} -v itest=$itest '{c=c+1;if (c==itest) print $2}'`
++     echo "Running ${input_file}"
+      output_file=${dir_out}/${dir}/${input_file}.out
+      output_last=${dir_last}/${dir}/${input_file}.out
+      ( ulimit -t ${job_max_time} -v 2000000 ; ${cp2k_prefix} ${input_file} ${cp2k_postfix} &> ${output_file} )

@@ -11,9 +11,9 @@ LD       = gfortran
 AR       = ar -r
 
 CPPFLAGS = 
-DFLAGS   = -D__GFORTRAN -D__FFTSG -D__FFTW3 -D__LIBINT -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6
+DFLAGS   = -D__GFORTRAN -D__FFTSG -D__FFTW3 -D__LIBINT -D__LIBINT_MAX_AM=8 -D__LIBDERIV_MAX_AM1=6
 OPTFLAGS = -O2 -ffast-math -funroll-loops -ftree-vectorize -march=native
-FCFLAGS  = $(OPTFLAGS) -ffree-form $(DFLAGS)
+FCFLAGS  = $(OPTFLAGS) -ffree-form -ffree-line-length-none $(DFLAGS)
 LDFLAGS  = $(FCFLAGS) 
 LIBS     = -llapack -lf77blas -latlas -lfftw3 -lint -lderiv
 
