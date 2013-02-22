@@ -70,6 +70,8 @@ BuildRequires:  openmpi-devel
 BuildRequires:  blacs-openmpi-devel
 BuildRequires:  scalapack-openmpi-devel
 Requires: %{name}-common = %{version}-%{release}
+Requires: blacs-openmpi
+Requires: scalapack-openmpi
 
 %description openmpi
 %{cp2k_desc_base}
@@ -83,6 +85,8 @@ BuildRequires:  mpich2-devel
 BuildRequires:  blacs-mpich2-devel
 BuildRequires:  scalapack-mpich2-devel
 Requires: %{name}-common = %{version}-%{release}
+Requires: blacs-mpich2
+Requires: scalapack-mpich2
 
 %description mpich2
 %{cp2k_desc_base}
@@ -180,6 +184,9 @@ popd
 %{_libdir}/mpich2%{?_opt_cc_suffix}/bin/cp2k.popt_mpich2
 
 %changelog
+* Fri Feb 22 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.4-0.2.20130220
+- add requires for respective blacs and scalapack versions
+
 * Wed Feb 20 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.4-0.1.20130220
 - re-enable regtests
 - update to current SVN trunk (2.4)
