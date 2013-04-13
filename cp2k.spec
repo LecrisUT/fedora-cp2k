@@ -3,7 +3,7 @@
 
 Name: cp2k
 Version: 2.3
-Release: 2.%{?snapshot}%{?dist}
+Release: 3.%{?snapshot}%{?dist}
 Group: Applications/Engineering
 Summary: A molecular dynamics engine capable of classical and Car-Parrinello simulations
 License: GPLv2+
@@ -28,6 +28,8 @@ Source4: cp2k-snapshot.sh
 # use external makedepf90
 # skip compilation during regtests
 Patch0: %{name}-rpm.patch
+# fix crashes in fftw on i686
+Patch1: %{name}-fftw_unaligned.patch
 BuildRequires: atlas-devel
 # for regtests
 BuildRequires: bc
@@ -105,8 +107,12 @@ cp -p %{SOURCE2} arch/Linux-i686-gfortran.ssmp
 cp -p %{SOURCE2} arch/Linux-x86-64-gfortran.ssmp
 cp -p %{SOURCE3} arch/
 %patch0 -p1 -b .r
+%patch1 -p1 -b .fftw_unaligned
 rm -r tools/makedepf90
 chmod -x src/harris_{functional,{env,energy}_types}.F
+%ifarch i686
+sed -i 's/-D__FFTW3/-D__FFTW3 -D__FFTW3_UNALIGNED/g' arch/Linux-i686-gfortran* arch/Linux-gfortran-{mpich2,openmpi}-popt
+%endif
 
 %build
 export FORT_C_NAME=gfortran
@@ -179,6 +185,9 @@ popd
 %{_libdir}/mpich2%{?_opt_cc_suffix}/bin/cp2k.popt_mpich2
 
 %changelog
+* Sat Apr 13 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.3-3.20130220
+- fix crashes in fftw on i686 (patch by Michael Banck)
+
 * Wed Feb 20 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.3-2.20130220
 - update to current SVN 2.3 stable branch
 - re-enable regtests
