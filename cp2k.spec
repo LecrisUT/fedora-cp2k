@@ -111,7 +111,7 @@ cp -p %{SOURCE3} arch/
 rm -r tools/makedepf90
 chmod -x src/harris_{functional,{env,energy}_types}.F
 %ifarch i686
-sed -i 's/-D__FFTW3/-D__FFTW3 -D__FFTW3_UNALIGNED/g' arch/Linux-i686-gfortran* arch/Linux-gfortran-{mpich2,openmpi}-popt
+sed -i 's/-D__FFTW3/-D__FFTW3 -D__FFTW3_UNALIGNED/g' arch/Linux-i686-gfortran* arch/Linux-gfortran-{mpich2,openmpi}.popt
 %endif
 
 %build
