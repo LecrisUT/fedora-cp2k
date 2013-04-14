@@ -1,0 +1,31 @@
+diff -up cp2k-2.3/src/fft_lib/fftw3_lib.F.fftw_unaligned cp2k-2.3/src/fft_lib/fftw3_lib.F
+--- cp2k-2.3/src/fft_lib/fftw3_lib.F.fftw_unaligned	2012-04-18 12:51:33.000000000 +0200
++++ cp2k-2.3/src/fft_lib/fftw3_lib.F	2013-04-13 22:52:25.663811899 +0200
+@@ -127,9 +127,13 @@ SUBROUTINE fftw3_create_plan_3d(plan, zi
+    STOP "fftw3_create_plan_3d"
+   END SELECT
+ 
++#if defined ( __FFTW3_UNALIGNED )
++  fftw_plan_type = fftw_plan_type + FFTW_UNALIGNED
++#else
+   IF ( .NOT. aligned ) THEN
+     fftw_plan_type = fftw_plan_type + FFTW_UNALIGNED
+   END IF
++#endif
+ 
+   n1 = plan%n_3d(1)
+   n2 = plan%n_3d(2)
+@@ -256,9 +260,13 @@ SUBROUTINE fftw3_create_plan_1dm(plan, z
+    STOP "fftw3_create_plan_1dm"
+   END SELECT
+ 
++#if defined ( __FFTW3_UNALIGNED )
++  fftw_plan_type = fftw_plan_type + FFTW_UNALIGNED
++#else
+   IF ( .NOT. aligned ) THEN
+     fftw_plan_type = fftw_plan_type + FFTW_UNALIGNED
+   END IF
++#endif
+ 
+ num_threads = 1
+ !$omp parallel default(none), &
