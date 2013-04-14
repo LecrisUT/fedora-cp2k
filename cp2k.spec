@@ -28,8 +28,6 @@ Source4: cp2k-snapshot.sh
 # use external makedepf90
 # skip compilation during regtests
 Patch0: %{name}-rpm.patch
-# fix crashes in fftw on i686
-Patch1: %{name}-fftw_unaligned.patch
 BuildRequires: atlas-devel
 # for regtests
 BuildRequires: bc
@@ -112,9 +110,9 @@ cp -p %{SOURCE2} arch/Linux-i686-gfortran.ssmp
 cp -p %{SOURCE2} arch/Linux-x86-64-gfortran.ssmp
 cp -p %{SOURCE3} arch/
 %patch0 -p1 -b .r
-%patch1 -p1 -b .fftw_unaligned
 rm -r tools/makedepf90
 chmod -x src/harris_{functional,{env,energy}_types}.F
+# fix crashes in fftw on i686
 %ifarch i686
 sed -i 's/-D__FFTW3/-D__FFTW3 -D__FFTW3_UNALIGNED/g' arch/Linux-i686-gfortran* arch/Linux-gfortran-{mpich2,openmpi}.popt
 %endif
