@@ -3,7 +3,7 @@
 
 Name: cp2k
 Version: 2.4
-Release: 0.3.%{snapshot}%{?dist}
+Release: 0.4.%{snapshot}%{?dist}
 Group: Applications/Engineering
 Summary: A molecular dynamics engine capable of classical and Car-Parrinello simulations
 License: GPLv2+
@@ -28,6 +28,8 @@ Source4: cp2k-snapshot.sh
 # use external makedepf90
 # skip compilation during regtests
 Patch0: %{name}-rpm.patch
+# fix build with gfortran-4.8
+Patch1: %{name}-gfortran48.patch
 BuildRequires: atlas-devel
 # for regtests
 BuildRequires: bc
@@ -110,6 +112,7 @@ cp -p %{SOURCE2} arch/Linux-i686-gfortran.ssmp
 cp -p %{SOURCE2} arch/Linux-x86-64-gfortran.ssmp
 cp -p %{SOURCE3} arch/
 %patch0 -p1 -b .r
+%patch1 -p1 -b .gfortran48
 rm -r tools/makedepf90
 chmod -x src/harris_{functional,{env,energy}_types}.F
 # fix crashes in fftw on i686
@@ -188,6 +191,10 @@ popd
 %{_libdir}/mpich2%{?_opt_cc_suffix}/bin/cp2k.popt_mpich2
 
 %changelog
+* Wed Apr 17 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.4-0.4.20130220
+- fix build with gfortran-4.8
+- link with libf77blas for MPI builds to avoid undefined reference to symbol 'dgemm_'
+
 * Sun Apr 14 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.4-0.3.20130220
 - fix crashes in fftw on i686 (patch by Michael Banck)
 

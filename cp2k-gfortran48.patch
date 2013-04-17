@@ -1,0 +1,21 @@
+diff -up cp2k-2.4/src/dbcsr_lib/dbcsr_dist_operations.F.gfortran48 cp2k-2.4/src/dbcsr_lib/dbcsr_dist_operations.F
+--- cp2k-2.4/src/dbcsr_lib/dbcsr_dist_operations.F.gfortran48	2012-05-31 17:01:33.000000000 +0200
++++ cp2k-2.4/src/dbcsr_lib/dbcsr_dist_operations.F	2013-04-17 23:43:46.677109224 +0200
+@@ -190,7 +190,7 @@ CONTAINS
+   PURE SUBROUTINE get_stored_coordinates_type(matrix, row, column, transpose,&
+        processor)
+     TYPE(dbcsr_type), INTENT(IN)             :: matrix
+-    INTEGER, INTENT(INOUT)                   :: row, column
++    INTEGER, INTENT(IN)                      :: row, column
+     LOGICAL, INTENT(INOUT)                   :: transpose
+     INTEGER, INTENT(OUT), OPTIONAL           :: processor
+ 
+@@ -252,7 +252,7 @@ CONTAINS
+ ! *****************************************************************************
+   SUBROUTINE get_stored_coordinates_obj(matrix, row, column, transpose, processor)
+     TYPE(dbcsr_obj), INTENT(IN)              :: matrix
+-    INTEGER, INTENT(INOUT)                   :: row, column
++    INTEGER, INTENT(IN)                      :: row, column
+     LOGICAL, INTENT(INOUT)                   :: transpose
+     INTEGER, INTENT(OUT), OPTIONAL           :: processor
+ 
