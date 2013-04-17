@@ -28,7 +28,7 @@ Source4: cp2k-snapshot.sh
 # use external makedepf90
 # skip compilation during regtests
 Patch0: %{name}-rpm.patch
-# fix build with gfortran-4.8
+# fix build with gfortran-4.8 (bug #913927)
 Patch1: %{name}-gfortran48.patch
 BuildRequires: atlas-devel
 # for regtests
@@ -192,7 +192,7 @@ popd
 
 %changelog
 * Wed Apr 17 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.4-0.4.20130220
-- fix build with gfortran-4.8
+- fix build with gfortran-4.8 (bug #913927)
 - link with libf77blas for MPI builds to avoid undefined reference to symbol 'dgemm_'
 
 * Sun Apr 14 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.4-0.3.20130220
