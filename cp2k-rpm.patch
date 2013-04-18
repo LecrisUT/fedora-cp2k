@@ -1,23 +1,42 @@
 diff -up cp2k-2.4/arch/Linux-x86-64-gfortran.sopt.r cp2k-2.4/arch/Linux-x86-64-gfortran.sopt
---- cp2k-2.4/arch/Linux-x86-64-gfortran.sopt.r	2010-12-22 17:46:11.000000000 +0100
-+++ cp2k-2.4/arch/Linux-x86-64-gfortran.sopt	2013-01-29 11:37:44.000000000 +0100
-@@ -11,9 +11,10 @@ LD       = gfortran
+--- cp2k-2.4/arch/Linux-x86-64-gfortran.sopt.r	2013-04-18 12:10:47.000000000 +0200
++++ cp2k-2.4/arch/Linux-x86-64-gfortran.sopt	2013-04-18 12:19:18.000000000 +0200
+@@ -12,9 +12,10 @@ LD       = gfortran
  AR       = ar -r
  
  CPPFLAGS = 
--DFLAGS   = -D__GFORTRAN -D__FFTSG -D__FFTW3 
--FCFLAGS  = -O2 -ffast-math -funroll-loops -ftree-vectorize -march=native -ffree-form $(DFLAGS)
-+DFLAGS   = -D__GFORTRAN -D__FFTSG -D__FFTW3 -D__LIBINT -D__LIBINT_MAX_AM=8 -D__LIBDERIV_MAX_AM1=6 -D__LIBXC
-+OPTFLAGS = -O2 -ffast-math -funroll-loops -ftree-vectorize -march=native
+-DFLAGS   = -D__GFORTRAN -D__FFTSG -D__LIBINT -D__FFTW3 -D__HAS_smm_dnn -D__LIBXC2
+-FCFLAGS  = -O3 -march=native -ffast-math -g -ffree-form $(DFLAGS)
+-LDFLAGS  = $(FCFLAGS)  -L/data/vjoost/libint/install/lib/ -L/data/vjoost/libsmm/lib/  -L/opt/intel/composerxe-2011.3.174/mkl/lib/intel64  -L/data/vjoost/libxc-2.0.1/install/lib
+-LIBS     = -lsmm_dnn -lderiv -lint -lstdc++ -lfftw3 -lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lxc
++DFLAGS   = -D__GFORTRAN -D__FFTSG -D__LIBINT -D__FFTW3 -D__LIBXC2 -D__LIBINT_MAX_AM=8 -D__LIBDERIV_MAX_AM1=6
++OPTFLAGS = -O3 -march=native -ffast-math -g -ffree-form
 +FCFLAGS  = $(OPTFLAGS) -ffree-form -ffree-line-length-none $(DFLAGS)
- LDFLAGS  = $(FCFLAGS) 
--LIBS     = -llapack -lblas -lfftw3
++LDFLAGS  = $(FCFLAGS)
 +LIBS     = -llapack -lf77blas -latlas -lfftw3 -lint -lderiv -lxc
  
  OBJECTS_ARCHITECTURE = machine_gfortran.o
+diff -up cp2k-2.4/arch/Linux-x86-64-gfortran.ssmp.r cp2k-2.4/arch/Linux-x86-64-gfortran.ssmp
+--- cp2k-2.4/arch/Linux-x86-64-gfortran.ssmp.r	2013-04-18 12:10:47.000000000 +0200
++++ cp2k-2.4/arch/Linux-x86-64-gfortran.ssmp	2013-04-18 12:24:17.000000000 +0200
+@@ -12,9 +11,10 @@ LD       = gfortran
+ AR       = ar -r
+ 
+ CPPFLAGS = 
+-DFLAGS   = -D__GFORTRAN -D__FFTSG -D__LIBINT -D__FFTW3 -D__HAS_smm_dnn -D__LIBXC2
+-FCFLAGS  = -fopenmp -O3 -march=native -ffast-math -g -ffree-form $(DFLAGS)
+-LDFLAGS  = $(FCFLAGS)  -L/data/vjoost/libint/install/lib/ -L/data/vjoost/libsmm/lib/  -L/opt/intel/composerxe-2011.3.174/mkl/lib/intel64  -L/data/vjoost/libxc-2.0.1/install/lib
+-LIBS     = -lsmm_dnn -lderiv -lint -lstdc++ -lfftw3 -lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lxc
++DFLAGS   = -D__GFORTRAN -D__FFTSG -D__LIBINT -D__FFTW3 -D__LIBXC2 -D__LIBINT_MAX_AM=8 -D__LIBDERIV_MAX_AM1=6
++OPTFLAGS = -O3 -march=native -ffast-math -g
++FCFLAGS  = $(OPTFLAGS) -ffree-form -ffree-line-length-none -fopenmp $(DFLAGS)
++LDFLAGS  = $(FCFLAGS) 
++LIBS     = -llapack -lf77blas -latlas -lfftw3_omp -lfftw3 -lint -lderiv -lxc
+ 
+ OBJECTS_ARCHITECTURE = machine_gfortran.o
 diff -up cp2k-2.4/makefiles/Makefile.r cp2k-2.4/makefiles/Makefile
---- cp2k-2.4/makefiles/Makefile.r	2012-11-02 13:12:37.000000000 +0100
-+++ cp2k-2.4/makefiles/Makefile	2013-01-29 11:37:44.000000000 +0100
+--- cp2k-2.4/makefiles/Makefile.r	2013-04-18 12:08:14.000000000 +0200
++++ cp2k-2.4/makefiles/Makefile	2013-04-18 12:19:18.000000000 +0200
 @@ -93,11 +93,11 @@ CLEAN_TARGETS = $(addsuffix /clean ,$(VE
  # lists the targets that are not files
  #
@@ -107,8 +126,8 @@ diff -up cp2k-2.4/makefiles/Makefile.r cp2k-2.4/makefiles/Makefile
  #
  # the rule how to generate the .o from the .F
 diff -up cp2k-2.4/tools/do_regtest.r cp2k-2.4/tools/do_regtest
---- cp2k-2.4/tools/do_regtest.r	2012-08-21 10:25:41.000000000 +0200
-+++ cp2k-2.4/tools/do_regtest	2013-01-29 21:38:47.000000000 +0100
+--- cp2k-2.4/tools/do_regtest.r	2013-04-18 12:08:49.000000000 +0200
++++ cp2k-2.4/tools/do_regtest	2013-04-18 12:19:18.000000000 +0200
 @@ -103,8 +103,8 @@ leakcheck="NO"
  
  # *** how to execute an input file [ cp2k_prefix input cp2k_postfix ]
@@ -141,7 +160,7 @@ diff -up cp2k-2.4/tools/do_regtest.r cp2k-2.4/tools/do_regtest
  echo "-------------------------regtesting cp2k----------------------------------"
  
  ###################################################################################
-@@ -518,6 +518,7 @@
+@@ -519,6 +520,7 @@ do
       input_file=`grep -v "#" TEST_FILES | ${awk} -v itest=$itest '{c=c+1;if (c==itest) print $1}'`
       # just one test right now, but this should generalize
       test_types=`grep -v "#" TEST_FILES | ${awk} -v itest=$itest '{c=c+1;if (c==itest) print $2}'`
