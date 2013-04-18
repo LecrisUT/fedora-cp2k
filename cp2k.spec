@@ -1,9 +1,9 @@
 %define svn 1
-%define snapshot 20130220
+%define snapshot 20130418
 
 Name: cp2k
 Version: 2.4
-Release: 0.4.%{snapshot}%{?dist}
+Release: 0.5.%{snapshot}%{?dist}
 Group: Applications/Engineering
 Summary: A molecular dynamics engine capable of classical and Car-Parrinello simulations
 License: GPLv2+
@@ -18,7 +18,7 @@ Source0: http://downloads.sourceforge.net/project/cp2k/cp2k-%{version}.tar.bz2
 # also works for mpich2 and possibly others
 # only assumption for mpi library: fortran compiler is named mpif90
 Source1: Linux-gfortran-openmpi.popt
-Source2: Linux-gfortran.ssmp
+Source2: Linux-i686-gfortran.ssmp
 Source3: Linux-i686-gfortran.sopt
 Source4: cp2k-snapshot.sh
 # patch to:
@@ -108,8 +108,7 @@ This package contains the documentation and the manual.
 %setup -q
 cp -p %{SOURCE1} arch/
 cp -p %{SOURCE1} arch/Linux-gfortran-mpich2.popt
-cp -p %{SOURCE2} arch/Linux-i686-gfortran.ssmp
-cp -p %{SOURCE2} arch/Linux-x86-64-gfortran.ssmp
+cp -p %{SOURCE2} arch/
 cp -p %{SOURCE3} arch/
 %patch0 -p1 -b .r
 %patch1 -p1 -b .gfortran48
@@ -121,7 +120,6 @@ sed -i 's/-D__FFTW3/-D__FFTW3 -D__FFTW3_UNALIGNED/g' arch/Linux-i686-gfortran* a
 %endif
 
 %build
-export FORT_C_NAME=gfortran
 pushd makefiles
     %{_openmpi_load}
         make OPTFLAGS="%{optflags} -L%{_libdir}/atlas" %{?_smp_mflags} ARCH="Linux-gfortran-openmpi" VERSION=popt
@@ -135,7 +133,6 @@ popd
 
 %install
 rm -rf %{buildroot}
-export FORT_C_NAME=gfortran
 install -d %{buildroot}%{_bindir}
 %{_openmpi_load}
     mkdir -p %{buildroot}%{_libdir}/openmpi%{?_opt_cc_suffix}/bin/
@@ -153,7 +150,6 @@ rm -rf %{buildroot}
 
 %if 1
 %check
-export FORT_C_NAME=gfortran
 cat > tests/fedora.config << __EOF__
 export LC_ALL=C
 export FORT_C_NAME=gfortran
@@ -191,6 +187,12 @@ popd
 %{_libdir}/mpich2%{?_opt_cc_suffix}/bin/cp2k.popt_mpich2
 
 %changelog
+* Thu Apr 18 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.4-0.5.20130418
+- correct SVN url in snapshot script
+- update to current SVN trunk (r12842)
+- use (and patch) upstream-provided configs for x86_64 ssmp and popt builds
+- no need to force FC=gfortran anymore
+
 * Wed Apr 17 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.4-0.4.20130220
 - fix build with gfortran-4.8 (bug #913927)
 - link with libf77blas for MPI builds to avoid undefined reference to symbol 'dgemm_'

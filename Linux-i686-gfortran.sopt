@@ -1,6 +1,7 @@
 #
-# gfortran arch file, currently for testing gfortran (svn version 4.3)
-# status on http://gcc.gnu.org/bugzilla/show_bug.cgi?id=29975
+# gfortran arch file, recommended to use gfortran >= 4.6
+# building libraries (fftw3, libint, libxc, scalapack, smm) is needed to use this arch file, mkl is assumed but can be replaced by standard blas/lapack/scalapack (see pdbg)
+# sopt is intended for production runs with a serial executable
 #
 CC       = cc
 CPP      = 
@@ -11,10 +12,10 @@ LD       = gfortran
 AR       = ar -r
 
 CPPFLAGS = 
-DFLAGS   = -D__GFORTRAN -D__FFTSG -D__FFTW3 -D__LIBINT -D__LIBINT_MAX_AM=8 -D__LIBDERIV_MAX_AM1=6 -D__LIBXC
-OPTFLAGS = -O2 -ffast-math -funroll-loops -ftree-vectorize -march=native
+DFLAGS   = -D__GFORTRAN -D__FFTSG -D__LIBINT -D__FFTW3 -D__LIBXC2 -D__LIBINT_MAX_AM=8 -D__LIBDERIV_MAX_AM1=6
+OPTFLAGS = -O3 -march=native -ffast-math -g -ffree-form
 FCFLAGS  = $(OPTFLAGS) -ffree-form -ffree-line-length-none $(DFLAGS)
-LDFLAGS  = $(FCFLAGS) 
+LDFLAGS  = $(FCFLAGS)
 LIBS     = -llapack -lf77blas -latlas -lfftw3 -lint -lderiv -lxc
 
 OBJECTS_ARCHITECTURE = machine_gfortran.o
