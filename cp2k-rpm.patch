@@ -13,7 +13,7 @@ diff -up cp2k-2.4/arch/Linux-x86-64-gfortran.sopt.r cp2k-2.4/arch/Linux-x86-64-g
 +OPTFLAGS = -O3 -march=native -ffast-math -g -ffree-form
 +FCFLAGS  = $(OPTFLAGS) -ffree-form -ffree-line-length-none $(DFLAGS)
 +LDFLAGS  = $(FCFLAGS)
-+LIBS     = -llapack -lf77blas -latlas -lfftw3 -lint -lderiv -lxc
++LIBS     = -lderiv -lint -lfftw3 -llapack -lf77blas -latlas -lxc
  
  OBJECTS_ARCHITECTURE = machine_gfortran.o
 diff -up cp2k-2.4/arch/Linux-x86-64-gfortran.ssmp.r cp2k-2.4/arch/Linux-x86-64-gfortran.ssmp
@@ -31,27 +31,25 @@ diff -up cp2k-2.4/arch/Linux-x86-64-gfortran.ssmp.r cp2k-2.4/arch/Linux-x86-64-g
 +OPTFLAGS = -O3 -march=native -ffast-math -g
 +FCFLAGS  = $(OPTFLAGS) -ffree-form -ffree-line-length-none -fopenmp $(DFLAGS)
 +LDFLAGS  = $(FCFLAGS) 
-+LIBS     = -llapack -lf77blas -latlas -lfftw3_omp -lfftw3 -lint -lderiv -lxc
++LIBS     = -lderiv -lint -lfftw3_omp -lfftw3 -llapack -lf77blas -latlas -lxc
  
  OBJECTS_ARCHITECTURE = machine_gfortran.o
 diff -up cp2k-2.4/makefiles/Makefile.r cp2k-2.4/makefiles/Makefile
---- cp2k-2.4/makefiles/Makefile.r	2013-04-18 12:08:14.000000000 +0200
-+++ cp2k-2.4/makefiles/Makefile	2013-04-18 12:19:18.000000000 +0200
-@@ -93,11 +93,11 @@ CLEAN_TARGETS = $(addsuffix /clean ,$(VE
+--- cp2k-2.4/makefiles/Makefile.r	2013-05-27 13:12:21.000000000 +0200
++++ cp2k-2.4/makefiles/Makefile	2013-06-17 18:14:52.704045939 +0200
+@@ -96,17 +96,17 @@ CLEAN_TARGETS = $(addsuffix /clean ,$(VE
  # lists the targets that are not files
  #
  .PHONY : _all libs _progr _lib build clean realclean distclean $(CLEAN_TARGETS)\
 -         $(ALL_TARGETS) $(LIB_TARGETS) $(VERSION_TARGETS) fes dirs deptool\
 +         $(ALL_TARGETS) $(LIB_TARGETS) $(VERSION_TARGETS) fes dirs\
-          dbcsr_test dbcsr_perf mrproper
+          dbcsr_test dbcsr_perf mrproper plumed          
  
  ### Master rules ###
 -build: dirs deptool
 +build: dirs
  	+$(MAKE) -C $(SRCDIR) -f $(MAKEFILE) all.dep
- 	+$(MAKE) -C $(SRCDIR)/lib -f $(MAKEFILE) lib.dep
- 	+$(MAKE) -C $(SRCDIR)/dbcsr_lib -f $(MAKEFILE) dbcsr.dep
-@@ -108,7 +108,7 @@ build: dirs deptool
+ 	+cp $(LIBCUDA_DEPENDENCIES) $(OBJDIR)/$(VERSION)/libc_cuda.dep
  	+cp $(LIBMA_DEPENDENCIES) $(OBJDIR)/$(VERSION)/libc_ma.dep
  	+$(MAKE) -C $(OBJDIR)/$(VERSION) -f $(MAKEFILE) $(WHAT)
  
@@ -60,7 +58,7 @@ diff -up cp2k-2.4/makefiles/Makefile.r cp2k-2.4/makefiles/Makefile
  	+$(MAKE) -C $(TOOLSRC)/metadyn/  -f $(MAKEFILE) fes.dep
  	+$(MAKE) -C $(OBJDIR)/$(VERSION) -f $(MAKEFILE) HACKLIBDEP=yes VERSION=$(VERSION) $(FES) 
  
-@@ -129,9 +129,6 @@ pretty: dirs
+@@ -127,9 +127,6 @@ pretty: dirs
  	+$(MAKE) -C $(SRCDIR)/arch_lib  -f $(MAKEFILE) _pretty_lib4
  	+$(MAKE) -C $(SRCDIR)/elpa_lib  -f $(MAKEFILE) _pretty_lib5
  
@@ -70,7 +68,7 @@ diff -up cp2k-2.4/makefiles/Makefile.r cp2k-2.4/makefiles/Makefile
  libs:
  	+$(MAKE) -f $(MAKEFILE) VERSION=$(VERSION) WHAT=_lib build
  all:
-@@ -150,7 +147,7 @@ dbcsr_perf:
+@@ -154,7 +151,7 @@ plumedobj: dirs
  #
  # on a parallel build only one task should go a build the deptool
  #
@@ -79,43 +77,32 @@ diff -up cp2k-2.4/makefiles/Makefile.r cp2k-2.4/makefiles/Makefile
  	+$(MAKE) -f $(MAKEFILE) VERSION=$@ build
  
  $(CLEAN_TARGETS):
-@@ -251,28 +248,28 @@ all.dep: $(OBJECTS:.o=.F) $(LIB1_OBJECTS
- ifeq ($(HACKDEP),yes)
- 	echo $^ | awk '{for (i=1;i<=NF;i++) {obj=$$(i) ; sub(".F",".o",obj); if ($$(i)!=obj) print obj,":",$$(i) }}' > $(OBJDIR)/$(VERSION)/all.dep
+@@ -269,13 +266,13 @@ ifeq ($(HACKDEP),yes)
+ 	echo $(ALL_SOURCE_FILES) | awk '{for (i=1;i<=NF;i++) {obj=$$(i) ; sub(".F",".o",obj); if ($$(i)!=obj) print obj,":",$$(i) }}' > $(OBJDIR)/$(VERSION)/all.dep
  else
--	$(TOOLDIR)/makedepf90 $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/all.dep || ( rm -f $(OBJDIR)/$(VERSION)/all.dep  ; exit 1 )
-+	makedepf90 $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/all.dep || ( rm -f $(OBJDIR)/$(VERSION)/all.dep  ; exit 1 )
- endif
- 
- lib.dep: $(LIB1_OBJECTS:.o=.F)
--	$(TOOLDIR)/makedepf90 $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/lib.dep || ( rm -f $(OBJDIR)/$(VERSION)/lib.dep ; exit 1 )
-+	makedepf90 $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/lib.dep || ( rm -f $(OBJDIR)/$(VERSION)/lib.dep ; exit 1 )
- 
- fft.dep: $(LIB2_OBJECTS:.o=.F)
--	$(TOOLDIR)/makedepf90 $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/fft.dep || ( rm -f $(OBJDIR)/$(VERSION)/fft.dep ; exit 1 )
-+	makedepf90 $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/fft.dep || ( rm -f $(OBJDIR)/$(VERSION)/fft.dep ; exit 1 )
- 
- dbcsr.dep: $(LIB3_OBJECTS:.o=.F) $(LIB4_OBJECTS:.o=.F)
--	$(TOOLDIR)/makedepf90 $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/dbcsr.dep || ( rm -f $(OBJDIR)/$(VERSION)/dbcsr.dep ; exit 1 )
-+	makedepf90 $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/dbcsr.dep || ( rm -f $(OBJDIR)/$(VERSION)/dbcsr.dep ; exit 1 )
- 
- ma.dep: $(LIB4_OBJECTS:.o=.F) machine.F message_passing.F mathlib.F
--	$(TOOLDIR)/makedepf90 $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/ma.dep || ( rm -f $(OBJDIR)/$(VERSION)/ma.dep ; exit 1 )
-+	makedepf90 $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/ma.dep || ( rm -f $(OBJDIR)/$(VERSION)/ma.dep ; exit 1 )
- 
- elpa.dep: $(LIB5_OBJECTS:.o=.F)
--	$(TOOLDIR)/makedepf90 $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/elpa.dep || ( rm -f $(OBJDIR)/$(VERSION)/elpa.dep ; exit 1 )
-+	makedepf90 $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/elpa.dep || ( rm -f $(OBJDIR)/$(VERSION)/elpa.dep ; exit 1 )
- 
+    ifeq ($(MC),)
+-	$(TOOLDIR)/makedepf90 -I $(SRCDIRS) $(MODSTRING) -free $(ALL_SOURCE_FILES) > $(OBJDIR)/$(VERSION)/all.dep || ( rm -f $(OBJDIR)/$(VERSION)/all.dep  ; exit 1 )
++	makedepf90 -I $(SRCDIRS) $(MODSTRING) -free $(ALL_SOURCE_FILES) > $(OBJDIR)/$(VERSION)/all.dep || ( rm -f $(OBJDIR)/$(VERSION)/all.dep  ; exit 1 )
+    else
+ # if MC is defined, it is our 'module compiler' which generates the .mod file from the source file
+ # it is useful in a two-stage compile. Therefore we split the dependency in two parts the .o and the .mod.
+ # the awk below assumes our current rule of one mod per file
+ # The current module compiler is 'gfortran -fsyntax-only ' which should work fine for gfortran 4.8.0 and higher.
+-	$(TOOLDIR)/makedepf90 -I $(SRCDIRS) $(MODSTRING) -free $(ALL_SOURCE_FILES) | \
++	makedepf90 -I $(SRCDIRS) $(MODSTRING) -free $(ALL_SOURCE_FILES) | \
+             awk '{deps=substr($$0,index($$0,":"),length($$0)-index($$0,":")+1); if ($$2==":") { print $$1,deps } else {print $$2,deps ; print $$1,deps,$$2 }}' > \
+             $(OBJDIR)/$(VERSION)/all.dep || ( rm -f $(OBJDIR)/$(VERSION)/all.dep  ; exit 1 )
+    endif
+@@ -283,7 +280,7 @@ endif
  
  # this is kind of a hack, fes depends on files in other directories, hence the -I and the -b.
  fes.dep: $(FESOBJS:.o=.F) 
 -	$(TOOLDIR)/makedepf90 -I$(SRCDIR) -b. $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/fes.dep || ( rm -f $(OBJDIR)/$(VERSION)/fes.dep  ; exit 1 )
 +	makedepf90 -I$(SRCDIR) -b. $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/fes.dep || ( rm -f $(OBJDIR)/$(VERSION)/fes.dep  ; exit 1 )
  
- #
- # and the rules doing the actual work
-@@ -387,9 +384,6 @@ dbcsr_performance_driver.o: $(LIB3_ARCHI
+ plumed.dep: $(OBJECTS:.o=.F) $(LIB1_OBJECTS:.o=.F) $(LIB2_OBJECTS:.o=.F) $(LIB4_OBJECTS:.o=.F) $(LIB3_OBJECTS:.o=.F) $(LIB5_OBJECTS:.o=.F) cp_common_uses.h src-plumed/metadyn.h cp2k.F 
+ 
+@@ -412,9 +409,6 @@ dbcsr_performance_driver.o: $(LIB3_ARCHI
  #
  # these are tools, but their integration in the build is ugly at least (e.g. see dependencies).
  #
@@ -126,8 +113,8 @@ diff -up cp2k-2.4/makefiles/Makefile.r cp2k-2.4/makefiles/Makefile
  #
  # the rule how to generate the .o from the .F
 diff -up cp2k-2.4/tools/do_regtest.r cp2k-2.4/tools/do_regtest
---- cp2k-2.4/tools/do_regtest.r	2013-04-18 12:08:49.000000000 +0200
-+++ cp2k-2.4/tools/do_regtest	2013-04-18 12:19:18.000000000 +0200
+--- cp2k-2.4/tools/do_regtest.r	2012-08-21 10:25:41.000000000 +0200
++++ cp2k-2.4/tools/do_regtest	2013-06-17 18:09:22.516209901 +0200
 @@ -103,8 +103,8 @@ leakcheck="NO"
  
  # *** how to execute an input file [ cp2k_prefix input cp2k_postfix ]

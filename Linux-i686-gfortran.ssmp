@@ -1,6 +1,7 @@
 #
-# gfortran arch file, currently for testing gfortran (svn version 4.3)
-# status on http://gcc.gnu.org/bugzilla/show_bug.cgi?id=29975
+# gfortran arch file, recommended to use gfortran >= 4.6
+# building libraries (fftw3, libint, libxc, scalapack, smm) is needed to use this arch file, mkl is assumed but can be replaced by standard blas/lapack/scalapack (see pdbg)
+# ssmp is intended for production runs with a multi-threaded executable
 #
 CC       = cc
 CPP      = 
@@ -15,6 +16,6 @@ DFLAGS   = -D__GFORTRAN -D__FFTSG -D__LIBINT -D__FFTW3 -D__LIBXC2 -D__LIBINT_MAX
 OPTFLAGS = -O3 -march=native -ffast-math -g
 FCFLAGS  = $(OPTFLAGS) -ffree-form -ffree-line-length-none -fopenmp $(DFLAGS)
 LDFLAGS  = $(FCFLAGS) 
-LIBS     = -llapack -lf77blas -latlas -lfftw3_omp -lfftw3 -lint -lderiv -lxc
+LIBS     = -lderiv -lint -lfftw3_omp -lfftw3 -llapack -lf77blas -latlas -lxc
 
 OBJECTS_ARCHITECTURE = machine_gfortran.o

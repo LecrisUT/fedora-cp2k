@@ -1,9 +1,9 @@
-%define svn 1
+%define svn 0
 %define snapshot 20130418
 
 Name: cp2k
 Version: 2.4
-Release: 0.5.%{snapshot}%{?dist}
+Release: 1%{?dist}
 Group: Applications/Engineering
 Summary: A molecular dynamics engine capable of classical and Car-Parrinello simulations
 License: GPLv2+
@@ -28,8 +28,6 @@ Source4: cp2k-snapshot.sh
 # use external makedepf90
 # skip compilation during regtests
 Patch0: %{name}-rpm.patch
-# fix build with gfortran-4.8 (bug #913927)
-Patch1: %{name}-gfortran48.patch
 BuildRequires: atlas-devel
 # for regtests
 BuildRequires: bc
@@ -111,7 +109,6 @@ cp -p %{SOURCE1} arch/Linux-gfortran-mpich2.popt
 cp -p %{SOURCE2} arch/
 cp -p %{SOURCE3} arch/
 %patch0 -p1 -b .r
-%patch1 -p1 -b .gfortran48
 rm -r tools/makedepf90
 chmod -x src/harris_{functional,{env,energy}_types}.F
 # fix crashes in fftw on i686
@@ -136,11 +133,11 @@ rm -rf %{buildroot}
 install -d %{buildroot}%{_bindir}
 %{_openmpi_load}
     mkdir -p %{buildroot}%{_libdir}/openmpi%{?_opt_cc_suffix}/bin/
-    install -pm755 exe/Linux-gfortran-openmpi/cp2k.popt %{buildroot}%{_libdir}/openmpi%{?_opt_cc_suffix}/bin/cp2k.popt_openmpi
+    install -pm755 exe/Linux-gfortran-openmpi/cp2k.popt %{buildroot}%{_libdir}/openmpi%{?_opt_cc_suffix}/bin/
 %{_openmpi_unload}
 %{_mpich2_load}
     mkdir -p %{buildroot}%{_libdir}/mpich2%{?_opt_cc_suffix}/bin/
-    install -pm755 exe/Linux-gfortran-mpich2/cp2k.popt %{buildroot}%{_libdir}/mpich2%{?_opt_cc_suffix}/bin/cp2k.popt_mpich2
+    install -pm755 exe/Linux-gfortran-mpich2/cp2k.popt %{buildroot}%{_libdir}/mpich2%{?_opt_cc_suffix}/bin/
 %{_mpich2_unload}
 install -pm755 exe/`tools/get_arch_code`/cp2k.sopt %{buildroot}%{_bindir}
 install -pm755 exe/`tools/get_arch_code`/cp2k.ssmp %{buildroot}%{_bindir}
@@ -152,7 +149,6 @@ rm -rf %{buildroot}
 %check
 cat > tests/fedora.config << __EOF__
 export LC_ALL=C
-export FORT_C_NAME=gfortran
 dir_base=%{_builddir}
 cp2k_version=sopt
 dir_triplet=`tools/get_arch_code`
@@ -180,13 +176,19 @@ popd
 
 %files openmpi
 %defattr(-,root,root,-)
-%{_libdir}/openmpi%{?_opt_cc_suffix}/bin/cp2k.popt_openmpi
+%{_libdir}/openmpi%{?_opt_cc_suffix}/bin/cp2k.popt
 
 %files mpich2
 %defattr(-,root,root,-)
-%{_libdir}/mpich2%{?_opt_cc_suffix}/bin/cp2k.popt_mpich2
+%{_libdir}/mpich2%{?_opt_cc_suffix}/bin/cp2k.popt
 
 %changelog
+* Mon Jun 17 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.4-1
+- update to 2.4 release
+- drop gfortran-4.8 patch (fixed upstream)
+- reorder libraries in LDFLAGS again to follow current upstream config
+- rename both MPI binaries to cp2k.popt
+
 * Thu Apr 18 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.4-0.5.20130418
 - correct SVN url in snapshot script
 - update to current SVN trunk (r12842)

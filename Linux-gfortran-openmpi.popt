@@ -16,6 +16,6 @@ DFLAGS   = -D__GFORTRAN -D__FFTSG -D__LIBINT -D__FFTW3 -D__parallel -D__SCALAPAC
 OPTFLAGS = -O3 -march=native -ffast-math -funroll-loops -g
 FCFLAGS  = $(OPTFLAGS) -ffree-form -ffree-line-length-none $(DFLAGS)
 LDFLAGS  = $(FCFLAGS)
-LIBS     = -lstdc++ -llapack -lscalapack -lf77blas -lmpiblacsF77init -lmpiblacs -lmpiblacsCinit -lfftw3 -lint -lderiv -lxc
+LIBS     = -lderiv -lint -lfftw3 -lstdc++ -llapack -lscalapack -lf77blas -lmpiblacsF77init -lmpiblacs -lmpiblacsCinit -lxc
 
 OBJECTS_ARCHITECTURE = machine_gfortran.o

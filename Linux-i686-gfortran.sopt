@@ -16,6 +16,6 @@ DFLAGS   = -D__GFORTRAN -D__FFTSG -D__LIBINT -D__FFTW3 -D__LIBXC2 -D__LIBINT_MAX
 OPTFLAGS = -O3 -march=native -ffast-math -g -ffree-form
 FCFLAGS  = $(OPTFLAGS) -ffree-form -ffree-line-length-none $(DFLAGS)
 LDFLAGS  = $(FCFLAGS)
-LIBS     = -llapack -lf77blas -latlas -lfftw3 -lint -lderiv -lxc
+LIBS     = -lderiv -lint -lfftw3 -llapack -lf77blas -latlas -lxc
 
 OBJECTS_ARCHITECTURE = machine_gfortran.o
