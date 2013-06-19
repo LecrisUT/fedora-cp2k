@@ -176,11 +176,11 @@ popd
 
 %files openmpi
 %defattr(-,root,root,-)
-%{_libdir}/openmpi%{?_opt_cc_suffix}/bin/cp2k.popt
+%{_libdir}/openmpi%{?_opt_cc_suffix}/bin/cp2k.popt_openmpi
 
 %files mpich2
 %defattr(-,root,root,-)
-%{_libdir}/mpich2%{?_opt_cc_suffix}/bin/cp2k.popt
+%{_libdir}/mpich2%{?_opt_cc_suffix}/bin/cp2k.popt_mpich2
 
 %changelog
 * Wed Jun 19 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.4-2
