@@ -3,7 +3,7 @@
 
 Name: cp2k
 Version: 2.4
-Release: 1%{?dist}
+Release: 2%{?dist}
 Group: Applications/Engineering
 Summary: A molecular dynamics engine capable of classical and Car-Parrinello simulations
 License: GPLv2+
@@ -133,11 +133,11 @@ rm -rf %{buildroot}
 install -d %{buildroot}%{_bindir}
 %{_openmpi_load}
     mkdir -p %{buildroot}%{_libdir}/openmpi%{?_opt_cc_suffix}/bin/
-    install -pm755 exe/Linux-gfortran-openmpi/cp2k.popt %{buildroot}%{_libdir}/openmpi%{?_opt_cc_suffix}/bin/
+    install -pm755 exe/Linux-gfortran-openmpi/cp2k.popt %{buildroot}%{_libdir}/openmpi%{?_opt_cc_suffix}/bin/cp2k.popt_openmpi
 %{_openmpi_unload}
 %{_mpich2_load}
     mkdir -p %{buildroot}%{_libdir}/mpich2%{?_opt_cc_suffix}/bin/
-    install -pm755 exe/Linux-gfortran-mpich2/cp2k.popt %{buildroot}%{_libdir}/mpich2%{?_opt_cc_suffix}/bin/
+    install -pm755 exe/Linux-gfortran-mpich2/cp2k.popt %{buildroot}%{_libdir}/mpich2%{?_opt_cc_suffix}/bin/cp2k.popt_mpich2
 %{_mpich2_unload}
 install -pm755 exe/`tools/get_arch_code`/cp2k.sopt %{buildroot}%{_bindir}
 install -pm755 exe/`tools/get_arch_code`/cp2k.ssmp %{buildroot}%{_bindir}
@@ -183,6 +183,9 @@ popd
 %{_libdir}/mpich2%{?_opt_cc_suffix}/bin/cp2k.popt
 
 %changelog
+* Wed Jun 19 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.4-2
+- add MPI implementation suffix back to MPI binaries (required by guidelines)
+
 * Mon Jun 17 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.4-1
 - update to 2.4 release
 - drop gfortran-4.8 patch (fixed upstream)
