@@ -3,7 +3,7 @@
 
 Name: cp2k
 Version: 2.4
-Release: 2%{?dist}
+Release: 3%{?dist}
 Group: Applications/Engineering
 Summary: A molecular dynamics engine capable of classical and Car-Parrinello simulations
 License: GPLv2+
@@ -14,17 +14,11 @@ Source0: cp2k-%{version}-%{snapshot}.tar.bz2
 %else
 Source0: http://downloads.sourceforge.net/project/cp2k/cp2k-%{version}.tar.bz2
 %endif
-# custom openmpi arch file
-# also works for mpich2 and possibly others
-# only assumption for mpi library: fortran compiler is named mpif90
-Source1: Linux-gfortran-openmpi.popt
-Source2: Linux-i686-gfortran.ssmp
-Source3: Linux-i686-gfortran.sopt
 Source4: cp2k-snapshot.sh
 # patch to:
 # use rpm optflags
 # link with atlas instead of vanilla blas/lapack
-# link with libint
+# build with libint and libxc
 # use external makedepf90
 # skip compilation during regtests
 Patch0: %{name}-rpm.patch
@@ -38,6 +32,8 @@ BuildRequires: libxc-devel
 BuildRequires: makedepf90
 BuildRequires: /bin/hostname
 Requires: %{name}-common = %{version}-%{release}
+Obsoletes: %{name}-smp < 2.4-3
+Provides: %{name}-smp = %{version}-%{release}
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %global cp2k_desc_base \
@@ -51,17 +47,7 @@ many-body potentials.
 %description
 %{cp2k_desc_base}
 
-This package contains the single process version.
-
-%package smp
-Group: Applications/Engineering
-Summary: Molecular simulations software - OpenMP version
-Requires: %{name}-common = %{version}-%{release}
-
-%description smp
-%{cp2k_desc_base}
-
-This package contains the multi-threaded version (using OpenMP).
+This package contains the non-MPI single process and multi-threaded versions.
 
 %package openmpi
 Group: Applications/Engineering
@@ -76,7 +62,8 @@ Requires: scalapack-openmpi
 %description openmpi
 %{cp2k_desc_base}
 
-This package contains the multi-threaded version (using OpenMPI).
+This package contains the parallel single- and multi-threaded versions
+using OpenMPI.
 
 %package mpich2
 Group: Applications/Engineering
@@ -91,7 +78,8 @@ Requires: scalapack-mpich2
 %description mpich2
 %{cp2k_desc_base}
 
-This package contains the multi-threaded version (using mpich2).
+This package contains the parallel single- and multi-threaded versions
+using mpich2.
 
 %package common
 Group: Applications/Engineering
@@ -104,43 +92,53 @@ This package contains the documentation and the manual.
 
 %prep
 %setup -q
-cp -p %{SOURCE1} arch/
-cp -p %{SOURCE1} arch/Linux-gfortran-mpich2.popt
-cp -p %{SOURCE2} arch/
-cp -p %{SOURCE3} arch/
+TARGET=$(tools/get_arch_code)
+%ifnarch x86_64
+ln -s Linux-x86-64-gfortran.sopt arch/${TARGET}.sopt
+ln -s Linux-x86-64-gfortran.ssmp arch/${TARGET}.ssmp
+%endif
+ln -s Linux-x86-64-gfortran.popt arch/${TARGET}-openmpi.popt
+ln -s Linux-x86-64-gfortran.popt arch/${TARGET}-mpich2.popt
+ln -s Linux-x86-64-gfortran.psmp arch/${TARGET}-openmpi.psmp
+ln -s Linux-x86-64-gfortran.psmp arch/${TARGET}-mpich2.psmp
 %patch0 -p1 -b .r
 rm -r tools/makedepf90
 chmod -x src/harris_{functional,{env,energy}_types}.F
 # fix crashes in fftw on i686
 %ifarch i686
-sed -i 's/-D__FFTW3/-D__FFTW3 -D__FFTW3_UNALIGNED/g' arch/Linux-i686-gfortran* arch/Linux-gfortran-{mpich2,openmpi}.popt
+sed -i 's/-D__FFTW3/-D__FFTW3 -D__FFTW3_UNALIGNED/g' arch/Linux-i686-gfortran*
 %endif
 
 %build
+TARGET=$(tools/get_arch_code)
 pushd makefiles
     %{_openmpi_load}
-        make OPTFLAGS="%{optflags} -L%{_libdir}/atlas" %{?_smp_mflags} ARCH="Linux-gfortran-openmpi" VERSION=popt
+        make OPTFLAGS="%{optflags} -L%{_libdir}/atlas" %{?_smp_mflags} ARCH="${TARGET}-openmpi" VERSION=popt
+        make OPTFLAGS="%{optflags} -L%{_libdir}/atlas" %{?_smp_mflags} ARCH="${TARGET}-openmpi" VERSION=psmp
     %{_openmpi_unload}
     %{_mpich2_load}
-        make OPTFLAGS="%{optflags} -L%{_libdir}/atlas" %{?_smp_mflags} ARCH="Linux-gfortran-mpich2" VERSION=popt
+        make OPTFLAGS="%{optflags} -L%{_libdir}/atlas" %{?_smp_mflags} ARCH="${TARGET}-mpich2" VERSION=popt
+        make OPTFLAGS="%{optflags} -L%{_libdir}/atlas" %{?_smp_mflags} ARCH="${TARGET}-mpich2" VERSION=psmp
     %{_mpich2_unload}
 
     make OPTFLAGS="%{optflags} -L%{_libdir}/atlas" %{?_smp_mflags} sopt ssmp
 popd
 
 %install
-rm -rf %{buildroot}
+TARGET=$(tools/get_arch_code)
 install -d %{buildroot}%{_bindir}
 %{_openmpi_load}
     mkdir -p %{buildroot}%{_libdir}/openmpi%{?_opt_cc_suffix}/bin/
-    install -pm755 exe/Linux-gfortran-openmpi/cp2k.popt %{buildroot}%{_libdir}/openmpi%{?_opt_cc_suffix}/bin/cp2k.popt_openmpi
+    install -pm755 exe/${TARGET}-openmpi/cp2k.popt %{buildroot}%{_libdir}/openmpi%{?_opt_cc_suffix}/bin/cp2k.popt_openmpi
+    install -pm755 exe/${TARGET}-openmpi/cp2k.psmp %{buildroot}%{_libdir}/openmpi%{?_opt_cc_suffix}/bin/cp2k.psmp_openmpi
 %{_openmpi_unload}
 %{_mpich2_load}
     mkdir -p %{buildroot}%{_libdir}/mpich2%{?_opt_cc_suffix}/bin/
-    install -pm755 exe/Linux-gfortran-mpich2/cp2k.popt %{buildroot}%{_libdir}/mpich2%{?_opt_cc_suffix}/bin/cp2k.popt_mpich2
+    install -pm755 exe/${TARGET}-mpich2/cp2k.popt %{buildroot}%{_libdir}/mpich2%{?_opt_cc_suffix}/bin/cp2k.popt_mpich2
+    install -pm755 exe/${TARGET}-mpich2/cp2k.psmp %{buildroot}%{_libdir}/mpich2%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich2
 %{_mpich2_unload}
-install -pm755 exe/`tools/get_arch_code`/cp2k.sopt %{buildroot}%{_bindir}
-install -pm755 exe/`tools/get_arch_code`/cp2k.ssmp %{buildroot}%{_bindir}
+install -pm755 exe/${TARGET}/cp2k.sopt %{buildroot}%{_bindir}
+install -pm755 exe/${TARGET}/cp2k.ssmp %{buildroot}%{_bindir}
 
 %clean
 rm -rf %{buildroot}
@@ -169,20 +167,25 @@ popd
 %files
 %defattr(-,root,root,-)
 %{_bindir}/cp2k.sopt
-
-%files smp
-%defattr(-,root,root,-)
 %{_bindir}/cp2k.ssmp
 
 %files openmpi
 %defattr(-,root,root,-)
 %{_libdir}/openmpi%{?_opt_cc_suffix}/bin/cp2k.popt_openmpi
+%{_libdir}/openmpi%{?_opt_cc_suffix}/bin/cp2k.psmp_openmpi
 
 %files mpich2
 %defattr(-,root,root,-)
 %{_libdir}/mpich2%{?_opt_cc_suffix}/bin/cp2k.popt_mpich2
+%{_libdir}/mpich2%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich2
 
 %changelog
+* Tue Jul 02 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.4-3
+- build psmp variants (MPI+OpenMP)
+- move ssmp build to main package and drop smp subpackage
+- drop local config files, patch upstream's and symlink when necessary
+- save the output of tools/get_arch_code and re-use it
+
 * Wed Jun 19 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.4-2
 - add MPI implementation suffix back to MPI binaries (required by guidelines)
 
