@@ -3,7 +3,7 @@
 
 Name: cp2k
 Version: 2.4
-Release: 3%{?dist}
+Release: 4%{?dist}
 Group: Applications/Engineering
 Summary: A molecular dynamics engine capable of classical and Car-Parrinello simulations
 License: GPLv2+
@@ -180,6 +180,9 @@ popd
 %{_libdir}/mpich2%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich2
 
 %changelog
+* Sun Jul 14 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.4-4
+- rebuild for new OpenMPI
+
 * Tue Jul 02 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.4-3
 - build psmp variants (MPI+OpenMP)
 - move ssmp build to main package and drop smp subpackage
