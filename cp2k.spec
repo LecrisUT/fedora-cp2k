@@ -3,7 +3,7 @@
 
 Name: cp2k
 Version: 2.4
-Release: 4%{?dist}
+Release: 5%{?dist}
 Group: Applications/Engineering
 Summary: A molecular dynamics engine capable of classical and Car-Parrinello simulations
 License: GPLv2+
@@ -65,21 +65,23 @@ Requires: scalapack-openmpi
 This package contains the parallel single- and multi-threaded versions
 using OpenMPI.
 
-%package mpich2
+%package mpich
 Group: Applications/Engineering
-Summary: Molecular simulations software - mpich2 version
-BuildRequires:  mpich2-devel
-BuildRequires:  blacs-mpich2-devel
-BuildRequires:  scalapack-mpich2-devel
+Summary: Molecular simulations software - mpich version
+BuildRequires:  mpich-devel
+BuildRequires:  blacs-mpich-devel
+BuildRequires:  scalapack-mpich-devel
 Requires: %{name}-common = %{version}-%{release}
-Requires: blacs-mpich2
-Requires: scalapack-mpich2
+Requires: blacs-mpich
+Requires: scalapack-mpich
+Provides: %{name}-mpich2 = %{version}-%{release}
+Obsoletes: %{name}-mpich2 < 2.4-5
 
-%description mpich2
+%description mpich
 %{cp2k_desc_base}
 
 This package contains the parallel single- and multi-threaded versions
-using mpich2.
+using mpich.
 
 %package common
 Group: Applications/Engineering
@@ -98,9 +100,9 @@ ln -s Linux-x86-64-gfortran.sopt arch/${TARGET}.sopt
 ln -s Linux-x86-64-gfortran.ssmp arch/${TARGET}.ssmp
 %endif
 ln -s Linux-x86-64-gfortran.popt arch/${TARGET}-openmpi.popt
-ln -s Linux-x86-64-gfortran.popt arch/${TARGET}-mpich2.popt
+ln -s Linux-x86-64-gfortran.popt arch/${TARGET}-mpich.popt
 ln -s Linux-x86-64-gfortran.psmp arch/${TARGET}-openmpi.psmp
-ln -s Linux-x86-64-gfortran.psmp arch/${TARGET}-mpich2.psmp
+ln -s Linux-x86-64-gfortran.psmp arch/${TARGET}-mpich.psmp
 %patch0 -p1 -b .r
 rm -r tools/makedepf90
 chmod -x src/harris_{functional,{env,energy}_types}.F
@@ -116,10 +118,10 @@ pushd makefiles
         make OPTFLAGS="%{optflags} -L%{_libdir}/atlas" %{?_smp_mflags} ARCH="${TARGET}-openmpi" VERSION=popt
         make OPTFLAGS="%{optflags} -L%{_libdir}/atlas" %{?_smp_mflags} ARCH="${TARGET}-openmpi" VERSION=psmp
     %{_openmpi_unload}
-    %{_mpich2_load}
-        make OPTFLAGS="%{optflags} -L%{_libdir}/atlas" %{?_smp_mflags} ARCH="${TARGET}-mpich2" VERSION=popt
-        make OPTFLAGS="%{optflags} -L%{_libdir}/atlas" %{?_smp_mflags} ARCH="${TARGET}-mpich2" VERSION=psmp
-    %{_mpich2_unload}
+    %{_mpich_load}
+        make OPTFLAGS="%{optflags} -L%{_libdir}/atlas" %{?_smp_mflags} ARCH="${TARGET}-mpich" VERSION=popt
+        make OPTFLAGS="%{optflags} -L%{_libdir}/atlas" %{?_smp_mflags} ARCH="${TARGET}-mpich" VERSION=psmp
+    %{_mpich_unload}
 
     make OPTFLAGS="%{optflags} -L%{_libdir}/atlas" %{?_smp_mflags} sopt ssmp
 popd
@@ -132,11 +134,11 @@ install -d %{buildroot}%{_bindir}
     install -pm755 exe/${TARGET}-openmpi/cp2k.popt %{buildroot}%{_libdir}/openmpi%{?_opt_cc_suffix}/bin/cp2k.popt_openmpi
     install -pm755 exe/${TARGET}-openmpi/cp2k.psmp %{buildroot}%{_libdir}/openmpi%{?_opt_cc_suffix}/bin/cp2k.psmp_openmpi
 %{_openmpi_unload}
-%{_mpich2_load}
-    mkdir -p %{buildroot}%{_libdir}/mpich2%{?_opt_cc_suffix}/bin/
-    install -pm755 exe/${TARGET}-mpich2/cp2k.popt %{buildroot}%{_libdir}/mpich2%{?_opt_cc_suffix}/bin/cp2k.popt_mpich2
-    install -pm755 exe/${TARGET}-mpich2/cp2k.psmp %{buildroot}%{_libdir}/mpich2%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich2
-%{_mpich2_unload}
+%{_mpich_load}
+    mkdir -p %{buildroot}%{_libdir}/mpich%{?_opt_cc_suffix}/bin/
+    install -pm755 exe/${TARGET}-mpich/cp2k.popt %{buildroot}%{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.popt_mpich
+    install -pm755 exe/${TARGET}-mpich/cp2k.psmp %{buildroot}%{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich
+%{_mpich_unload}
 install -pm755 exe/${TARGET}/cp2k.sopt %{buildroot}%{_bindir}
 install -pm755 exe/${TARGET}/cp2k.ssmp %{buildroot}%{_bindir}
 
@@ -174,12 +176,15 @@ popd
 %{_libdir}/openmpi%{?_opt_cc_suffix}/bin/cp2k.popt_openmpi
 %{_libdir}/openmpi%{?_opt_cc_suffix}/bin/cp2k.psmp_openmpi
 
-%files mpich2
+%files mpich
 %defattr(-,root,root,-)
-%{_libdir}/mpich2%{?_opt_cc_suffix}/bin/cp2k.popt_mpich2
-%{_libdir}/mpich2%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich2
+%{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.popt_mpich
+%{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich
 
 %changelog
+* Sat Jul 20 2013 Deji Akingunola <dakingun@gmail.com> - 2.4-5
+- Rename mpich2 sub-packages to mpich and rebuild for mpich-3.0
+
 * Sun Jul 14 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.4-4
 - rebuild for new OpenMPI
 
