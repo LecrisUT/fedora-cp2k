@@ -3,7 +3,7 @@
 
 Name: cp2k
 Version: 2.4
-Release: 5%{?dist}
+Release: 6%{?dist}
 Group: Applications/Engineering
 Summary: A molecular dynamics engine capable of classical and Car-Parrinello simulations
 License: GPLv2+
@@ -182,6 +182,9 @@ popd
 %{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich
 
 %changelog
+* Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.4-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
+
 * Sat Jul 20 2013 Deji Akingunola <dakingun@gmail.com> - 2.4-5
 - Rename mpich2 sub-packages to mpich and rebuild for mpich-3.0
 
