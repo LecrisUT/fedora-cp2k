@@ -13,7 +13,7 @@ diff -up cp2k-2.5/arch/Linux-x86-64-gfortran.popt.r cp2k-2.5/arch/Linux-x86-64-g
 +OPTFLAGS = -O3 -march=native -ffast-math -funroll-loops -g
 +FCFLAGS  = $(OPTFLAGS) -ffree-form -ffree-line-length-none $(DFLAGS)
 +LDFLAGS  = $(FCFLAGS)
-+LIBS     = -lderiv -lint -lfftw3 -lstdc++ -llapack -lscalapack -lf77blas -lmpiblacsF77init -lmpiblacs -lmpiblacsCinit -lxc
++LIBS     = -lderiv -lint -lfftw3 -lstdc++ -lsatlas -lscalapack -lmpiblacsF77init -lmpiblacs -lmpiblacsCinit -lxc
  
  OBJECTS_ARCHITECTURE = machine_gfortran.o
 diff -up cp2k-2.5/arch/Linux-x86-64-gfortran.psmp.r cp2k-2.5/arch/Linux-x86-64-gfortran.psmp
@@ -31,7 +31,7 @@ diff -up cp2k-2.5/arch/Linux-x86-64-gfortran.psmp.r cp2k-2.5/arch/Linux-x86-64-g
 +OPTFLAGS = -fopenmp -O3 -march=native -ffast-math -funroll-loops -g
 +FCFLAGS  = $(OPTFLAGS) -ffree-form -ffree-line-length-none $(DFLAGS)
 +LDFLAGS  = $(FCFLAGS)
-+LIBS     = -lderiv -lint -lfftw3_omp -lfftw3 -lstdc++ -llapack -lscalapack -lf77blas -lmpiblacsF77init -lmpiblacs -lmpiblacsCinit -lxc
++LIBS     = -lderiv -lint -lfftw3_omp -lfftw3 -lstdc++ -lsatlas -lscalapack -lmpiblacsF77init -lmpiblacs -lmpiblacsCinit -lxc
  
  OBJECTS_ARCHITECTURE = machine_gfortran.o
 diff -up cp2k-2.5/arch/Linux-x86-64-gfortran.sopt.r cp2k-2.5/arch/Linux-x86-64-gfortran.sopt
@@ -49,7 +49,7 @@ diff -up cp2k-2.5/arch/Linux-x86-64-gfortran.sopt.r cp2k-2.5/arch/Linux-x86-64-g
 +OPTFLAGS = -O3 -march=native -ffast-math -g -ffree-form
 +FCFLAGS  = $(OPTFLAGS) -ffree-form -ffree-line-length-none $(DFLAGS)
 +LDFLAGS  = $(FCFLAGS)
-+LIBS     = -lderiv -lint -lfftw3 -llapack -lf77blas -latlas -lxc
++LIBS     = -lderiv -lint -lfftw3 -lsatlas -lxc
  
  OBJECTS_ARCHITECTURE = machine_gfortran.o
 diff -up cp2k-2.5/arch/Linux-x86-64-gfortran.ssmp.r cp2k-2.5/arch/Linux-x86-64-gfortran.ssmp
@@ -67,7 +67,7 @@ diff -up cp2k-2.5/arch/Linux-x86-64-gfortran.ssmp.r cp2k-2.5/arch/Linux-x86-64-g
 +OPTFLAGS = -O3 -march=native -ffast-math -g
 +FCFLAGS  = $(OPTFLAGS) -ffree-form -ffree-line-length-none -fopenmp $(DFLAGS)
 +LDFLAGS  = $(FCFLAGS) 
-+LIBS     = -lderiv -lint -lfftw3_omp -lfftw3 -llapack -lf77blas -latlas -lxc
++LIBS     = -lderiv -lint -lfftw3_omp -lfftw3 -lsatlas -lxc
  
  OBJECTS_ARCHITECTURE = machine_gfortran.o
 diff -up cp2k-2.5/makefiles/Makefile.r cp2k-2.5/makefiles/Makefile

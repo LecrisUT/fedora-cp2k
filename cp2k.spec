@@ -22,7 +22,7 @@ Source4: cp2k-snapshot.sh
 # use external makedepf90
 # skip compilation during regtests
 Patch0: %{name}-rpm.patch
-BuildRequires: atlas-devel
+BuildRequires: atlas-devel >= 3.10.1
 # for regtests
 BuildRequires: bc
 BuildRequires: fftw-devel
@@ -30,7 +30,7 @@ BuildRequires: gcc-gfortran
 BuildRequires: libint-devel >= 1.1.4
 BuildRequires: libxc-devel
 BuildRequires: makedepf90
-BuildRequires: /bin/hostname
+BuildRequires: /usr/bin/hostname
 Requires: %{name}-common = %{version}-%{release}
 Obsoletes: %{name}-smp < 2.4-3
 Provides: %{name}-smp = %{version}-%{release}
@@ -184,6 +184,9 @@ popd
 %changelog
 * Wed Nov 13 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.5-0.1.20131112svn13316
 - update to current SVN trunk
+- fix build against atlast >= 3.10.1
+- use non-threaded atlas for OpenMP builds per upstream recommendation
+- fix BR broken by UsrMove feature
 
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.4-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
