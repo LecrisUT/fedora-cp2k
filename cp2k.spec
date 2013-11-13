@@ -1,9 +1,9 @@
-%define svn 0
-%define snapshot 20130418
+%define svn 1
+%define snapshot 20131112
 
 Name: cp2k
-Version: 2.4
-Release: 6%{?dist}
+Version: 2.5
+Release: 0.1.%{snapshot}svn13316%{?dist}
 Group: Applications/Engineering
 Summary: A molecular dynamics engine capable of classical and Car-Parrinello simulations
 License: GPLv2+
@@ -158,7 +158,7 @@ emptycheck="NO"
 leakcheck="NO"
 __EOF__
 pushd tests
-../tools/do_regtest -config fedora.config
+../tools/regtesting/do_regtest -nosvn -nobuild -config fedora.config
 popd
 %endif
 
@@ -182,6 +182,9 @@ popd
 %{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich
 
 %changelog
+* Wed Nov 13 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.5-0.1.20131112svn13316
+- update to current SVN trunk
+
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.4-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 

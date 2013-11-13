@@ -13,10 +13,10 @@ cleanup() {
 unset CDPATH
 pwd=$(pwd)
 svn=$(date +%Y%m%d)
-svn=20130418
-dirname=cp2k-2.4
+svn=20131112
+dirname=cp2k-2.5
 url=svn://svn.code.sf.net/p/cp2k/code/trunk/cp2k
-rev={$svn}
+rev=13316
 
 cd "$tmp"
 svn checkout -r ${rev} ${url} $dirname
