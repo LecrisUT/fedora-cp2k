@@ -184,7 +184,7 @@ popd
 %changelog
 * Wed Nov 13 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.5-0.1.20131112svn13316
 - update to current SVN trunk
-- fix build against atlast >= 3.10.1
+- fix build against atlas >= 3.10.1
 - use non-threaded atlas for OpenMP builds per upstream recommendation
 - fix BR broken by UsrMove feature
 
