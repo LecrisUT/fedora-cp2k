@@ -3,14 +3,14 @@
 
 Name: cp2k
 Version: 2.5
-Release: 0.1.%{snapshot}svn13316%{?dist}
+Release: 0.2.%{snapshot}svn13316%{?dist}
 Group: Applications/Engineering
 Summary: A molecular dynamics engine capable of classical and Car-Parrinello simulations
 License: GPLv2+
 URL: http://cp2k.org/
 %if %{svn}
 # run cp2k-snapshot.sh to produce this
-Source0: cp2k-%{version}-%{snapshot}.tar.bz2
+Source0: cp2k-%{version}-%{snapshot}.tar.xz
 %else
 Source0: http://downloads.sourceforge.net/project/cp2k/cp2k-%{version}.tar.bz2
 %endif
@@ -182,6 +182,9 @@ popd
 %{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich
 
 %changelog
+* Fri Nov 15 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.5-0.2.20131112svn13316
+- use xz to compress SVN snapshot tarball
+
 * Wed Nov 13 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.5-0.1.20131112svn13316
 - update to current SVN trunk
 - fix build against atlas >= 3.10.1

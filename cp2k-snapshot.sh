@@ -24,5 +24,5 @@ cd $dirname
 tools/get_revision_number . >REVISION
 find . -type d -name .svn -print0 | xargs -0r rm -rf
 cd ..
-tar jcf "$pwd"/$dirname-$svn.tar.bz2 $dirname
+tar Jcf "$pwd"/$dirname-$svn.tar.xz $dirname
 cd - >/dev/null
