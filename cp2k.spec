@@ -102,6 +102,11 @@ This package contains the documentation and the manual.
 
 %prep
 %setup -q
+%patch0 -p1 -b .r
+rm -r tools/makedepf90
+chmod -x src/harris_{functional,{env,energy}_types}.F
+
+# Generate necessary symlinks
 TARGET=$(tools/get_arch_code)
 %ifnarch x86_64
 ln -s Linux-x86-64-gfortran.sopt arch/${TARGET}.sopt
@@ -111,12 +116,10 @@ ln -s Linux-x86-64-gfortran.popt arch/${TARGET}-openmpi.popt
 ln -s Linux-x86-64-gfortran.popt arch/${TARGET}-mpich.popt
 ln -s Linux-x86-64-gfortran.psmp arch/${TARGET}-openmpi.psmp
 ln -s Linux-x86-64-gfortran.psmp arch/${TARGET}-mpich.psmp
-%patch0 -p1 -b .r
-rm -r tools/makedepf90
-chmod -x src/harris_{functional,{env,energy}_types}.F
-# fix crashes in fftw on i686
+
+# fix crashes in fftw on i686. Need to run on original file, otherwise symlinks will be replaced with copies.
 %ifarch i686
-sed -i 's/-D__FFTW3/-D__FFTW3 -D__FFTW3_UNALIGNED/g' arch/Linux-i686-gfortran*
+sed -i 's/-D__FFTW3/-D__FFTW3 -D__FFTW3_UNALIGNED/g' arch/Linux-x86-64-gfortran*
 %endif
 
 # Get libint and libderiv limits
