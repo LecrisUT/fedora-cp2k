@@ -3,7 +3,7 @@
 
 Name: cp2k
 Version: 2.5
-Release: 0.2.%{snapshot}svn13316%{?dist}
+Release: 0.3.%{snapshot}svn13316%{?dist}
 Group: Applications/Engineering
 Summary: A molecular dynamics engine capable of classical and Car-Parrinello simulations
 License: GPLv2+
@@ -31,6 +31,10 @@ BuildRequires: libint-devel >= 1.1.4
 BuildRequires: libxc-devel
 BuildRequires: makedepf90
 BuildRequires: /usr/bin/hostname
+
+# Libint can break the API between releases
+Requires: libint%{?_isa} = %{_libint_version}
+
 Requires: %{name}-common = %{version}-%{release}
 Obsoletes: %{name}-smp < 2.4-3
 Provides: %{name}-smp = %{version}-%{release}
@@ -56,8 +60,8 @@ BuildRequires:  openmpi-devel
 BuildRequires:  blacs-openmpi-devel
 BuildRequires:  scalapack-openmpi-devel
 Requires: %{name}-common = %{version}-%{release}
-Requires: blacs-openmpi
-Requires: scalapack-openmpi
+Requires: blacs-openmpi%{?_isa}
+Requires: scalapack-openmpi%{?_isa}
 
 %description openmpi
 %{cp2k_desc_base}
@@ -72,8 +76,8 @@ BuildRequires:  mpich-devel
 BuildRequires:  blacs-mpich-devel
 BuildRequires:  scalapack-mpich-devel
 Requires: %{name}-common = %{version}-%{release}
-Requires: blacs-mpich
-Requires: scalapack-mpich
+Requires: blacs-mpich%{?_isa}
+Requires: scalapack-mpich%{?_isa}
 Provides: %{name}-mpich2 = %{version}-%{release}
 Obsoletes: %{name}-mpich2 < 2.4-5
 
@@ -182,6 +186,9 @@ popd
 %{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich
 
 %changelog
+* Mon Dec 23 2013 Susi Lehtola <jussilehtola@fedoraproject.org> - 2.5-0.3.20131112svn13316
+- Rebuild against new libint.
+
 * Fri Nov 15 2013 Dominik Mierzejewski <rpm@greysector.net> - 2.5-0.2.20131112svn13316
 - use xz to compress SVN snapshot tarball
 
