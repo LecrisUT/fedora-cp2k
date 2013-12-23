@@ -1,6 +1,6 @@
 diff -up cp2k-2.5/arch/Linux-x86-64-gfortran.popt.r cp2k-2.5/arch/Linux-x86-64-gfortran.popt
---- cp2k-2.5/arch/Linux-x86-64-gfortran.popt.r	2013-04-17 11:28:09.000000000 +0200
-+++ cp2k-2.5/arch/Linux-x86-64-gfortran.popt	2013-11-13 00:04:32.728738146 +0100
+--- cp2k-2.5/arch/Linux-x86-64-gfortran.popt.r	2013-04-17 12:28:09.000000000 +0300
++++ cp2k-2.5/arch/Linux-x86-64-gfortran.popt	2013-12-24 00:07:47.365227230 +0200
 @@ -12,9 +12,10 @@ LD       = mpif90
  AR       = ar -r
  
@@ -9,7 +9,7 @@ diff -up cp2k-2.5/arch/Linux-x86-64-gfortran.popt.r cp2k-2.5/arch/Linux-x86-64-g
 -FCFLAGS  = -O3 -march=native -ffast-math -funroll-loops -g -ffree-form $(DFLAGS)
 -LDFLAGS  = $(FCFLAGS)  -L/data/vjoost/libint/install/lib/ -L/data/vjoost/libsmm/lib/  -L/opt/intel/composerxe-2011.3.174/mkl/lib/intel64 -L/data/vjoost/libxc-2.0.1/install/lib
 -LIBS     = -lsmm_dnn -lderiv -lint -lstdc++ -lfftw3 -lmkl_gf_lp64 -lmkl_scalapack_lp64 -lmkl_blacs_openmpi_lp64 -lmkl_sequential -lmkl_core -lxc
-+DFLAGS   = -D__GFORTRAN -D__FFTSG -D__LIBINT -D__FFTW3 -D__parallel -D__SCALAPACK -D__BLACS -D__LIBXC2 -D__LIBINT_MAX_AM=8 -D__LIBDERIV_MAX_AM1=6
++DFLAGS   = -D__GFORTRAN -D__FFTSG -D__LIBINT -D__FFTW3 -D__parallel -D__SCALAPACK -D__BLACS -D__LIBXC2 -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@
 +OPTFLAGS = -O3 -march=native -ffast-math -funroll-loops -g
 +FCFLAGS  = $(OPTFLAGS) -ffree-form -ffree-line-length-none $(DFLAGS)
 +LDFLAGS  = $(FCFLAGS)
@@ -17,8 +17,8 @@ diff -up cp2k-2.5/arch/Linux-x86-64-gfortran.popt.r cp2k-2.5/arch/Linux-x86-64-g
  
  OBJECTS_ARCHITECTURE = machine_gfortran.o
 diff -up cp2k-2.5/arch/Linux-x86-64-gfortran.psmp.r cp2k-2.5/arch/Linux-x86-64-gfortran.psmp
---- cp2k-2.5/arch/Linux-x86-64-gfortran.psmp.r	2013-04-17 11:28:09.000000000 +0200
-+++ cp2k-2.5/arch/Linux-x86-64-gfortran.psmp	2013-11-13 00:04:32.728738146 +0100
+--- cp2k-2.5/arch/Linux-x86-64-gfortran.psmp.r	2013-04-17 12:28:09.000000000 +0300
++++ cp2k-2.5/arch/Linux-x86-64-gfortran.psmp	2013-12-24 00:07:40.837400491 +0200
 @@ -13,9 +13,10 @@ LD       = mpif90
  AR       = ar -r
  
@@ -27,7 +27,7 @@ diff -up cp2k-2.5/arch/Linux-x86-64-gfortran.psmp.r cp2k-2.5/arch/Linux-x86-64-g
 -FCFLAGS  = -fopenmp -O3 -march=native -ffast-math -funroll-loops -g -ffree-form $(DFLAGS)
 -LDFLAGS  = $(FCFLAGS)  -L/data/vjoost/libint/install/lib/ -L/data/vjoost/libsmm/lib/  -L/opt/intel/composerxe-2011.3.174/mkl/lib/intel64 -L/data/vjoost/libxc-2.0.1/install/lib
 -LIBS     = -lsmm_dnn -lderiv -lint -lstdc++ -lfftw3_threads -lfftw3 -lmkl_gf_lp64 -lmkl_scalapack_lp64 -lmkl_blacs_openmpi_lp64 -lmkl_sequential -lmkl_core -lxc
-+DFLAGS   = -D__GFORTRAN -D__FFTSG -D__LIBINT -D__FFTW3 -D__parallel -D__SCALAPACK -D__BLACS -D__LIBXC2 -D__LIBINT_MAX_AM=8 -D__LIBDERIV_MAX_AM1=6
++DFLAGS   = -D__GFORTRAN -D__FFTSG -D__LIBINT -D__FFTW3 -D__parallel -D__SCALAPACK -D__BLACS -D__LIBXC2 -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@
 +OPTFLAGS = -fopenmp -O3 -march=native -ffast-math -funroll-loops -g
 +FCFLAGS  = $(OPTFLAGS) -ffree-form -ffree-line-length-none $(DFLAGS)
 +LDFLAGS  = $(FCFLAGS)
@@ -35,8 +35,8 @@ diff -up cp2k-2.5/arch/Linux-x86-64-gfortran.psmp.r cp2k-2.5/arch/Linux-x86-64-g
  
  OBJECTS_ARCHITECTURE = machine_gfortran.o
 diff -up cp2k-2.5/arch/Linux-x86-64-gfortran.sopt.r cp2k-2.5/arch/Linux-x86-64-gfortran.sopt
---- cp2k-2.5/arch/Linux-x86-64-gfortran.sopt.r	2013-04-17 11:28:09.000000000 +0200
-+++ cp2k-2.5/arch/Linux-x86-64-gfortran.sopt	2013-11-13 00:04:32.728738146 +0100
+--- cp2k-2.5/arch/Linux-x86-64-gfortran.sopt.r	2013-04-17 12:28:09.000000000 +0300
++++ cp2k-2.5/arch/Linux-x86-64-gfortran.sopt	2013-12-24 00:07:53.445065857 +0200
 @@ -12,9 +12,10 @@ LD       = gfortran
  AR       = ar -r
  
@@ -45,7 +45,7 @@ diff -up cp2k-2.5/arch/Linux-x86-64-gfortran.sopt.r cp2k-2.5/arch/Linux-x86-64-g
 -FCFLAGS  = -O3 -march=native -ffast-math -g -ffree-form $(DFLAGS)
 -LDFLAGS  = $(FCFLAGS)  -L/data/vjoost/libint/install/lib/ -L/data/vjoost/libsmm/lib/  -L/opt/intel/composerxe-2011.3.174/mkl/lib/intel64  -L/data/vjoost/libxc-2.0.1/install/lib
 -LIBS     = -lsmm_dnn -lderiv -lint -lstdc++ -lfftw3 -lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lxc
-+DFLAGS   = -D__GFORTRAN -D__FFTSG -D__LIBINT -D__FFTW3 -D__LIBXC2 -D__LIBINT_MAX_AM=8 -D__LIBDERIV_MAX_AM1=6
++DFLAGS   = -D__GFORTRAN -D__FFTSG -D__LIBINT -D__FFTW3 -D__LIBXC2 -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@
 +OPTFLAGS = -O3 -march=native -ffast-math -g -ffree-form
 +FCFLAGS  = $(OPTFLAGS) -ffree-form -ffree-line-length-none $(DFLAGS)
 +LDFLAGS  = $(FCFLAGS)
@@ -53,8 +53,8 @@ diff -up cp2k-2.5/arch/Linux-x86-64-gfortran.sopt.r cp2k-2.5/arch/Linux-x86-64-g
  
  OBJECTS_ARCHITECTURE = machine_gfortran.o
 diff -up cp2k-2.5/arch/Linux-x86-64-gfortran.ssmp.r cp2k-2.5/arch/Linux-x86-64-gfortran.ssmp
---- cp2k-2.5/arch/Linux-x86-64-gfortran.ssmp.r	2013-04-17 11:28:09.000000000 +0200
-+++ cp2k-2.5/arch/Linux-x86-64-gfortran.ssmp	2013-11-13 00:04:32.728738146 +0100
+--- cp2k-2.5/arch/Linux-x86-64-gfortran.ssmp.r	2013-04-17 12:28:09.000000000 +0300
++++ cp2k-2.5/arch/Linux-x86-64-gfortran.ssmp	2013-12-24 00:07:33.540594091 +0200
 @@ -12,9 +12,10 @@ LD       = gfortran
  AR       = ar -r
  
@@ -63,7 +63,7 @@ diff -up cp2k-2.5/arch/Linux-x86-64-gfortran.ssmp.r cp2k-2.5/arch/Linux-x86-64-g
 -FCFLAGS  = -fopenmp -O3 -march=native -ffast-math -g -ffree-form $(DFLAGS)
 -LDFLAGS  = $(FCFLAGS)  -L/data/vjoost/libint/install/lib/ -L/data/vjoost/libsmm/lib/  -L/opt/intel/composerxe-2011.3.174/mkl/lib/intel64  -L/data/vjoost/libxc-2.0.1/install/lib
 -LIBS     = -lsmm_dnn -lderiv -lint -lstdc++ -lfftw3 -lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lxc
-+DFLAGS   = -D__GFORTRAN -D__FFTSG -D__LIBINT -D__FFTW3 -D__LIBXC2 -D__LIBINT_MAX_AM=8 -D__LIBDERIV_MAX_AM1=6
++DFLAGS   = -D__GFORTRAN -D__FFTSG -D__LIBINT -D__FFTW3 -D__LIBXC2 -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@
 +OPTFLAGS = -O3 -march=native -ffast-math -g
 +FCFLAGS  = $(OPTFLAGS) -ffree-form -ffree-line-length-none -fopenmp $(DFLAGS)
 +LDFLAGS  = $(FCFLAGS) 
@@ -71,8 +71,8 @@ diff -up cp2k-2.5/arch/Linux-x86-64-gfortran.ssmp.r cp2k-2.5/arch/Linux-x86-64-g
  
  OBJECTS_ARCHITECTURE = machine_gfortran.o
 diff -up cp2k-2.5/makefiles/Makefile.r cp2k-2.5/makefiles/Makefile
---- cp2k-2.5/makefiles/Makefile.r	2013-11-08 16:35:55.000000000 +0100
-+++ cp2k-2.5/makefiles/Makefile	2013-11-13 00:10:49.039762080 +0100
+--- cp2k-2.5/makefiles/Makefile.r	2013-11-08 17:35:55.000000000 +0200
++++ cp2k-2.5/makefiles/Makefile	2013-12-24 00:06:08.782843373 +0200
 @@ -100,11 +100,11 @@ CLEAN_TARGETS = $(addsuffix /clean ,$(VE
  # lists the targets that are not files
  #
@@ -151,8 +151,8 @@ diff -up cp2k-2.5/makefiles/Makefile.r cp2k-2.5/makefiles/Makefile
  #
  # the rule how to generate the .o from the .F
 diff -up cp2k-2.5/tools/regtesting/do_regtest.r cp2k-2.5/tools/regtesting/do_regtest
---- cp2k-2.5/tools/regtesting/do_regtest.r	2013-11-13 00:05:42.720929294 +0100
-+++ cp2k-2.5/tools/regtesting/do_regtest	2013-11-13 00:09:15.930504239 +0100
+--- cp2k-2.5/tools/regtesting/do_regtest.r	2013-09-27 17:05:41.000000000 +0300
++++ cp2k-2.5/tools/regtesting/do_regtest	2013-12-24 00:06:08.783843347 +0200
 @@ -682,7 +682,7 @@ for dir in ${dirs}; do
       # third field allows numerical tolerances to be read from the TEST_FILES
       # if value does not exist set to the default of 1.0E-14

@@ -62,6 +62,8 @@ BuildRequires:  scalapack-openmpi-devel
 Requires: %{name}-common = %{version}-%{release}
 Requires: blacs-openmpi%{?_isa}
 Requires: scalapack-openmpi%{?_isa}
+# Libint may have API breakage
+Requires: libint%{?_isa} = %{_libint_version}
 
 %description openmpi
 %{cp2k_desc_base}
@@ -80,6 +82,8 @@ Requires: blacs-mpich%{?_isa}
 Requires: scalapack-mpich%{?_isa}
 Provides: %{name}-mpich2 = %{version}-%{release}
 Obsoletes: %{name}-mpich2 < 2.4-5
+# Libint may have API breakage
+Requires: libint%{?_isa} = %{_libint_version}
 
 %description mpich
 %{cp2k_desc_base}
@@ -114,6 +118,15 @@ chmod -x src/harris_{functional,{env,energy}_types}.F
 %ifarch i686
 sed -i 's/-D__FFTW3/-D__FFTW3 -D__FFTW3_UNALIGNED/g' arch/Linux-i686-gfortran*
 %endif
+
+# Get libint and libderiv limits
+maxam=`grep LIBINT_MAX_AM %{_includedir}/libint/libint.h | awk '{print $3}'`
+maxderiv=`grep "LIBDERIV_MAX_AM1 " %{_includedir}/libderiv/libderiv.h | awk '{print $3}'`
+# Plug them in the configuration
+for f in arch/Linux-x86-64-gfortran.{popt,psmp,sopt,ssmp}; do
+ sed -i "s|@LIBINT_MAX_AM@|$maxam|g;s|@LIBDERIV_MAX_AM@|$maxderiv|g" $f
+done
+
 
 %build
 TARGET=$(tools/get_arch_code)
