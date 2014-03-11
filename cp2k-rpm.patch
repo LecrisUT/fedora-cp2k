@@ -1,79 +1,148 @@
-diff -up cp2k-2.5/arch/Linux-x86-64-gfortran.popt.r cp2k-2.5/arch/Linux-x86-64-gfortran.popt
---- cp2k-2.5/arch/Linux-x86-64-gfortran.popt.r	2013-04-17 12:28:09.000000000 +0300
-+++ cp2k-2.5/arch/Linux-x86-64-gfortran.popt	2013-12-24 00:07:47.365227230 +0200
-@@ -12,9 +12,10 @@ LD       = mpif90
- AR       = ar -r
+diff -up cp2k-2.5.0/arch/Linux-x86-64-gfortran.popt.r cp2k-2.5.0/arch/Linux-x86-64-gfortran.popt
+--- cp2k-2.5.0/arch/Linux-x86-64-gfortran.popt.r	2014-02-12 18:29:10.000000000 +0100
++++ cp2k-2.5.0/arch/Linux-x86-64-gfortran.popt	2014-03-11 06:36:24.592412451 +0100
+@@ -11,19 +11,20 @@ LIBINT_INC = $(GCC_DIR)/libint/1.1.4-LAR
+ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LARGE_L-gnu/lib64
+ LIBXC_INC  = $(GCC_DIR)/libxc/2.0.1-gnu/include
+ LIBXC_LIB  = $(GCC_DIR)/libxc/2.0.1-gnu/lib64
+-DFLAGS     = -D__GFORTRAN -D__FFTACML -D__FFTSG -D__FFTW3 -D__LIBINT -D__LIBXC2\
+-             -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6 -D__MAX_CONTR=4\
++DFLAGS     = -D__GFORTRAN -D__FFTSG -D__FFTW3 -D__LIBINT -D__LIBXC2\
++             -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@ -D__MAX_CONTR=4\
+              -D__parallel -D__BLACS -D__SCALAPACK
+ CPPFLAGS   = 
+-FCFLAGS    = $(DFLAGS) -O2 -ffast-math -ffree-form -ffree-line-length-none\
++OPTFLAGS   = -O2 -ffast-math\
+              -ftree-vectorize -funroll-loops\
+              -mtune=native\
+-             -I$(ACML_INC) -I$(FFTW_INC) -I$(LIBINT_INC) -I$(LIBXC_INC)
+-LDFLAGS    = $(FCFLAGS) -static-libgfortran
+-LIBS       = $(LIBPATH)/libscalapack-gnu.a\
+-             $(ACML_LIB)/libacml.a\
+-             $(FFTW_LIB)/libfftw3.a\
+-             $(LIBXC_LIB)/libxc.a\
+-             $(LIBINT_LIB)/libderiv.a\
+-             $(LIBINT_LIB)/libint.a
++
++FCFLAGS    = $(DFLAGS) $(OPTFLAGS) -ffree-form -ffree-line-length-none
++LDFLAGS    = $(FCFLAGS)
++LIBS       = -lscalapack -lmpiblacsF77init -lmpiblacs -lmpiblacsCinit -lstdc++\
++             -lsatlas\
++             -lfftw3\
++             -lxc\
++             -lderiv\
++             -lint
  
- CPPFLAGS = 
--DFLAGS   = -D__GFORTRAN -D__FFTSG -D__LIBINT -D__FFTW3 -D__parallel -D__SCALAPACK -D__BLACS -D__HAS_smm_dnn -D__LIBXC2
--FCFLAGS  = -O3 -march=native -ffast-math -funroll-loops -g -ffree-form $(DFLAGS)
--LDFLAGS  = $(FCFLAGS)  -L/data/vjoost/libint/install/lib/ -L/data/vjoost/libsmm/lib/  -L/opt/intel/composerxe-2011.3.174/mkl/lib/intel64 -L/data/vjoost/libxc-2.0.1/install/lib
--LIBS     = -lsmm_dnn -lderiv -lint -lstdc++ -lfftw3 -lmkl_gf_lp64 -lmkl_scalapack_lp64 -lmkl_blacs_openmpi_lp64 -lmkl_sequential -lmkl_core -lxc
-+DFLAGS   = -D__GFORTRAN -D__FFTSG -D__LIBINT -D__FFTW3 -D__parallel -D__SCALAPACK -D__BLACS -D__LIBXC2 -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@
-+OPTFLAGS = -O3 -march=native -ffast-math -funroll-loops -g
-+FCFLAGS  = $(OPTFLAGS) -ffree-form -ffree-line-length-none $(DFLAGS)
-+LDFLAGS  = $(FCFLAGS)
-+LIBS     = -lderiv -lint -lfftw3 -lstdc++ -lsatlas -lscalapack -lmpiblacsF77init -lmpiblacs -lmpiblacsCinit -lxc
+diff -up cp2k-2.5.0/arch/Linux-x86-64-gfortran.psmp.r cp2k-2.5.0/arch/Linux-x86-64-gfortran.psmp
+--- cp2k-2.5.0/arch/Linux-x86-64-gfortran.psmp.r	2014-02-12 18:29:10.000000000 +0100
++++ cp2k-2.5.0/arch/Linux-x86-64-gfortran.psmp	2014-03-11 06:36:31.866434894 +0100
+@@ -11,20 +11,21 @@ LIBINT_INC = $(GCC_DIR)/libint/1.1.4-LAR
+ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LARGE_L-gnu/lib64
+ LIBXC_INC  = $(GCC_DIR)/libxc/2.0.1-gnu/include
+ LIBXC_LIB  = $(GCC_DIR)/libxc/2.0.1-gnu/lib64
+-DFLAGS     = -D__GFORTRAN -D__FFTACML -D__FFTSG -D__FFTW3 -D__LIBINT -D__LIBXC2\
+-             -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6 -D__MAX_CONTR=4\
++DFLAGS     = -D__GFORTRAN -D__FFTSG -D__FFTW3 -D__LIBINT -D__LIBXC2\
++             -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@ -D__MAX_CONTR=4\
+              -D__parallel -D__BLACS -D__SCALAPACK -D__NO_MPI_THREAD_SUPPORT_CHECK
+ CPPFLAGS   = 
+-FCFLAGS    = $(DFLAGS) -O2 -ffast-math -ffree-form -ffree-line-length-none\
+-             -fopenmp -ftree-vectorize -funroll-loops\
++OPTFLAGS   = -O2 -ffast-math\
++             -ftree-vectorize -funroll-loops\
+              -mtune=native\
+-             -I$(ACML_INC) -I$(FFTW_INC) -I$(LIBINT_INC) -I$(LIBXC_INC)
+-LDFLAGS    = $(FCFLAGS) -static-libgfortran
+-LIBS       = $(LIBPATH)/libscalapack-gnu.a\
+-             $(ACML_LIB)/libacml.a\
+-             $(FFTW_LIB)/libfftw3.a\
+-             $(FFTW_LIB)/libfftw3_threads.a\
+-             $(LIBXC_LIB)/libxc.a\
+-             $(LIBINT_LIB)/libderiv.a\
+-             $(LIBINT_LIB)/libint.a
++
++FCFLAGS    = $(DFLAGS) $(OPTFLAGS) -fopenmp -ffree-form -ffree-line-length-none
++LDFLAGS    = $(FCFLAGS)
++LIBS       = -lscalapack -lmpiblacsF77init -lmpiblacs -lmpiblacsCinit -lstdc++\
++             -lsatlas\
++             -lfftw3\
++             -lfftw3_omp\
++             -lxc\
++             -lderiv\
++             -lint
  
- OBJECTS_ARCHITECTURE = machine_gfortran.o
-diff -up cp2k-2.5/arch/Linux-x86-64-gfortran.psmp.r cp2k-2.5/arch/Linux-x86-64-gfortran.psmp
---- cp2k-2.5/arch/Linux-x86-64-gfortran.psmp.r	2013-04-17 12:28:09.000000000 +0300
-+++ cp2k-2.5/arch/Linux-x86-64-gfortran.psmp	2013-12-24 00:07:40.837400491 +0200
-@@ -13,9 +13,10 @@ LD       = mpif90
- AR       = ar -r
+diff -up cp2k-2.5.0/arch/Linux-x86-64-gfortran.sopt.r cp2k-2.5.0/arch/Linux-x86-64-gfortran.sopt
+--- cp2k-2.5.0/arch/Linux-x86-64-gfortran.sopt.r	2014-02-12 18:29:10.000000000 +0100
++++ cp2k-2.5.0/arch/Linux-x86-64-gfortran.sopt	2014-03-11 06:36:36.764448758 +0100
+@@ -11,17 +11,18 @@ LIBINT_INC = $(GCC_DIR)/libint/1.1.4-LAR
+ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LARGE_L-gnu/lib64
+ LIBXC_INC  = $(GCC_DIR)/libxc/2.0.1-gnu/include
+ LIBXC_LIB  = $(GCC_DIR)/libxc/2.0.1-gnu/lib64
+-DFLAGS     = -D__GFORTRAN -D__FFTACML -D__FFTSG -D__FFTW3 -D__LIBINT -D__LIBXC2\
+-             -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6 -D__MAX_CONTR=4
++DFLAGS     = -D__GFORTRAN -D__FFTSG -D__FFTW3 -D__LIBINT -D__LIBXC2\
++             -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@ -D__MAX_CONTR=4
+ CPPFLAGS   = 
+-FCFLAGS    = $(DFLAGS) -O2 -ffast-math -ffree-form -ffree-line-length-none\
++OPTFLAGS   = -O2 -ffast-math\
+              -ftree-vectorize -funroll-loops\
+              -mtune=native\
+-             -I$(ACML_INC) -I$(FFTW_INC) -I$(LIBINT_INC) -I$(LIBXC_INC)
+-LDFLAGS    = $(FCFLAGS) -static-libgfortran
+-LIBS       = $(ACML_LIB)/libacml.a\
+-             $(FFTW_LIB)/libfftw3.a\
+-             $(LIBXC_LIB)/libxc.a\
+-             $(LIBINT_LIB)/libderiv.a\
+-             $(LIBINT_LIB)/libint.a
++
++FCFLAGS    = $(DFLAGS) $(OPTFLAGS) -ffree-form -ffree-line-length-none
++LDFLAGS    = $(FCFLAGS)
++LIBS       = -lsatlas\
++             -lfftw3\
++             -lxc\
++             -lderiv\
++             -lint
  
- CPPFLAGS = 
--DFLAGS   = -D__GFORTRAN -D__FFTSG -D__LIBINT -D__FFTW3 -D__parallel -D__SCALAPACK -D__BLACS -D__HAS_smm_dnn -D__LIBXC2
--FCFLAGS  = -fopenmp -O3 -march=native -ffast-math -funroll-loops -g -ffree-form $(DFLAGS)
--LDFLAGS  = $(FCFLAGS)  -L/data/vjoost/libint/install/lib/ -L/data/vjoost/libsmm/lib/  -L/opt/intel/composerxe-2011.3.174/mkl/lib/intel64 -L/data/vjoost/libxc-2.0.1/install/lib
--LIBS     = -lsmm_dnn -lderiv -lint -lstdc++ -lfftw3_threads -lfftw3 -lmkl_gf_lp64 -lmkl_scalapack_lp64 -lmkl_blacs_openmpi_lp64 -lmkl_sequential -lmkl_core -lxc
-+DFLAGS   = -D__GFORTRAN -D__FFTSG -D__LIBINT -D__FFTW3 -D__parallel -D__SCALAPACK -D__BLACS -D__LIBXC2 -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@
-+OPTFLAGS = -fopenmp -O3 -march=native -ffast-math -funroll-loops -g
-+FCFLAGS  = $(OPTFLAGS) -ffree-form -ffree-line-length-none $(DFLAGS)
-+LDFLAGS  = $(FCFLAGS)
-+LIBS     = -lderiv -lint -lfftw3_omp -lfftw3 -lstdc++ -lsatlas -lscalapack -lmpiblacsF77init -lmpiblacs -lmpiblacsCinit -lxc
+diff -up cp2k-2.5.0/arch/Linux-x86-64-gfortran.ssmp.r cp2k-2.5.0/arch/Linux-x86-64-gfortran.ssmp
+--- cp2k-2.5.0/arch/Linux-x86-64-gfortran.ssmp.r	2014-02-12 18:29:10.000000000 +0100
++++ cp2k-2.5.0/arch/Linux-x86-64-gfortran.ssmp	2014-03-11 06:36:39.849459583 +0100
+@@ -11,18 +11,19 @@ LIBINT_INC = $(GCC_DIR)/libint/1.1.4-LAR
+ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LARGE_L-gnu/lib64
+ LIBXC_INC  = $(GCC_DIR)/libxc/2.0.1-gnu/include
+ LIBXC_LIB  = $(GCC_DIR)/libxc/2.0.1-gnu/lib64
+-DFLAGS     = -D__GFORTRAN -D__FFTACML -D__FFTSG -D__FFTW3 -D__LIBINT -D__LIBXC2\
+-             -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6 -D__MAX_CONTR=4
+-CPPFLAGS   = 
+-FCFLAGS    = $(DFLAGS) -O2 -ffast-math -ffree-form -ffree-line-length-none\
+-             -fopenmp -ftree-vectorize -funroll-loops\
++DFLAGS     = -D__GFORTRAN -D__FFTSG -D__FFTW3 -D__LIBINT -D__LIBXC2\
++             -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@ -D__MAX_CONTR=4
++CPPFLAGS   =
++OPTFLAGS   = -O2 -ffast-math\
++             -ftree-vectorize -funroll-loops\
+              -mtune=native\
+-             -I$(ACML_INC) -I$(FFTW_INC) -I$(LIBINT_INC) -I$(LIBXC_INC)
+-LDFLAGS    = $(FCFLAGS) -static-libgfortran
+-LIBS       = $(ACML_LIB)/libacml.a\
+-             $(FFTW_LIB)/libfftw3.a\
+-             $(FFTW_LIB)/libfftw3_threads.a\
+-             $(LIBXC_LIB)/libxc.a\
+-             $(LIBINT_LIB)/libderiv.a\
+-             $(LIBINT_LIB)/libint.a
++
++FCFLAGS    = $(DFLAGS) $(OPTFLAGS) -fopenmp -ffree-form -ffree-line-length-none
++LDFLAGS    = $(FCFLAGS)
++LIBS       = -lsatlas\
++             -lfftw3\
++             -lfftw3_omp\
++             -lxc\
++             -lderiv\
++             -lint
  
- OBJECTS_ARCHITECTURE = machine_gfortran.o
-diff -up cp2k-2.5/arch/Linux-x86-64-gfortran.sopt.r cp2k-2.5/arch/Linux-x86-64-gfortran.sopt
---- cp2k-2.5/arch/Linux-x86-64-gfortran.sopt.r	2013-04-17 12:28:09.000000000 +0300
-+++ cp2k-2.5/arch/Linux-x86-64-gfortran.sopt	2013-12-24 00:07:53.445065857 +0200
-@@ -12,9 +12,10 @@ LD       = gfortran
- AR       = ar -r
- 
- CPPFLAGS = 
--DFLAGS   = -D__GFORTRAN -D__FFTSG -D__LIBINT -D__FFTW3 -D__HAS_smm_dnn -D__LIBXC2
--FCFLAGS  = -O3 -march=native -ffast-math -g -ffree-form $(DFLAGS)
--LDFLAGS  = $(FCFLAGS)  -L/data/vjoost/libint/install/lib/ -L/data/vjoost/libsmm/lib/  -L/opt/intel/composerxe-2011.3.174/mkl/lib/intel64  -L/data/vjoost/libxc-2.0.1/install/lib
--LIBS     = -lsmm_dnn -lderiv -lint -lstdc++ -lfftw3 -lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lxc
-+DFLAGS   = -D__GFORTRAN -D__FFTSG -D__LIBINT -D__FFTW3 -D__LIBXC2 -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@
-+OPTFLAGS = -O3 -march=native -ffast-math -g -ffree-form
-+FCFLAGS  = $(OPTFLAGS) -ffree-form -ffree-line-length-none $(DFLAGS)
-+LDFLAGS  = $(FCFLAGS)
-+LIBS     = -lderiv -lint -lfftw3 -lsatlas -lxc
- 
- OBJECTS_ARCHITECTURE = machine_gfortran.o
-diff -up cp2k-2.5/arch/Linux-x86-64-gfortran.ssmp.r cp2k-2.5/arch/Linux-x86-64-gfortran.ssmp
---- cp2k-2.5/arch/Linux-x86-64-gfortran.ssmp.r	2013-04-17 12:28:09.000000000 +0300
-+++ cp2k-2.5/arch/Linux-x86-64-gfortran.ssmp	2013-12-24 00:07:33.540594091 +0200
-@@ -12,9 +12,10 @@ LD       = gfortran
- AR       = ar -r
- 
- CPPFLAGS = 
--DFLAGS   = -D__GFORTRAN -D__FFTSG -D__LIBINT -D__FFTW3 -D__HAS_smm_dnn -D__LIBXC2
--FCFLAGS  = -fopenmp -O3 -march=native -ffast-math -g -ffree-form $(DFLAGS)
--LDFLAGS  = $(FCFLAGS)  -L/data/vjoost/libint/install/lib/ -L/data/vjoost/libsmm/lib/  -L/opt/intel/composerxe-2011.3.174/mkl/lib/intel64  -L/data/vjoost/libxc-2.0.1/install/lib
--LIBS     = -lsmm_dnn -lderiv -lint -lstdc++ -lfftw3 -lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lxc
-+DFLAGS   = -D__GFORTRAN -D__FFTSG -D__LIBINT -D__FFTW3 -D__LIBXC2 -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@
-+OPTFLAGS = -O3 -march=native -ffast-math -g
-+FCFLAGS  = $(OPTFLAGS) -ffree-form -ffree-line-length-none -fopenmp $(DFLAGS)
-+LDFLAGS  = $(FCFLAGS) 
-+LIBS     = -lderiv -lint -lfftw3_omp -lfftw3 -lsatlas -lxc
- 
- OBJECTS_ARCHITECTURE = machine_gfortran.o
-diff -up cp2k-2.5/makefiles/Makefile.r cp2k-2.5/makefiles/Makefile
---- cp2k-2.5/makefiles/Makefile.r	2013-11-08 17:35:55.000000000 +0200
-+++ cp2k-2.5/makefiles/Makefile	2013-12-24 00:06:08.782843373 +0200
-@@ -100,11 +100,11 @@ CLEAN_TARGETS = $(addsuffix /clean ,$(VE
+diff -up cp2k-2.5.0/makefiles/Makefile.r cp2k-2.5.0/makefiles/Makefile
+--- cp2k-2.5.0/makefiles/Makefile.r	2014-02-20 17:40:35.000000000 +0100
++++ cp2k-2.5.0/makefiles/Makefile	2014-03-11 06:36:05.705353668 +0100
+@@ -99,11 +99,11 @@ CLEAN_TARGETS = $(addsuffix /clean ,$(VE
  # lists the targets that are not files
  #
  .PHONY : _all libs _progr _lib build clean realclean distclean $(CLEAN_TARGETS)\
@@ -86,19 +155,19 @@ diff -up cp2k-2.5/makefiles/Makefile.r cp2k-2.5/makefiles/Makefile
 +build: dirs libcusmm
  	+$(MAKE) -C $(SRCDIR) -f $(MAKEFILE) all.dep
  	+cp $(LIBCUDA_DEPENDENCIES) $(OBJDIR)/$(VERSION)/libc_cuda.dep
- 	+if [ -a $(LIBCUSMM_DEPENDENCIES) ]; then \
-@@ -113,7 +113,7 @@ build: dirs deptool libcusmm
+ 	+if [ -e $(LIBCUSMM_DEPENDENCIES) ]; then \
+@@ -112,7 +112,7 @@ build: dirs deptool libcusmm
  	+cp $(LIBMA_DEPENDENCIES) $(OBJDIR)/$(VERSION)/libc_ma.dep
  	+$(MAKE) -C $(OBJDIR)/$(VERSION) -f $(MAKEFILE) $(WHAT)
  
 -fes: dirs deptool
 +fes: dirs
- 	+$(MAKE) -C $(TOOLSRC)/metadyn/  -f $(MAKEFILE) fes.dep
+ 	+$(MAKE) -C $(SRCDIR)/metadyn_tools/  -f $(MAKEFILE) fes.dep
  	+$(MAKE) -C $(OBJDIR)/$(VERSION) -f $(MAKEFILE) HACKLIBDEP=yes VERSION=$(VERSION) $(FES) 
  
-@@ -134,9 +134,6 @@ pretty: dirs
+@@ -132,9 +132,6 @@ pretty: dirs
+ 	+$(MAKE) -C $(SRCDIR)/dbcsr_lib -f $(MAKEFILE) _pretty_lib3
  	+$(MAKE) -C $(SRCDIR)/arch_lib  -f $(MAKEFILE) _pretty_lib4
- 	+$(MAKE) -C $(SRCDIR)/elpa_lib  -f $(MAKEFILE) _pretty_lib5
  
 -deptool: dirs
 -	+$(MAKE) LDFLAGS=$(MAKDEPF90_LDFLAGS) -C $(TOOLDIR) -f $(MAKEFILE) makedepf90
@@ -106,7 +175,7 @@ diff -up cp2k-2.5/makefiles/Makefile.r cp2k-2.5/makefiles/Makefile
  libs:
  	+$(MAKE) -f $(MAKEFILE) VERSION=$(VERSION) WHAT=_lib build
  all:
-@@ -161,7 +158,7 @@ plumedobj: dirs
+@@ -159,7 +156,7 @@ plumedobj: dirs
  #
  # on a parallel build only one task should go a build the deptool
  #
@@ -138,9 +207,9 @@ diff -up cp2k-2.5/makefiles/Makefile.r cp2k-2.5/makefiles/Makefile
 -	$(TOOLDIR)/makedepf90 -I$(SRCDIR) -b. $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/fes.dep || ( rm -f $(OBJDIR)/$(VERSION)/fes.dep  ; exit 1 )
 +	makedepf90 -I$(SRCDIR) -b. $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/fes.dep || ( rm -f $(OBJDIR)/$(VERSION)/fes.dep  ; exit 1 )
  
- plumed.dep: $(OBJECTS:.o=.F) $(LIB1_OBJECTS:.o=.F) $(LIB2_OBJECTS:.o=.F) $(LIB4_OBJECTS:.o=.F) $(LIB3_OBJECTS:.o=.F) $(LIB5_OBJECTS:.o=.F) cp_common_uses.h src-plumed/metadyn.h cp2k.F 
+ plumed.dep: $(OBJECTS:.o=.F) $(LIB1_OBJECTS:.o=.F) $(LIB2_OBJECTS:.o=.F) $(LIB4_OBJECTS:.o=.F) $(LIB3_OBJECTS:.o=.F) cp_common_uses.h src-plumed/metadyn.h cp2k.F 
  
-@@ -430,9 +427,6 @@ dbcsr_performance_driver.o: $(LIB3_ARCHI
+@@ -426,9 +423,6 @@ dbcsr_performance_driver.o: $(LIB3_ARCHI
  #
  # these are tools, but their integration in the build is ugly at least (e.g. see dependencies).
  #
@@ -150,15 +219,14 @@ diff -up cp2k-2.5/makefiles/Makefile.r cp2k-2.5/makefiles/Makefile
  
  #
  # the rule how to generate the .o from the .F
-diff -up cp2k-2.5/tools/regtesting/do_regtest.r cp2k-2.5/tools/regtesting/do_regtest
---- cp2k-2.5/tools/regtesting/do_regtest.r	2013-09-27 17:05:41.000000000 +0300
-+++ cp2k-2.5/tools/regtesting/do_regtest	2013-12-24 00:06:08.783843347 +0200
-@@ -682,7 +682,7 @@ for dir in ${dirs}; do
-      # third field allows numerical tolerances to be read from the TEST_FILES
+diff -up cp2k-2.5.0/tools/regtesting/do_regtest.r cp2k-2.5.0/tools/regtesting/do_regtest
+--- cp2k-2.5.0/tools/regtesting/do_regtest.r	2014-01-16 15:35:28.000000000 +0100
++++ cp2k-2.5.0/tools/regtesting/do_regtest	2014-03-11 06:36:05.705353668 +0100
+@@ -688,6 +688,7 @@ for dir in ${dirs}; do
       # if value does not exist set to the default of 1.0E-14
       test_tolerance=`grep -v "#" TEST_FILES | ${awk} -v itest=$itest -v def_err_tol=$default_err_tolerance '{c=c+1;if (c==itest) if (NF == 3) { print $3 } else { print def_err_tol } }'`
--
+ 
 +     echo "Running ${input_file}"
       output_file=${dir_out}/${dir}/${input_file}.out
       output_last=${dir_last}/${dir}/${input_file}.out
-      ( ulimit -t ${job_max_time} ; ${cp2k_prefix} ${input_file} ${cp2k_postfix} &> ${output_file} )
+      ( ulimit -t ${job_max_time} ; ${cp2k_prefix} ${input_file} ${cp2k_postfix} &> ${output_file} ) >& /dev/null

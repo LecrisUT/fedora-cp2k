@@ -1,11 +1,11 @@
-%define svn 1
+%define svn 0
 %define snapshot 20131112
 
 Name: cp2k
-Version: 2.5
-Release: 0.5.%{snapshot}svn13316%{?dist}
+Version: 2.5.0
+Release: 1%{?dist}
 Group: Applications/Engineering
-Summary: A molecular dynamics engine capable of classical and Car-Parrinello simulations
+Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
 URL: http://cp2k.org/
 %if %{svn}
@@ -22,6 +22,8 @@ Source4: cp2k-snapshot.sh
 # use external makedepf90
 # skip compilation during regtests
 Patch0: %{name}-rpm.patch
+# fix fes compilation (fixed in SVN r13644)
+Patch1: cp2k-r13644.patch
 BuildRequires: atlas-devel >= 3.10.1
 # for regtests
 BuildRequires: bc
@@ -46,7 +48,9 @@ perform atomistic and molecular simulations of solid state, liquid,\
 molecular and biological systems. It provides a general framework for\
 different methods such as e.g. density functional theory (DFT) using a\
 mixed Gaussian and plane waves approach (GPW), and classical pair and\
-many-body potentials.
+many-body potentials.\
+\
+CP2K does not implement Car-Parinello Molecular Dynamics (CPMD).
 
 %description
 %{cp2k_desc_base}
@@ -103,6 +107,7 @@ This package contains the documentation and the manual.
 %prep
 %setup -q
 %patch0 -p1 -b .r
+%patch1 -p1 -b .r13644
 rm -r tools/makedepf90
 chmod -x src/harris_{functional,{env,energy}_types}.F
 
@@ -184,7 +189,7 @@ popd
 
 %files common
 %defattr(-,root,root,-)
-%doc COPYRIGHT README doc/tutorialCp2k.html
+%doc COPYRIGHT README
 
 %files
 %defattr(-,root,root,-)
@@ -202,6 +207,11 @@ popd
 %{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich
 
 %changelog
+* Tue Mar 11 2014 Dominik Mierzejewski <rpm@greysector.net> - 2.5.0-1
+- update to upstream 2.5 release
+- backport compilation fix from SVN
+- fix description (cp2k doesn't implement Car-Parinello Molecular Dynamics)
+
 * Mon Mar 10 2014 Susi Lehtola <jussilehtola@fedoraproject.org> - 2.5-0.5.20131112svn13316
 - Rebuild against updated libint.
 
