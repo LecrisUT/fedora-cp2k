@@ -2,7 +2,7 @@
 %define snapshot 20131112
 
 Name: cp2k
-Version: 2.5.0
+Version: 2.5.1
 Release: 1%{?dist}
 Group: Applications/Engineering
 Summary: Ab Initio Molecular Dynamics
@@ -22,8 +22,6 @@ Source4: cp2k-snapshot.sh
 # use external makedepf90
 # skip compilation during regtests
 Patch0: %{name}-rpm.patch
-# fix fes compilation (fixed in SVN r13644)
-Patch1: cp2k-r13644.patch
 BuildRequires: atlas-devel >= 3.10.1
 # for regtests
 BuildRequires: bc
@@ -107,7 +105,6 @@ This package contains the documentation and the manual.
 %prep
 %setup -q
 %patch0 -p1 -b .r
-%patch1 -p1 -b .r13644
 rm -r tools/makedepf90
 chmod -x src/harris_{functional,{env,energy}_types}.F
 
@@ -207,6 +204,10 @@ popd
 %{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich
 
 %changelog
+* Fri Mar 14 2014 Dominik Mierzejewski <rpm@greysector.net> - 2.5.1-1
+- update to upstream 2.5.1 release
+- drop backported compilation fix
+
 * Tue Mar 11 2014 Dominik Mierzejewski <rpm@greysector.net> - 2.5.0-1
 - update to upstream 2.5 release
 - backport compilation fix from SVN
