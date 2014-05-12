@@ -3,7 +3,7 @@
 
 Name: cp2k
 Version: 2.5.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 Group: Applications/Engineering
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
@@ -108,6 +108,11 @@ This package contains the documentation and the manual.
 rm -r tools/makedepf90
 chmod -x src/harris_{functional,{env,energy}_types}.F
 
+%if 0%{?fedora} >= 21
+sed -i 's|-lmpiblacsF77init||g' arch/Linux-x86-64-gfortran*
+sed -i 's|-lmpiblacsCinit||g' arch/Linux-x86-64-gfortran*
+%endif
+
 # Generate necessary symlinks
 TARGET=$(tools/get_arch_code)
 %ifnarch x86_64
@@ -204,6 +209,9 @@ popd
 %{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich
 
 %changelog
+* Mon May 12 2014 Tom Callaway <spot@fedoraproject.org> - 2.5.1-2
+- compile against new blacs in rawhide
+
 * Fri Mar 14 2014 Dominik Mierzejewski <rpm@greysector.net> - 2.5.1-1
 - update to upstream 2.5.1 release
 - drop backported compilation fix
