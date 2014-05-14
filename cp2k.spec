@@ -3,7 +3,7 @@
 
 Name: cp2k
 Version: 2.5.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 Group: Applications/Engineering
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
@@ -14,6 +14,7 @@ Source0: cp2k-%{version}-%{snapshot}.tar.xz
 %else
 Source0: http://downloads.sourceforge.net/project/cp2k/cp2k-%{version}.tar.bz2
 %endif
+Source1: http://downloads.sourceforge.net/project/cp2k/cp2k-2_5-branch_LAST-Linux-x86-64-gfortran-popt.tar.bz2
 Source4: cp2k-snapshot.sh
 # patch to:
 # use rpm optflags
@@ -137,6 +138,9 @@ for f in arch/Linux-x86-64-gfortran.{popt,psmp,sopt,ssmp}; do
  sed -i "s|@LIBINT_MAX_AM@|$maxam|g;s|@LIBDERIV_MAX_AM@|$maxderiv|g" $f
 done
 
+tar -xf %{SOURCE1}
+ln -s LAST-Linux-x86-64-gfortran-popt LAST-${TARGET}-sopt
+
 
 %build
 TARGET=$(tools/get_arch_code)
@@ -209,6 +213,9 @@ popd
 %{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich
 
 %changelog
+* Tue May 13 2014 Thomas Spura <tomspur@fedoraproject.org> - 2.5.1-3
+- add upstream reference data for evaluating tests
+
 * Mon May 12 2014 Tom Callaway <spot@fedoraproject.org> - 2.5.1-2
 - compile against new blacs in rawhide
 

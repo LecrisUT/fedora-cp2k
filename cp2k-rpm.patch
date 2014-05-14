@@ -219,10 +219,20 @@ diff -up cp2k-2.5.0/makefiles/Makefile.r cp2k-2.5.0/makefiles/Makefile
  
  #
  # the rule how to generate the .o from the .F
-diff -up cp2k-2.5.0/tools/regtesting/do_regtest.r cp2k-2.5.0/tools/regtesting/do_regtest
---- cp2k-2.5.0/tools/regtesting/do_regtest.r	2014-01-16 15:35:28.000000000 +0100
-+++ cp2k-2.5.0/tools/regtesting/do_regtest	2014-03-11 06:36:05.705353668 +0100
-@@ -688,6 +688,7 @@ for dir in ${dirs}; do
+--- cp2k-2.5.0/tools/regtesting/do_regtest	2014-01-16 15:35:28.000000000 +0100
++++ cp2k-2.5.0/tools/regtesting/do_regtest	2014-05-13 11:00:52.984100148 +0200
+@@ -240,8 +240,8 @@
+ #
+ ###################################################################################
+ test_types_file=${dir_base}/${cp2k_dir}/tests/TEST_TYPES
+-dir_last=${dir_base}/LAST-${dir_triplet}-${cp2k_version}
+-dir_out=${dir_base}/TEST-${dir_triplet}-${cp2k_version}-${datum_short}
++dir_last=${dir_base}/${cp2k_dir}/LAST-${dir_triplet}-${cp2k_version}
++dir_out=${dir_base}/${cp2k_dir}/TEST-${dir_triplet}-${cp2k_version}-${datum_short}
+ changelog=${dir_last}/ChangeLog
+ changelog_diff=${changelog}.diff
+ changelog_new=${changelog}.new
+@@ -688,6 +688,7 @@
       # if value does not exist set to the default of 1.0E-14
       test_tolerance=`grep -v "#" TEST_FILES | ${awk} -v itest=$itest -v def_err_tol=$default_err_tolerance '{c=c+1;if (c==itest) if (NF == 3) { print $3 } else { print def_err_tol } }'`
  
