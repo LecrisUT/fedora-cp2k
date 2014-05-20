@@ -3,7 +3,7 @@
 
 Name: cp2k
 Version: 2.5.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 Group: Applications/Engineering
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
@@ -140,6 +140,7 @@ done
 
 tar -xf %{SOURCE1}
 ln -s LAST-Linux-x86-64-gfortran-popt LAST-${TARGET}-sopt
+ln -s LAST-Linux-x86-64-gfortran-popt LAST-${TARGET}-openmpi-popt
 
 
 %build
@@ -181,15 +182,18 @@ rm -rf %{buildroot}
 cat > tests/fedora.config << __EOF__
 export LC_ALL=C
 dir_base=%{_builddir}
-cp2k_version=sopt
-dir_triplet=`tools/get_arch_code`
+cp2k_version=popt
+cp2k_run_prefix="mpirun -np 2"
+dir_triplet=`tools/get_arch_code`-openmpi
 cp2k_dir=cp2k-%{version}
-maxtasks=`getconf _NPROCESSORS_ONLN`
+maxtasks=$(echo `getconf _NPROCESSORS_ONLN`/2 | bc)
 emptycheck="NO"
 leakcheck="NO"
 __EOF__
 pushd tests
+%{_openmpi_load}
 ../tools/regtesting/do_regtest -nosvn -nobuild -config fedora.config
+%{_openmpi_unload}
 popd
 %endif
 
@@ -213,6 +217,9 @@ popd
 %{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich
 
 %changelog
+* Tue May 20 2014 Thomas Spura <tomspur@fedoraproject.org> - 2.5.1-4
+- run tests with openmpi on 2 cores
+
 * Tue May 13 2014 Thomas Spura <tomspur@fedoraproject.org> - 2.5.1-3
 - add upstream reference data for evaluating tests
 
