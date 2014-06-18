@@ -3,7 +3,7 @@
 
 Name: cp2k
 Version: 2.5.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 Group: Applications/Engineering
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
@@ -217,6 +217,9 @@ popd
 %{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich
 
 %changelog
+* Wed Jun 18 2014 Dominik Mierzejewski <rpm@greysector.net> - 2.5.1-6
+- rebuild for libint
+
 * Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.5.1-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
 
