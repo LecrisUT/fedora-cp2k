@@ -3,7 +3,7 @@
 
 Name: cp2k
 Version: 2.5.1
-Release: 6%{?dist}
+Release: 7%{?dist}
 Group: Applications/Engineering
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
@@ -14,7 +14,7 @@ Source0: cp2k-%{version}-%{snapshot}.tar.xz
 %else
 Source0: http://downloads.sourceforge.net/project/cp2k/cp2k-%{version}.tar.bz2
 %endif
-Source1: http://downloads.sourceforge.net/project/cp2k/cp2k-2_5-branch_LAST-Linux-x86-64-gfortran-popt.tar.bz2
+Source1: http://downloads.sourceforge.net/project/cp2k/testresults/cp2k-2_5-branch_LAST-Linux-x86-64-gfortran-popt.tar.bz2
 Source4: cp2k-snapshot.sh
 # patch to:
 # use rpm optflags
@@ -61,6 +61,7 @@ Group: Applications/Engineering
 Summary: Molecular simulations software - openmpi version
 BuildRequires:  openmpi-devel
 BuildRequires:  blacs-openmpi-devel
+BuildRequires:  elpa-openmpi-devel
 BuildRequires:  scalapack-openmpi-devel
 Requires: %{name}-common = %{version}-%{release}
 Requires: blacs-openmpi%{?_isa}
@@ -79,6 +80,7 @@ Group: Applications/Engineering
 Summary: Molecular simulations software - mpich version
 BuildRequires:  mpich-devel
 BuildRequires:  blacs-mpich-devel
+BuildRequires:  elpa-mpich-devel
 BuildRequires:  scalapack-mpich-devel
 Requires: %{name}-common = %{version}-%{release}
 Requires: blacs-mpich%{?_isa}
@@ -147,12 +149,12 @@ ln -s LAST-Linux-x86-64-gfortran-popt LAST-${TARGET}-openmpi-popt
 TARGET=$(tools/get_arch_code)
 pushd makefiles
     %{_openmpi_load}
-        make OPTFLAGS="%{optflags} -L%{_libdir}/atlas" %{?_smp_mflags} ARCH="${TARGET}-openmpi" VERSION=popt
-        make OPTFLAGS="%{optflags} -L%{_libdir}/atlas" %{?_smp_mflags} ARCH="${TARGET}-openmpi" VERSION=psmp
+        make OPTFLAGS="%{optflags} -L%{_libdir}/atlas -I%{_fmoddir}/openmpi" %{?_smp_mflags} ARCH="${TARGET}-openmpi" VERSION=popt
+        make OPTFLAGS="%{optflags} -L%{_libdir}/atlas -I%{_fmoddir}/openmpi" %{?_smp_mflags} ARCH="${TARGET}-openmpi" VERSION=psmp
     %{_openmpi_unload}
     %{_mpich_load}
-        make OPTFLAGS="%{optflags} -L%{_libdir}/atlas" %{?_smp_mflags} ARCH="${TARGET}-mpich" VERSION=popt
-        make OPTFLAGS="%{optflags} -L%{_libdir}/atlas" %{?_smp_mflags} ARCH="${TARGET}-mpich" VERSION=psmp
+        make OPTFLAGS="%{optflags} -L%{_libdir}/atlas -I%{_fmoddir}/mpich" %{?_smp_mflags} ARCH="${TARGET}-mpich" VERSION=popt
+        make OPTFLAGS="%{optflags} -L%{_libdir}/atlas -I%{_fmoddir}/mpich" %{?_smp_mflags} ARCH="${TARGET}-mpich" VERSION=psmp
     %{_mpich_unload}
 
     make OPTFLAGS="%{optflags} -L%{_libdir}/atlas" %{?_smp_mflags} sopt ssmp
@@ -217,6 +219,10 @@ popd
 %{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich
 
 %changelog
+* Tue Jun 24 2014 Dominik Mierzejewski <rpm@greysector.net> - 2.5.1-7
+- add ELPA support
+- fix download link for reference test data
+
 * Wed Jun 18 2014 Dominik Mierzejewski <rpm@greysector.net> - 2.5.1-6
 - rebuild for libint
 
