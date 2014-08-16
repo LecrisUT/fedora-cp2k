@@ -3,7 +3,7 @@
 
 Name: cp2k
 Version: 2.5.1
-Release: 7%{?dist}
+Release: 8%{?dist}
 Group: Applications/Engineering
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
@@ -219,6 +219,9 @@ popd
 %{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich
 
 %changelog
+* Sat Aug 16 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.5.1-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
+
 * Tue Jun 24 2014 Dominik Mierzejewski <rpm@greysector.net> - 2.5.1-7
 - add ELPA support
 - fix download link for reference test data
