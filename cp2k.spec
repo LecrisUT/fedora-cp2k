@@ -3,7 +3,7 @@
 
 Name: cp2k
 Version: 2.5.1
-Release: 8%{?dist}
+Release: 9%{?dist}
 Group: Applications/Engineering
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
@@ -34,7 +34,7 @@ BuildRequires: makedepf90
 BuildRequires: /usr/bin/hostname
 
 # Libint can break the API between releases
-Requires: libint%{?_isa} = %{_libint_version}
+Requires: libint(api)%{?_isa} = %{_libint_apiversion}
 
 Requires: %{name}-common = %{version}-%{release}
 Obsoletes: %{name}-smp < 2.4-3
@@ -67,7 +67,7 @@ Requires: %{name}-common = %{version}-%{release}
 Requires: blacs-openmpi%{?_isa}
 Requires: scalapack-openmpi%{?_isa}
 # Libint may have API breakage
-Requires: libint%{?_isa} = %{_libint_version}
+Requires: libint(api)%{?_isa} = %{_libint_apiversion}
 
 %description openmpi
 %{cp2k_desc_base}
@@ -88,7 +88,7 @@ Requires: scalapack-mpich%{?_isa}
 Provides: %{name}-mpich2 = %{version}-%{release}
 Obsoletes: %{name}-mpich2 < 2.4-5
 # Libint may have API breakage
-Requires: libint%{?_isa} = %{_libint_version}
+Requires: libint(api)%{?_isa} = %{_libint_apiversion}
 
 %description mpich
 %{cp2k_desc_base}
@@ -219,6 +219,9 @@ popd
 %{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich
 
 %changelog
+* Tue Sep 09 2014 Susi Lehtola <jussilehtola@fedoraproject.org> - 2.5.1-9
+- Requires: libint(api).
+
 * Sat Aug 16 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.5.1-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
