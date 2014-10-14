@@ -3,7 +3,7 @@
 
 Name: cp2k
 Version: 2.5.1
-Release: 9%{?dist}
+Release: 10%{?dist}
 Group: Applications/Engineering
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
@@ -23,6 +23,8 @@ Source4: cp2k-snapshot.sh
 # use external makedepf90
 # skip compilation during regtests
 Patch0: %{name}-rpm.patch
+# add Linux on non-x86 support in tools/get_arch_code
+Patch1: %{name}-non-x86.patch
 BuildRequires: atlas-devel >= 3.10.1
 # for regtests
 BuildRequires: bc
@@ -108,6 +110,7 @@ This package contains the documentation and the manual.
 %prep
 %setup -q
 %patch0 -p1 -b .r
+%patch1 -p1 -b .non-x86
 rm -r tools/makedepf90
 chmod -x src/harris_{functional,{env,energy}_types}.F
 
@@ -219,6 +222,9 @@ popd
 %{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich
 
 %changelog
+* Tue Oct 14 2014 Dominik Mierzejewski <rpm@greysector.net> - 2.5.1-10
+- add Linux on non-x86 support to tools/get_arch_code
+
 * Tue Sep 09 2014 Susi Lehtola <jussilehtola@fedoraproject.org> - 2.5.1-9
 - Requires: libint(api).
 
