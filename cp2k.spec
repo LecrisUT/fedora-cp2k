@@ -24,7 +24,7 @@ Source4: cp2k-snapshot.sh
 # skip compilation during regtests
 Patch0: %{name}-rpm.patch
 # add Linux on non-x86 support in tools/get_arch_code
-Patch1: %{name}-non-x86.patch
+Patch1: %{name}-get_arch_code-non-x86.patch
 BuildRequires: atlas-devel >= 3.10.1
 # for regtests
 BuildRequires: bc
