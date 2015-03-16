@@ -3,7 +3,7 @@
 
 Name: cp2k
 Version: 2.5.1
-Release: 10%{?dist}
+Release: 11%{?dist}
 Group: Applications/Engineering
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
@@ -222,6 +222,9 @@ popd
 %{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich
 
 %changelog
+* Mon Mar 16 2015 Thomas Spura <tomspur@fedoraproject.org> - 2.5.1-11
+- Rebuild for changed mpich libraries
+
 * Tue Oct 14 2014 Dominik Mierzejewski <rpm@greysector.net> - 2.5.1-10
 - add Linux on non-x86 support to tools/get_arch_code
 
