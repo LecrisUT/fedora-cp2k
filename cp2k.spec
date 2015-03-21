@@ -185,7 +185,7 @@ install -pm755 exe/${TARGET}/cp2k.ssmp %{buildroot}%{_bindir}
 %clean
 rm -rf %{buildroot}
 
-%if 0
+%if 1
 %check
 cat > tests/fedora.config << __EOF__
 export LC_ALL=C
