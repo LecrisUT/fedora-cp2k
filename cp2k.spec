@@ -200,7 +200,7 @@ leakcheck="NO"
 __EOF__
 pushd tests
 %{_openmpi_load}
-../tools/build_utils/regtesting/do_regtest -nosvn -nobuild -config fedora.config
+../tools/regtesting/do_regtest -nosvn -nobuild -config fedora.config
 %{_openmpi_unload}
 popd
 %endif
