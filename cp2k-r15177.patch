@@ -1,0 +1,445 @@
+diff -up cp2k-2.6.0/REVISION.r15177 cp2k-2.6.0/REVISION
+--- cp2k-2.6.0/REVISION.r15177	2014-12-22 07:41:26.384775000 +0100
++++ cp2k-2.6.0/REVISION	2015-03-20 10:07:13.435631608 +0100
+@@ -1 +1 @@
+-svn:14880
++svn:15177
+diff -up cp2k-2.6.0/src/common/timings.F.r15177 cp2k-2.6.0/src/common/timings.F
+--- cp2k-2.6.0/src/common/timings.F.r15177	2014-07-24 23:13:13.080754000 +0200
++++ cp2k-2.6.0/src/common/timings.F	2015-03-20 10:02:46.990384754 +0100
+@@ -424,6 +424,8 @@ MODULE timings
+        r_stat => list_get(timer_env%routine_stats, cs_entry%routine_id)
+        WRITE (unit_nr, '(T10,I4,1X,A)') i, TRIM(r_stat%routineN)
+     END DO
++    CALL m_flush(unit_nr)
++
+   END SUBROUTINE print_stack
+ 
+ ! *****************************************************************************
+diff -up cp2k-2.6.0/src/dbcsr/block/dbcsr_work_operations.F.r15177 cp2k-2.6.0/src/dbcsr/block/dbcsr_work_operations.F
+--- cp2k-2.6.0/src/dbcsr/block/dbcsr_work_operations.F.r15177	2014-11-28 10:16:37.893249000 +0100
++++ cp2k-2.6.0/src/dbcsr/block/dbcsr_work_operations.F	2015-03-20 10:02:46.990384754 +0100
+@@ -716,7 +716,8 @@ CONTAINS
+       SAVE, TARGET                           :: empty_row_p
+     INTEGER, DIMENSION(:), POINTER, SAVE     :: old_blk_p, old_col_i, &
+                                                 old_row_p
+-    LOGICAL                                  :: fake_row_p, sort_data, spawn
++    LOGICAL                                  :: can_quick, fake_row_p, &
++                                                sort_data, spawn
+ 
+ !   ---------------------------------------------------------------------------
+ 
+@@ -814,10 +815,12 @@ CONTAINS
+     ENDIF
+     !$OMP END MASTER
+     !
++    !$OMP BARRIER
++    can_quick=can_quickly_finalize (matrix)
++    !$OMP BARRIER
+     ! If the matrix, work matricies, and environment fit several
+     ! criteria, then a quick O(1) finalization is performed.
+-    IF (can_quickly_finalize (matrix) .AND. .NOT. sort_data) THEN
+-       !$OMP BARRIER
++    IF (can_quick .AND. .NOT. sort_data) THEN
+        CALL quick_finalize (matrix, error=error)
+     ELSE
+        !
+@@ -930,7 +933,7 @@ CONTAINS
+     LOGICAL, PARAMETER                       :: dbg = .FALSE.
+ 
+     INTEGER                                  :: error_handler
+-    LOGICAL                                  :: sort_data
++    LOGICAL                                  :: can_quick, sort_data
+ 
+ !   ---------------------------------------------------------------------------
+ 
+@@ -959,12 +962,13 @@ CONTAINS
+     ELSE
+        sort_data = .FALSE.
+     ENDIF
+-
++    !$OMP BARRIER
++    can_quick=can_quickly_finalize (matrix)
+     !$OMP BARRIER
+ 
+     ! If the matrix, work matricies, and environment fit several
+     ! criteria, then a quick O(1) finalization is performed.
+-    IF (can_quickly_finalize (matrix) .AND. .NOT. sort_data) THEN
++    IF (can_quick .AND. .NOT. sort_data) THEN
+        CALL quick_finalize (matrix, error=error)
+     ELSE
+        CALL dbcsr_assert (sort_data,&
+diff -up cp2k-2.6.0/src/iterate_matrix.F.r15177 cp2k-2.6.0/src/iterate_matrix.F
+--- cp2k-2.6.0/src/iterate_matrix.F.r15177	2014-12-12 16:18:17.796173000 +0100
++++ cp2k-2.6.0/src/iterate_matrix.F	2015-03-20 10:02:46.990384754 +0100
+@@ -684,9 +684,15 @@ CONTAINS
+     INTEGER                                  :: handle, i, ispin, unit_nr
+     REAL(KIND=dp)                            :: frob_norm
+     TYPE(cp_dbcsr_type)                      :: matrix_pp, matrix_tmp
++    TYPE(cp_logger_type), POINTER            :: logger
+ 
+     CALL timeset(routineN,handle)
+-    unit_nr = cp_logger_get_default_unit_nr()
++    logger => cp_error_get_logger(error)
++    IF (logger%para_env%mepos==logger%para_env%source) THEN
++       unit_nr=cp_logger_get_default_unit_nr(logger,local=.TRUE.)
++    ELSE
++       unit_nr=-1
++    ENDIF
+ 
+     CALL cp_dbcsr_init(matrix_pp,error=error)
+     CALL cp_dbcsr_create(matrix_pp,template=matrix_p(1),matrix_type=dbcsr_type_no_symmetry,error=error)
+@@ -744,9 +750,16 @@ CONTAINS
+     REAL(KIND=dp)                            :: frob_norm
+     TYPE(cp_dbcsr_type)                      :: matrix_ps, matrix_psp, &
+                                                 matrix_test
++    TYPE(cp_logger_type), POINTER            :: logger
+ 
+     CALL timeset(routineN,handle)
+-    unit_nr = cp_logger_get_default_unit_nr()
++
++    logger => cp_error_get_logger(error)
++    IF (logger%para_env%mepos==logger%para_env%source) THEN
++       unit_nr=cp_logger_get_default_unit_nr(logger,local=.TRUE.)
++    ELSE
++       unit_nr=-1
++    ENDIF
+ 
+     CALL cp_dbcsr_init(matrix_ps,error=error)
+     CALL cp_dbcsr_create(matrix_ps,template=matrix_p(1),matrix_type=dbcsr_type_no_symmetry,error=error)
+diff -up cp2k-2.6.0/src/mpiwrap/message_c_passing.f90.r15177 cp2k-2.6.0/src/mpiwrap/message_c_passing.f90
+--- cp2k-2.6.0/src/mpiwrap/message_c_passing.f90.r15177	2014-11-19 10:16:00.441676000 +0100
++++ cp2k-2.6.0/src/mpiwrap/message_c_passing.f90	2015-03-20 10:02:46.988384747 +0100
+@@ -46,7 +46,7 @@
+     msglen = SIZE(msg)
+     t_start = m_walltime ( )
+     CALL mpi_sendrecv_replace(msg,msglen,MPI_COMPLEX,right,tag,left,tag, &
+-         group,status(1),ierror)
++         group,status,ierror)
+     t_end = m_walltime ( )
+     IF ( ierror /= 0 ) CALL mp_stop ( ierror, "mpi_sendrecv_replace @ "//routineN )
+     CALL add_perf(perf_id=7,count=1,time=t_end-t_start,msg_size=msglen*(2*real_4_size))
+@@ -104,7 +104,7 @@
+     msglen = SIZE(msg)
+     t_start = m_walltime ( )
+     CALL mpi_sendrecv_replace(msg,msglen,MPI_COMPLEX,right,tag,left,&
+-         tag,group,status(1),ierror)
++         tag,group,status,ierror)
+     t_end = m_walltime ( )
+     IF ( ierror /= 0 ) CALL mp_stop ( ierror, "mpi_sendrecv_replace @ "//routineN )
+     CALL add_perf(perf_id=7,count=1,time=t_end-t_start,msg_size=msglen*(2*real_4_size))
+@@ -1718,7 +1718,7 @@
+     send_tag = 0 ! cannot think of something better here, this might be dangerous
+     recv_tag = 0 ! cannot think of something better here, this might be dangerous
+     CALL mpi_sendrecv(msgin,msglen_in,MPI_COMPLEX,dest,send_tag,msgout,&
+-         msglen_out,MPI_COMPLEX,source,recv_tag,comm,status(1),ierr)
++         msglen_out,MPI_COMPLEX,source,recv_tag,comm,status,ierr)
+     ! we do not check the status
+     IF ( ierr /= 0 ) CALL mp_stop( ierr, "mpi_sendrecv @ "//routineN )
+     t_end = m_walltime ( )
+@@ -1767,7 +1767,7 @@
+     send_tag = 0 ! cannot think of something better here, this might be dangerous
+     recv_tag = 0 ! cannot think of something better here, this might be dangerous
+     CALL mpi_sendrecv(msgin,msglen_in,MPI_COMPLEX,dest,send_tag,msgout,&
+-         msglen_out,MPI_COMPLEX,source,recv_tag,comm,status(1),ierr)
++         msglen_out,MPI_COMPLEX,source,recv_tag,comm,status,ierr)
+     ! we do not check the status
+     IF ( ierr /= 0 ) CALL mp_stop( ierr, "mpi_sendrecv @ "//routineN )
+     t_end = m_walltime ( )
+@@ -1816,7 +1816,7 @@
+     send_tag = 0 ! cannot think of something better here, this might be dangerous
+     recv_tag = 0 ! cannot think of something better here, this might be dangerous
+     CALL mpi_sendrecv(msgin,msglen_in,MPI_COMPLEX,dest,send_tag,msgout,&
+-         msglen_out,MPI_COMPLEX,source,recv_tag,comm,status(1),ierr)
++         msglen_out,MPI_COMPLEX,source,recv_tag,comm,status,ierr)
+     ! we do not check the status
+     IF ( ierr /= 0 ) CALL mp_stop( ierr, "mpi_sendrecv @ "//routineN )
+     t_end = m_walltime ( )
+diff -up cp2k-2.6.0/src/mpiwrap/message_d_passing.f90.r15177 cp2k-2.6.0/src/mpiwrap/message_d_passing.f90
+--- cp2k-2.6.0/src/mpiwrap/message_d_passing.f90.r15177	2014-11-19 10:16:00.441676000 +0100
++++ cp2k-2.6.0/src/mpiwrap/message_d_passing.f90	2015-03-20 10:02:46.989384750 +0100
+@@ -46,7 +46,7 @@
+     msglen = SIZE(msg)
+     t_start = m_walltime ( )
+     CALL mpi_sendrecv_replace(msg,msglen,MPI_DOUBLE_PRECISION,right,tag,left,tag, &
+-         group,status(1),ierror)
++         group,status,ierror)
+     t_end = m_walltime ( )
+     IF ( ierror /= 0 ) CALL mp_stop ( ierror, "mpi_sendrecv_replace @ "//routineN )
+     CALL add_perf(perf_id=7,count=1,time=t_end-t_start,msg_size=msglen*real_8_size)
+@@ -104,7 +104,7 @@
+     msglen = SIZE(msg)
+     t_start = m_walltime ( )
+     CALL mpi_sendrecv_replace(msg,msglen,MPI_DOUBLE_PRECISION,right,tag,left,&
+-         tag,group,status(1),ierror)
++         tag,group,status,ierror)
+     t_end = m_walltime ( )
+     IF ( ierror /= 0 ) CALL mp_stop ( ierror, "mpi_sendrecv_replace @ "//routineN )
+     CALL add_perf(perf_id=7,count=1,time=t_end-t_start,msg_size=msglen*real_8_size)
+@@ -1718,7 +1718,7 @@
+     send_tag = 0 ! cannot think of something better here, this might be dangerous
+     recv_tag = 0 ! cannot think of something better here, this might be dangerous
+     CALL mpi_sendrecv(msgin,msglen_in,MPI_DOUBLE_PRECISION,dest,send_tag,msgout,&
+-         msglen_out,MPI_DOUBLE_PRECISION,source,recv_tag,comm,status(1),ierr)
++         msglen_out,MPI_DOUBLE_PRECISION,source,recv_tag,comm,status,ierr)
+     ! we do not check the status
+     IF ( ierr /= 0 ) CALL mp_stop( ierr, "mpi_sendrecv @ "//routineN )
+     t_end = m_walltime ( )
+@@ -1767,7 +1767,7 @@
+     send_tag = 0 ! cannot think of something better here, this might be dangerous
+     recv_tag = 0 ! cannot think of something better here, this might be dangerous
+     CALL mpi_sendrecv(msgin,msglen_in,MPI_DOUBLE_PRECISION,dest,send_tag,msgout,&
+-         msglen_out,MPI_DOUBLE_PRECISION,source,recv_tag,comm,status(1),ierr)
++         msglen_out,MPI_DOUBLE_PRECISION,source,recv_tag,comm,status,ierr)
+     ! we do not check the status
+     IF ( ierr /= 0 ) CALL mp_stop( ierr, "mpi_sendrecv @ "//routineN )
+     t_end = m_walltime ( )
+@@ -1816,7 +1816,7 @@
+     send_tag = 0 ! cannot think of something better here, this might be dangerous
+     recv_tag = 0 ! cannot think of something better here, this might be dangerous
+     CALL mpi_sendrecv(msgin,msglen_in,MPI_DOUBLE_PRECISION,dest,send_tag,msgout,&
+-         msglen_out,MPI_DOUBLE_PRECISION,source,recv_tag,comm,status(1),ierr)
++         msglen_out,MPI_DOUBLE_PRECISION,source,recv_tag,comm,status,ierr)
+     ! we do not check the status
+     IF ( ierr /= 0 ) CALL mp_stop( ierr, "mpi_sendrecv @ "//routineN )
+     t_end = m_walltime ( )
+diff -up cp2k-2.6.0/src/mpiwrap/message_i_passing.f90.r15177 cp2k-2.6.0/src/mpiwrap/message_i_passing.f90
+--- cp2k-2.6.0/src/mpiwrap/message_i_passing.f90.r15177	2014-11-19 10:16:00.441676000 +0100
++++ cp2k-2.6.0/src/mpiwrap/message_i_passing.f90	2015-03-20 10:02:46.989384750 +0100
+@@ -46,7 +46,7 @@
+     msglen = SIZE(msg)
+     t_start = m_walltime ( )
+     CALL mpi_sendrecv_replace(msg,msglen,MPI_INTEGER,right,tag,left,tag, &
+-         group,status(1),ierror)
++         group,status,ierror)
+     t_end = m_walltime ( )
+     IF ( ierror /= 0 ) CALL mp_stop ( ierror, "mpi_sendrecv_replace @ "//routineN )
+     CALL add_perf(perf_id=7,count=1,time=t_end-t_start,msg_size=msglen*int_4_size)
+@@ -104,7 +104,7 @@
+     msglen = SIZE(msg)
+     t_start = m_walltime ( )
+     CALL mpi_sendrecv_replace(msg,msglen,MPI_INTEGER,right,tag,left,&
+-         tag,group,status(1),ierror)
++         tag,group,status,ierror)
+     t_end = m_walltime ( )
+     IF ( ierror /= 0 ) CALL mp_stop ( ierror, "mpi_sendrecv_replace @ "//routineN )
+     CALL add_perf(perf_id=7,count=1,time=t_end-t_start,msg_size=msglen*int_4_size)
+@@ -1718,7 +1718,7 @@
+     send_tag = 0 ! cannot think of something better here, this might be dangerous
+     recv_tag = 0 ! cannot think of something better here, this might be dangerous
+     CALL mpi_sendrecv(msgin,msglen_in,MPI_INTEGER,dest,send_tag,msgout,&
+-         msglen_out,MPI_INTEGER,source,recv_tag,comm,status(1),ierr)
++         msglen_out,MPI_INTEGER,source,recv_tag,comm,status,ierr)
+     ! we do not check the status
+     IF ( ierr /= 0 ) CALL mp_stop( ierr, "mpi_sendrecv @ "//routineN )
+     t_end = m_walltime ( )
+@@ -1767,7 +1767,7 @@
+     send_tag = 0 ! cannot think of something better here, this might be dangerous
+     recv_tag = 0 ! cannot think of something better here, this might be dangerous
+     CALL mpi_sendrecv(msgin,msglen_in,MPI_INTEGER,dest,send_tag,msgout,&
+-         msglen_out,MPI_INTEGER,source,recv_tag,comm,status(1),ierr)
++         msglen_out,MPI_INTEGER,source,recv_tag,comm,status,ierr)
+     ! we do not check the status
+     IF ( ierr /= 0 ) CALL mp_stop( ierr, "mpi_sendrecv @ "//routineN )
+     t_end = m_walltime ( )
+@@ -1816,7 +1816,7 @@
+     send_tag = 0 ! cannot think of something better here, this might be dangerous
+     recv_tag = 0 ! cannot think of something better here, this might be dangerous
+     CALL mpi_sendrecv(msgin,msglen_in,MPI_INTEGER,dest,send_tag,msgout,&
+-         msglen_out,MPI_INTEGER,source,recv_tag,comm,status(1),ierr)
++         msglen_out,MPI_INTEGER,source,recv_tag,comm,status,ierr)
+     ! we do not check the status
+     IF ( ierr /= 0 ) CALL mp_stop( ierr, "mpi_sendrecv @ "//routineN )
+     t_end = m_walltime ( )
+diff -up cp2k-2.6.0/src/mpiwrap/message_l_passing.f90.r15177 cp2k-2.6.0/src/mpiwrap/message_l_passing.f90
+--- cp2k-2.6.0/src/mpiwrap/message_l_passing.f90.r15177	2014-11-19 10:16:00.441676000 +0100
++++ cp2k-2.6.0/src/mpiwrap/message_l_passing.f90	2015-03-20 10:02:46.987384743 +0100
+@@ -46,7 +46,7 @@
+     msglen = SIZE(msg)
+     t_start = m_walltime ( )
+     CALL mpi_sendrecv_replace(msg,msglen,MPI_INTEGER8,right,tag,left,tag, &
+-         group,status(1),ierror)
++         group,status,ierror)
+     t_end = m_walltime ( )
+     IF ( ierror /= 0 ) CALL mp_stop ( ierror, "mpi_sendrecv_replace @ "//routineN )
+     CALL add_perf(perf_id=7,count=1,time=t_end-t_start,msg_size=msglen*int_8_size)
+@@ -104,7 +104,7 @@
+     msglen = SIZE(msg)
+     t_start = m_walltime ( )
+     CALL mpi_sendrecv_replace(msg,msglen,MPI_INTEGER8,right,tag,left,&
+-         tag,group,status(1),ierror)
++         tag,group,status,ierror)
+     t_end = m_walltime ( )
+     IF ( ierror /= 0 ) CALL mp_stop ( ierror, "mpi_sendrecv_replace @ "//routineN )
+     CALL add_perf(perf_id=7,count=1,time=t_end-t_start,msg_size=msglen*int_8_size)
+@@ -1718,7 +1718,7 @@
+     send_tag = 0 ! cannot think of something better here, this might be dangerous
+     recv_tag = 0 ! cannot think of something better here, this might be dangerous
+     CALL mpi_sendrecv(msgin,msglen_in,MPI_INTEGER8,dest,send_tag,msgout,&
+-         msglen_out,MPI_INTEGER8,source,recv_tag,comm,status(1),ierr)
++         msglen_out,MPI_INTEGER8,source,recv_tag,comm,status,ierr)
+     ! we do not check the status
+     IF ( ierr /= 0 ) CALL mp_stop( ierr, "mpi_sendrecv @ "//routineN )
+     t_end = m_walltime ( )
+@@ -1767,7 +1767,7 @@
+     send_tag = 0 ! cannot think of something better here, this might be dangerous
+     recv_tag = 0 ! cannot think of something better here, this might be dangerous
+     CALL mpi_sendrecv(msgin,msglen_in,MPI_INTEGER8,dest,send_tag,msgout,&
+-         msglen_out,MPI_INTEGER8,source,recv_tag,comm,status(1),ierr)
++         msglen_out,MPI_INTEGER8,source,recv_tag,comm,status,ierr)
+     ! we do not check the status
+     IF ( ierr /= 0 ) CALL mp_stop( ierr, "mpi_sendrecv @ "//routineN )
+     t_end = m_walltime ( )
+@@ -1816,7 +1816,7 @@
+     send_tag = 0 ! cannot think of something better here, this might be dangerous
+     recv_tag = 0 ! cannot think of something better here, this might be dangerous
+     CALL mpi_sendrecv(msgin,msglen_in,MPI_INTEGER8,dest,send_tag,msgout,&
+-         msglen_out,MPI_INTEGER8,source,recv_tag,comm,status(1),ierr)
++         msglen_out,MPI_INTEGER8,source,recv_tag,comm,status,ierr)
+     ! we do not check the status
+     IF ( ierr /= 0 ) CALL mp_stop( ierr, "mpi_sendrecv @ "//routineN )
+     t_end = m_walltime ( )
+diff -up cp2k-2.6.0/src/mpiwrap/message__nametype1__passing.template.r15177 cp2k-2.6.0/src/mpiwrap/message__nametype1__passing.template
+--- cp2k-2.6.0/src/mpiwrap/message__nametype1__passing.template.r15177	2014-11-19 10:16:00.441676000 +0100
++++ cp2k-2.6.0/src/mpiwrap/message__nametype1__passing.template	2015-03-20 10:02:46.987384743 +0100
+@@ -46,7 +46,7 @@
+     msglen = SIZE(msg)
+     t_start = m_walltime ( )
+     CALL mpi_sendrecv_replace(msg,msglen,[mpi_type1],right,tag,left,tag, &
+-         group,status(1),ierror)
++         group,status,ierror)
+     t_end = m_walltime ( )
+     IF ( ierror /= 0 ) CALL mp_stop ( ierror, "mpi_sendrecv_replace @ "//routineN )
+     CALL add_perf(perf_id=7,count=1,time=t_end-t_start,msg_size=msglen*[bytes1])
+@@ -104,7 +104,7 @@
+     msglen = SIZE(msg)
+     t_start = m_walltime ( )
+     CALL mpi_sendrecv_replace(msg,msglen,[mpi_type1],right,tag,left,&
+-         tag,group,status(1),ierror)
++         tag,group,status,ierror)
+     t_end = m_walltime ( )
+     IF ( ierror /= 0 ) CALL mp_stop ( ierror, "mpi_sendrecv_replace @ "//routineN )
+     CALL add_perf(perf_id=7,count=1,time=t_end-t_start,msg_size=msglen*[bytes1])
+@@ -1718,7 +1718,7 @@
+     send_tag = 0 ! cannot think of something better here, this might be dangerous
+     recv_tag = 0 ! cannot think of something better here, this might be dangerous
+     CALL mpi_sendrecv(msgin,msglen_in,[mpi_type1],dest,send_tag,msgout,&
+-         msglen_out,[mpi_type1],source,recv_tag,comm,status(1),ierr)
++         msglen_out,[mpi_type1],source,recv_tag,comm,status,ierr)
+     ! we do not check the status
+     IF ( ierr /= 0 ) CALL mp_stop( ierr, "mpi_sendrecv @ "//routineN )
+     t_end = m_walltime ( )
+@@ -1767,7 +1767,7 @@
+     send_tag = 0 ! cannot think of something better here, this might be dangerous
+     recv_tag = 0 ! cannot think of something better here, this might be dangerous
+     CALL mpi_sendrecv(msgin,msglen_in,[mpi_type1],dest,send_tag,msgout,&
+-         msglen_out,[mpi_type1],source,recv_tag,comm,status(1),ierr)
++         msglen_out,[mpi_type1],source,recv_tag,comm,status,ierr)
+     ! we do not check the status
+     IF ( ierr /= 0 ) CALL mp_stop( ierr, "mpi_sendrecv @ "//routineN )
+     t_end = m_walltime ( )
+@@ -1816,7 +1816,7 @@
+     send_tag = 0 ! cannot think of something better here, this might be dangerous
+     recv_tag = 0 ! cannot think of something better here, this might be dangerous
+     CALL mpi_sendrecv(msgin,msglen_in,[mpi_type1],dest,send_tag,msgout,&
+-         msglen_out,[mpi_type1],source,recv_tag,comm,status(1),ierr)
++         msglen_out,[mpi_type1],source,recv_tag,comm,status,ierr)
+     ! we do not check the status
+     IF ( ierr /= 0 ) CALL mp_stop( ierr, "mpi_sendrecv @ "//routineN )
+     t_end = m_walltime ( )
+diff -up cp2k-2.6.0/src/mpiwrap/message_r_passing.f90.r15177 cp2k-2.6.0/src/mpiwrap/message_r_passing.f90
+--- cp2k-2.6.0/src/mpiwrap/message_r_passing.f90.r15177	2014-11-19 10:16:00.441676000 +0100
++++ cp2k-2.6.0/src/mpiwrap/message_r_passing.f90	2015-03-20 10:02:46.988384747 +0100
+@@ -46,7 +46,7 @@
+     msglen = SIZE(msg)
+     t_start = m_walltime ( )
+     CALL mpi_sendrecv_replace(msg,msglen,MPI_REAL,right,tag,left,tag, &
+-         group,status(1),ierror)
++         group,status,ierror)
+     t_end = m_walltime ( )
+     IF ( ierror /= 0 ) CALL mp_stop ( ierror, "mpi_sendrecv_replace @ "//routineN )
+     CALL add_perf(perf_id=7,count=1,time=t_end-t_start,msg_size=msglen*real_4_size)
+@@ -104,7 +104,7 @@
+     msglen = SIZE(msg)
+     t_start = m_walltime ( )
+     CALL mpi_sendrecv_replace(msg,msglen,MPI_REAL,right,tag,left,&
+-         tag,group,status(1),ierror)
++         tag,group,status,ierror)
+     t_end = m_walltime ( )
+     IF ( ierror /= 0 ) CALL mp_stop ( ierror, "mpi_sendrecv_replace @ "//routineN )
+     CALL add_perf(perf_id=7,count=1,time=t_end-t_start,msg_size=msglen*real_4_size)
+@@ -1718,7 +1718,7 @@
+     send_tag = 0 ! cannot think of something better here, this might be dangerous
+     recv_tag = 0 ! cannot think of something better here, this might be dangerous
+     CALL mpi_sendrecv(msgin,msglen_in,MPI_REAL,dest,send_tag,msgout,&
+-         msglen_out,MPI_REAL,source,recv_tag,comm,status(1),ierr)
++         msglen_out,MPI_REAL,source,recv_tag,comm,status,ierr)
+     ! we do not check the status
+     IF ( ierr /= 0 ) CALL mp_stop( ierr, "mpi_sendrecv @ "//routineN )
+     t_end = m_walltime ( )
+@@ -1767,7 +1767,7 @@
+     send_tag = 0 ! cannot think of something better here, this might be dangerous
+     recv_tag = 0 ! cannot think of something better here, this might be dangerous
+     CALL mpi_sendrecv(msgin,msglen_in,MPI_REAL,dest,send_tag,msgout,&
+-         msglen_out,MPI_REAL,source,recv_tag,comm,status(1),ierr)
++         msglen_out,MPI_REAL,source,recv_tag,comm,status,ierr)
+     ! we do not check the status
+     IF ( ierr /= 0 ) CALL mp_stop( ierr, "mpi_sendrecv @ "//routineN )
+     t_end = m_walltime ( )
+@@ -1816,7 +1816,7 @@
+     send_tag = 0 ! cannot think of something better here, this might be dangerous
+     recv_tag = 0 ! cannot think of something better here, this might be dangerous
+     CALL mpi_sendrecv(msgin,msglen_in,MPI_REAL,dest,send_tag,msgout,&
+-         msglen_out,MPI_REAL,source,recv_tag,comm,status(1),ierr)
++         msglen_out,MPI_REAL,source,recv_tag,comm,status,ierr)
+     ! we do not check the status
+     IF ( ierr /= 0 ) CALL mp_stop( ierr, "mpi_sendrecv @ "//routineN )
+     t_end = m_walltime ( )
+diff -up cp2k-2.6.0/src/mpiwrap/message_z_passing.f90.r15177 cp2k-2.6.0/src/mpiwrap/message_z_passing.f90
+--- cp2k-2.6.0/src/mpiwrap/message_z_passing.f90.r15177	2014-11-19 10:16:00.441676000 +0100
++++ cp2k-2.6.0/src/mpiwrap/message_z_passing.f90	2015-03-20 10:02:46.989384750 +0100
+@@ -46,7 +46,7 @@
+     msglen = SIZE(msg)
+     t_start = m_walltime ( )
+     CALL mpi_sendrecv_replace(msg,msglen,MPI_DOUBLE_COMPLEX,right,tag,left,tag, &
+-         group,status(1),ierror)
++         group,status,ierror)
+     t_end = m_walltime ( )
+     IF ( ierror /= 0 ) CALL mp_stop ( ierror, "mpi_sendrecv_replace @ "//routineN )
+     CALL add_perf(perf_id=7,count=1,time=t_end-t_start,msg_size=msglen*(2*real_8_size))
+@@ -104,7 +104,7 @@
+     msglen = SIZE(msg)
+     t_start = m_walltime ( )
+     CALL mpi_sendrecv_replace(msg,msglen,MPI_DOUBLE_COMPLEX,right,tag,left,&
+-         tag,group,status(1),ierror)
++         tag,group,status,ierror)
+     t_end = m_walltime ( )
+     IF ( ierror /= 0 ) CALL mp_stop ( ierror, "mpi_sendrecv_replace @ "//routineN )
+     CALL add_perf(perf_id=7,count=1,time=t_end-t_start,msg_size=msglen*(2*real_8_size))
+@@ -1718,7 +1718,7 @@
+     send_tag = 0 ! cannot think of something better here, this might be dangerous
+     recv_tag = 0 ! cannot think of something better here, this might be dangerous
+     CALL mpi_sendrecv(msgin,msglen_in,MPI_DOUBLE_COMPLEX,dest,send_tag,msgout,&
+-         msglen_out,MPI_DOUBLE_COMPLEX,source,recv_tag,comm,status(1),ierr)
++         msglen_out,MPI_DOUBLE_COMPLEX,source,recv_tag,comm,status,ierr)
+     ! we do not check the status
+     IF ( ierr /= 0 ) CALL mp_stop( ierr, "mpi_sendrecv @ "//routineN )
+     t_end = m_walltime ( )
+@@ -1767,7 +1767,7 @@
+     send_tag = 0 ! cannot think of something better here, this might be dangerous
+     recv_tag = 0 ! cannot think of something better here, this might be dangerous
+     CALL mpi_sendrecv(msgin,msglen_in,MPI_DOUBLE_COMPLEX,dest,send_tag,msgout,&
+-         msglen_out,MPI_DOUBLE_COMPLEX,source,recv_tag,comm,status(1),ierr)
++         msglen_out,MPI_DOUBLE_COMPLEX,source,recv_tag,comm,status,ierr)
+     ! we do not check the status
+     IF ( ierr /= 0 ) CALL mp_stop( ierr, "mpi_sendrecv @ "//routineN )
+     t_end = m_walltime ( )
+@@ -1816,7 +1816,7 @@
+     send_tag = 0 ! cannot think of something better here, this might be dangerous
+     recv_tag = 0 ! cannot think of something better here, this might be dangerous
+     CALL mpi_sendrecv(msgin,msglen_in,MPI_DOUBLE_COMPLEX,dest,send_tag,msgout,&
+-         msglen_out,MPI_DOUBLE_COMPLEX,source,recv_tag,comm,status(1),ierr)
++         msglen_out,MPI_DOUBLE_COMPLEX,source,recv_tag,comm,status,ierr)
+     ! we do not check the status
+     IF ( ierr /= 0 ) CALL mp_stop( ierr, "mpi_sendrecv @ "//routineN )
+     t_end = m_walltime ( )

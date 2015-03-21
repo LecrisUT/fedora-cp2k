@@ -2,8 +2,8 @@
 %define snapshot 20131112
 
 Name: cp2k
-Version: 2.5.1
-Release: 11%{?dist}
+Version: 2.6.0
+Release: 1%{?dist}
 Group: Applications/Engineering
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
@@ -14,7 +14,7 @@ Source0: cp2k-%{version}-%{snapshot}.tar.xz
 %else
 Source0: http://downloads.sourceforge.net/project/cp2k/cp2k-%{version}.tar.bz2
 %endif
-Source1: http://downloads.sourceforge.net/project/cp2k/testresults/cp2k-2_5-branch_LAST-Linux-x86-64-gfortran-popt.tar.bz2
+Source1: http://downloads.sourceforge.net/project/cp2k/testresults/cp2k-2_6-branch_LAST-Linux-x86-64-gfortran-popt.tar.bz2
 Source4: cp2k-snapshot.sh
 # patch to:
 # use rpm optflags
@@ -23,8 +23,10 @@ Source4: cp2k-snapshot.sh
 # use external makedepf90
 # skip compilation during regtests
 Patch0: %{name}-rpm.patch
-# add Linux on non-x86 support in tools/get_arch_code
-Patch1: %{name}-get_arch_code-non-x86.patch
+# backport fixes from 2.6 branch r15177
+Patch1: %{name}-r15177.patch
+# port to new ELPA
+Patch2: 0001-elpa-2014-interface-updated.patch
 BuildRequires: atlas-devel >= 3.10.1
 # for regtests
 BuildRequires: bc
@@ -32,7 +34,7 @@ BuildRequires: fftw-devel
 BuildRequires: gcc-gfortran
 BuildRequires: libint-devel >= 1.1.4
 BuildRequires: libxc-devel
-BuildRequires: makedepf90
+BuildRequires: python
 BuildRequires: /usr/bin/hostname
 
 # Libint can break the API between releases
@@ -63,7 +65,7 @@ Group: Applications/Engineering
 Summary: Molecular simulations software - openmpi version
 BuildRequires:  openmpi-devel
 BuildRequires:  blacs-openmpi-devel
-BuildRequires:  elpa-openmpi-devel
+BuildRequires:  elpa-openmpi-devel >= 2015.02.001
 BuildRequires:  scalapack-openmpi-devel
 Requires: %{name}-common = %{version}-%{release}
 Requires: blacs-openmpi%{?_isa}
@@ -82,7 +84,7 @@ Group: Applications/Engineering
 Summary: Molecular simulations software - mpich version
 BuildRequires:  mpich-devel
 BuildRequires:  blacs-mpich-devel
-BuildRequires:  elpa-mpich-devel
+BuildRequires:  elpa-mpich-devel >= 2015.02.001
 BuildRequires:  scalapack-mpich-devel
 Requires: %{name}-common = %{version}-%{release}
 Requires: blacs-mpich%{?_isa}
@@ -110,9 +112,8 @@ This package contains the documentation and the manual.
 %prep
 %setup -q
 %patch0 -p1 -b .r
-%patch1 -p1 -b .non-x86
-rm -r tools/makedepf90
-chmod -x src/harris_{functional,{env,energy}_types}.F
+%patch1 -p1 -b .r15177
+%patch2 -p2 -b .elpa
 
 %if 0%{?fedora} >= 21
 sed -i 's|-lmpiblacsF77init||g' arch/Linux-x86-64-gfortran*
@@ -120,7 +121,7 @@ sed -i 's|-lmpiblacsCinit||g' arch/Linux-x86-64-gfortran*
 %endif
 
 # Generate necessary symlinks
-TARGET=$(tools/get_arch_code)
+TARGET=$(tools/build_utils/get_arch_code)
 %ifnarch x86_64
 ln -s Linux-x86-64-gfortran.sopt arch/${TARGET}.sopt
 ln -s Linux-x86-64-gfortran.ssmp arch/${TARGET}.ssmp
@@ -136,8 +137,8 @@ sed -i 's/-D__FFTW3/-D__FFTW3 -D__FFTW3_UNALIGNED/g' arch/Linux-x86-64-gfortran*
 %endif
 
 # Get libint and libderiv limits
-maxam=`grep LIBINT_MAX_AM %{_includedir}/libint/libint.h | awk '{print $3}'`
-maxderiv=`grep "LIBDERIV_MAX_AM1 " %{_includedir}/libderiv/libderiv.h | awk '{print $3}'`
+maxam=`awk '/LIBINT_MAX_AM / {print $3}' %{_includedir}/libint/libint.h`
+maxderiv=`awk '/LIBDERIV_MAX_AM1 / {print $3}' %{_includedir}/libderiv/libderiv.h`
 # Plug them in the configuration
 for f in arch/Linux-x86-64-gfortran.{popt,psmp,sopt,ssmp}; do
  sed -i "s|@LIBINT_MAX_AM@|$maxam|g;s|@LIBDERIV_MAX_AM@|$maxderiv|g" $f
@@ -149,22 +150,24 @@ ln -s LAST-Linux-x86-64-gfortran-popt LAST-${TARGET}-openmpi-popt
 
 
 %build
-TARGET=$(tools/get_arch_code)
+TARGET=$(tools/build_utils/get_arch_code)
+OPTFLAGS_COMMON="%{optflags} -L%{_libdir}/atlas"
 pushd makefiles
     %{_openmpi_load}
-        make OPTFLAGS="%{optflags} -L%{_libdir}/atlas -I%{_fmoddir}/openmpi" %{?_smp_mflags} ARCH="${TARGET}-openmpi" VERSION=popt
-        make OPTFLAGS="%{optflags} -L%{_libdir}/atlas -I%{_fmoddir}/openmpi" %{?_smp_mflags} ARCH="${TARGET}-openmpi" VERSION=psmp
+        make OPTFLAGS="${OPTFLAGS_COMMON} -I%{_fmoddir}/openmpi" %{?_smp_mflags} ARCH="${TARGET}-openmpi" VERSION=popt
+        make OPTFLAGS="${OPTFLAGS_COMMON} -I%{_fmoddir}/openmpi" %{?_smp_mflags} ARCH="${TARGET}-openmpi" VERSION=psmp
     %{_openmpi_unload}
     %{_mpich_load}
-        make OPTFLAGS="%{optflags} -L%{_libdir}/atlas -I%{_fmoddir}/mpich" %{?_smp_mflags} ARCH="${TARGET}-mpich" VERSION=popt
-        make OPTFLAGS="%{optflags} -L%{_libdir}/atlas -I%{_fmoddir}/mpich" %{?_smp_mflags} ARCH="${TARGET}-mpich" VERSION=psmp
+        make OPTFLAGS="${OPTFLAGS_COMMON} -I%{_fmoddir}/mpich" %{?_smp_mflags} ARCH="${TARGET}-mpich" VERSION=popt
+        make OPTFLAGS="${OPTFLAGS_COMMON} -I%{_fmoddir}/mpich" %{?_smp_mflags} ARCH="${TARGET}-mpich" VERSION=psmp
     %{_mpich_unload}
 
-    make OPTFLAGS="%{optflags} -L%{_libdir}/atlas" %{?_smp_mflags} sopt ssmp
+    make OPTFLAGS="${OPTFLAGS_COMMON}" %{?_smp_mflags} ARCH="${TARGET}" VERSION=sopt
+    make OPTFLAGS="${OPTFLAGS_COMMON}" %{?_smp_mflags} ARCH="${TARGET}" VERSION=ssmp
 popd
 
 %install
-TARGET=$(tools/get_arch_code)
+TARGET=$(tools/build_utils/get_arch_code)
 install -d %{buildroot}%{_bindir}
 %{_openmpi_load}
     mkdir -p %{buildroot}%{_libdir}/openmpi%{?_opt_cc_suffix}/bin/
@@ -182,14 +185,14 @@ install -pm755 exe/${TARGET}/cp2k.ssmp %{buildroot}%{_bindir}
 %clean
 rm -rf %{buildroot}
 
-%if 1
+%if 0
 %check
 cat > tests/fedora.config << __EOF__
 export LC_ALL=C
 dir_base=%{_builddir}
 cp2k_version=popt
 cp2k_run_prefix="mpirun -np 2"
-dir_triplet=`tools/get_arch_code`-openmpi
+dir_triplet=`tools/build_utils/get_arch_code`-openmpi
 cp2k_dir=cp2k-%{version}
 maxtasks=$(echo `getconf _NPROCESSORS_ONLN`/2 | bc)
 emptycheck="NO"
@@ -197,7 +200,7 @@ leakcheck="NO"
 __EOF__
 pushd tests
 %{_openmpi_load}
-../tools/regtesting/do_regtest -nosvn -nobuild -config fedora.config
+../tools/build_utils/regtesting/do_regtest -nosvn -nobuild -config fedora.config
 %{_openmpi_unload}
 popd
 %endif
@@ -222,6 +225,12 @@ popd
 %{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich
 
 %changelog
+* Tue Mar 17 2015 Dominik Mierzejewski <rpm@greysector.net> - 2.6.0-1
+- update to 2.6.0 release
+- makedepf90 no longer required (replaced with python script)
+- drop upstreamed patch
+- backport fixes from 2.6 stable branch
+
 * Mon Mar 16 2015 Thomas Spura <tomspur@fedoraproject.org> - 2.5.1-11
 - Rebuild for changed mpich libraries
 

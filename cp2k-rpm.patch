@@ -1,229 +1,160 @@
-diff -up cp2k-2.5.0/arch/Linux-x86-64-gfortran.popt.r cp2k-2.5.0/arch/Linux-x86-64-gfortran.popt
---- cp2k-2.5.0/arch/Linux-x86-64-gfortran.popt.r	2014-02-12 18:29:10.000000000 +0100
-+++ cp2k-2.5.0/arch/Linux-x86-64-gfortran.popt	2014-03-11 06:36:24.592412451 +0100
-@@ -11,19 +11,21 @@ LIBINT_INC = $(GCC_DIR)/libint/1.1.4-LAR
- LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LARGE_L-gnu/lib64
- LIBXC_INC  = $(GCC_DIR)/libxc/2.0.1-gnu/include
- LIBXC_LIB  = $(GCC_DIR)/libxc/2.0.1-gnu/lib64
--DFLAGS     = -D__GFORTRAN -D__FFTACML -D__FFTSG -D__FFTW3 -D__LIBINT -D__LIBXC2\
+diff -up cp2k-2.6.0/arch/Linux-x86-64-gfortran.popt.r cp2k-2.6.0/arch/Linux-x86-64-gfortran.popt
+--- cp2k-2.6.0/arch/Linux-x86-64-gfortran.popt.r	2014-10-30 09:11:05.836895000 +0100
++++ cp2k-2.6.0/arch/Linux-x86-64-gfortran.popt	2015-03-17 22:45:20.056977801 +0100
+@@ -1,8 +1,8 @@
+ # Tested with: GFortran 4.9.1, MPICH 3.1, LAPACK 3.5.0, ScaLAPACK 2.0.2
+ CC         = gcc
+ CPP        =
+-FC         = mpif90
+-LD         = mpif90
++FC         = mpifort
++LD         = mpifort
+ AR         = ar -r
+ ACML_INC   = $(ACMLPATH)/include
+ ACML_LIB   = $(ACMLPATH)/lib
+@@ -13,18 +13,20 @@ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LAR
+ LIBXC_INC  = $(GCC_DIR)/libxc/2.2.0-gnu/include
+ LIBXC_LIB  = $(GCC_DIR)/libxc/2.2.0-gnu/lib64
+ DFLAGS     = -D__FFTW3 -D__LIBINT -D__LIBXC2\
 -             -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6 -D__MAX_CONTR=4\
-+DFLAGS     = -D__GFORTRAN -D__FFTSG -D__FFTW3 -D__LIBINT -D__LIBXC2\
 +             -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@ -D__MAX_CONTR=4\
 +             -D__ELPA\
-              -D__parallel -D__BLACS -D__SCALAPACK
- CPPFLAGS   = 
+              -D__parallel -D__SCALAPACK
+ CPPFLAGS   =
 -FCFLAGS    = $(DFLAGS) -O2 -ffast-math -ffree-form -ffree-line-length-none\
 +OPTFLAGS   = -O2 -ffast-math\
               -ftree-vectorize -funroll-loops\
               -mtune=native\
--             -I$(ACML_INC) -I$(FFTW_INC) -I$(LIBINT_INC) -I$(LIBXC_INC)
+              -I$(ACML_INC) -I$(FFTW_INC) -I$(LIBINT_INC) -I$(LIBXC_INC)
 -LDFLAGS    = $(FCFLAGS) -static-libgfortran
--LIBS       = $(LIBPATH)/libscalapack-gnu.a\
+-LIBS       = $(MPI_LIBRARY_PATH)/libscalapack-gnu.a\
 -             $(ACML_LIB)/libacml.a\
 -             $(FFTW_LIB)/libfftw3.a\
+-             $(LIBXC_LIB)/libxcf90.a\
 -             $(LIBXC_LIB)/libxc.a\
 -             $(LIBINT_LIB)/libderiv.a\
 -             $(LIBINT_LIB)/libint.a
-+
 +FCFLAGS    = $(DFLAGS) $(OPTFLAGS) -ffree-form -ffree-line-length-none
 +LDFLAGS    = $(FCFLAGS)
-+LIBS       = -lelpa -lscalapack -lmpiblacsF77init -lmpiblacs -lmpiblacsCinit -lstdc++\
++LIBS       = -lelpa \
++             -lscalapack -lmpiblacsF77init -lmpiblacs -lmpiblacsCinit -lstdc++\
 +             -lsatlas\
 +             -lfftw3\
 +             -lxc\
 +             -lderiv\
 +             -lint
- 
-diff -up cp2k-2.5.0/arch/Linux-x86-64-gfortran.psmp.r cp2k-2.5.0/arch/Linux-x86-64-gfortran.psmp
---- cp2k-2.5.0/arch/Linux-x86-64-gfortran.psmp.r	2014-02-12 18:29:10.000000000 +0100
-+++ cp2k-2.5.0/arch/Linux-x86-64-gfortran.psmp	2014-03-11 06:36:31.866434894 +0100
-@@ -11,20 +11,22 @@ LIBINT_INC = $(GCC_DIR)/libint/1.1.4-LAR
- LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LARGE_L-gnu/lib64
- LIBXC_INC  = $(GCC_DIR)/libxc/2.0.1-gnu/include
- LIBXC_LIB  = $(GCC_DIR)/libxc/2.0.1-gnu/lib64
--DFLAGS     = -D__GFORTRAN -D__FFTACML -D__FFTSG -D__FFTW3 -D__LIBINT -D__LIBXC2\
+diff -up cp2k-2.6.0/arch/Linux-x86-64-gfortran.psmp.r cp2k-2.6.0/arch/Linux-x86-64-gfortran.psmp
+--- cp2k-2.6.0/arch/Linux-x86-64-gfortran.psmp.r	2014-12-22 01:17:03.067670000 +0100
++++ cp2k-2.6.0/arch/Linux-x86-64-gfortran.psmp	2015-03-17 22:45:26.986086166 +0100
+@@ -1,8 +1,8 @@
+ # Tested with: GFortran 4.9.1, MPICH 3.1, LAPACK 3.5.0, ScaLAPACK 2.0.2
+ CC         = gcc
+ CPP        =
+-FC         = mpif90
+-LD         = mpif90
++FC         = mpifort
++LD         = mpifort
+ AR         = ar -r
+ ACML_INC   = $(ACMLPATH)/include
+ ACML_LIB   = $(ACMLPATH)/lib
+@@ -13,19 +13,20 @@ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LAR
+ LIBXC_INC  = $(GCC_DIR)/libxc/2.2.0-gnu/include
+ LIBXC_LIB  = $(GCC_DIR)/libxc/2.2.0-gnu/lib64
+ DFLAGS     = -D__FFTW3 -D__LIBINT -D__LIBXC2\
 -             -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6 -D__MAX_CONTR=4\
-+DFLAGS     = -D__GFORTRAN -D__FFTSG -D__FFTW3 -D__LIBINT -D__LIBXC2\
 +             -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@ -D__MAX_CONTR=4\
 +             -D__ELPA\
-              -D__parallel -D__BLACS -D__SCALAPACK -D__NO_MPI_THREAD_SUPPORT_CHECK
- CPPFLAGS   = 
+              -D__parallel -D__SCALAPACK
+ CPPFLAGS   =
 -FCFLAGS    = $(DFLAGS) -O2 -ffast-math -ffree-form -ffree-line-length-none\
 -             -fopenmp -ftree-vectorize -funroll-loops\
-+OPTFLAGS   = -O2 -ffast-math\
-+             -ftree-vectorize -funroll-loops\
++OPTFLAGS   = -O2 -ffast-math -ftree-vectorize -funroll-loops\
               -mtune=native\
--             -I$(ACML_INC) -I$(FFTW_INC) -I$(LIBINT_INC) -I$(LIBXC_INC)
+              -I$(ACML_INC) -I$(FFTW_INC) -I$(LIBINT_INC) -I$(LIBXC_INC)
 -LDFLAGS    = $(FCFLAGS) -static-libgfortran
--LIBS       = $(LIBPATH)/libscalapack-gnu.a\
+-LIBS       = $(MPI_LIBRARY_PATH)/libscalapack-gnu.a\
 -             $(ACML_LIB)/libacml.a\
 -             $(FFTW_LIB)/libfftw3.a\
 -             $(FFTW_LIB)/libfftw3_threads.a\
+-             $(LIBXC_LIB)/libxcf90.a\
 -             $(LIBXC_LIB)/libxc.a\
 -             $(LIBINT_LIB)/libderiv.a\
 -             $(LIBINT_LIB)/libint.a
-+
 +FCFLAGS    = $(DFLAGS) $(OPTFLAGS) -fopenmp -ffree-form -ffree-line-length-none
 +LDFLAGS    = $(FCFLAGS)
-+LIBS       = -lelpa -lscalapack -lmpiblacsF77init -lmpiblacs -lmpiblacsCinit -lstdc++\
++LIBS       = -lelpa \
++             -lscalapack -lmpiblacsF77init -lmpiblacs -lmpiblacsCinit -lstdc++\
 +             -lsatlas\
 +             -lfftw3\
 +             -lfftw3_omp\
 +             -lxc\
 +             -lderiv\
 +             -lint
- 
-diff -up cp2k-2.5.0/arch/Linux-x86-64-gfortran.sopt.r cp2k-2.5.0/arch/Linux-x86-64-gfortran.sopt
---- cp2k-2.5.0/arch/Linux-x86-64-gfortran.sopt.r	2014-02-12 18:29:10.000000000 +0100
-+++ cp2k-2.5.0/arch/Linux-x86-64-gfortran.sopt	2014-03-11 06:36:36.764448758 +0100
-@@ -11,17 +11,18 @@ LIBINT_INC = $(GCC_DIR)/libint/1.1.4-LAR
- LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LARGE_L-gnu/lib64
- LIBXC_INC  = $(GCC_DIR)/libxc/2.0.1-gnu/include
- LIBXC_LIB  = $(GCC_DIR)/libxc/2.0.1-gnu/lib64
--DFLAGS     = -D__GFORTRAN -D__FFTACML -D__FFTSG -D__FFTW3 -D__LIBINT -D__LIBXC2\
+diff -up cp2k-2.6.0/arch/Linux-x86-64-gfortran.sopt.r cp2k-2.6.0/arch/Linux-x86-64-gfortran.sopt
+--- cp2k-2.6.0/arch/Linux-x86-64-gfortran.sopt.r	2014-12-22 01:17:03.067670000 +0100
++++ cp2k-2.6.0/arch/Linux-x86-64-gfortran.sopt	2015-03-17 22:45:04.022727041 +0100
+@@ -13,17 +13,16 @@ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LAR
+ LIBXC_INC  = $(GCC_DIR)/libxc/2.2.0-gnu/include
+ LIBXC_LIB  = $(GCC_DIR)/libxc/2.2.0-gnu/lib64
+ DFLAGS     = -D__FFTW3 -D__LIBINT -D__LIBXC2\
 -             -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6 -D__MAX_CONTR=4
-+DFLAGS     = -D__GFORTRAN -D__FFTSG -D__FFTW3 -D__LIBINT -D__LIBXC2\
 +             -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@ -D__MAX_CONTR=4
  CPPFLAGS   = 
 -FCFLAGS    = $(DFLAGS) -O2 -ffast-math -ffree-form -ffree-line-length-none\
 +OPTFLAGS   = -O2 -ffast-math\
               -ftree-vectorize -funroll-loops\
               -mtune=native\
--             -I$(ACML_INC) -I$(FFTW_INC) -I$(LIBINT_INC) -I$(LIBXC_INC)
+              -I$(ACML_INC) -I$(FFTW_INC) -I$(LIBINT_INC) -I$(LIBXC_INC)
 -LDFLAGS    = $(FCFLAGS) -static-libgfortran
 -LIBS       = $(ACML_LIB)/libacml.a\
 -             $(FFTW_LIB)/libfftw3.a\
+-             $(LIBXC_LIB)/libxcf90.a\
 -             $(LIBXC_LIB)/libxc.a\
 -             $(LIBINT_LIB)/libderiv.a\
 -             $(LIBINT_LIB)/libint.a
-+
-+FCFLAGS    = $(DFLAGS) $(OPTFLAGS) -ffree-form -ffree-line-length-none
-+LDFLAGS    = $(FCFLAGS)
-+LIBS       = -lsatlas\
-+             -lfftw3\
-+             -lxc\
-+             -lderiv\
-+             -lint
- 
-diff -up cp2k-2.5.0/arch/Linux-x86-64-gfortran.ssmp.r cp2k-2.5.0/arch/Linux-x86-64-gfortran.ssmp
---- cp2k-2.5.0/arch/Linux-x86-64-gfortran.ssmp.r	2014-02-12 18:29:10.000000000 +0100
-+++ cp2k-2.5.0/arch/Linux-x86-64-gfortran.ssmp	2014-03-11 06:36:39.849459583 +0100
-@@ -11,18 +11,19 @@ LIBINT_INC = $(GCC_DIR)/libint/1.1.4-LAR
- LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LARGE_L-gnu/lib64
- LIBXC_INC  = $(GCC_DIR)/libxc/2.0.1-gnu/include
- LIBXC_LIB  = $(GCC_DIR)/libxc/2.0.1-gnu/lib64
--DFLAGS     = -D__GFORTRAN -D__FFTACML -D__FFTSG -D__FFTW3 -D__LIBINT -D__LIBXC2\
--             -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6 -D__MAX_CONTR=4
--CPPFLAGS   = 
--FCFLAGS    = $(DFLAGS) -O2 -ffast-math -ffree-form -ffree-line-length-none\
--             -fopenmp -ftree-vectorize -funroll-loops\
-+DFLAGS     = -D__GFORTRAN -D__FFTSG -D__FFTW3 -D__LIBINT -D__LIBXC2\
-+             -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@ -D__MAX_CONTR=4
-+CPPFLAGS   =
-+OPTFLAGS   = -O2 -ffast-math\
-+             -ftree-vectorize -funroll-loops\
-              -mtune=native\
--             -I$(ACML_INC) -I$(FFTW_INC) -I$(LIBINT_INC) -I$(LIBXC_INC)
--LDFLAGS    = $(FCFLAGS) -static-libgfortran
--LIBS       = $(ACML_LIB)/libacml.a\
--             $(FFTW_LIB)/libfftw3.a\
--             $(FFTW_LIB)/libfftw3_threads.a\
--             $(LIBXC_LIB)/libxc.a\
--             $(LIBINT_LIB)/libderiv.a\
--             $(LIBINT_LIB)/libint.a
-+
-+FCFLAGS    = $(DFLAGS) $(OPTFLAGS) -fopenmp -ffree-form -ffree-line-length-none
-+LDFLAGS    = $(FCFLAGS)
-+LIBS       = -lsatlas\
-+             -lfftw3\
-+             -lfftw3_omp\
-+             -lxc\
-+             -lderiv\
-+             -lint
- 
-diff -up cp2k-2.5.0/makefiles/Makefile.r cp2k-2.5.0/makefiles/Makefile
---- cp2k-2.5.0/makefiles/Makefile.r	2014-02-20 17:40:35.000000000 +0100
-+++ cp2k-2.5.0/makefiles/Makefile	2014-03-11 06:36:05.705353668 +0100
-@@ -99,11 +99,11 @@ CLEAN_TARGETS = $(addsuffix /clean ,$(VE
- # lists the targets that are not files
- #
- .PHONY : _all libs _progr _lib build clean realclean distclean $(CLEAN_TARGETS)\
--         $(ALL_TARGETS) $(LIB_TARGETS) $(VERSION_TARGETS) fes dirs deptool\
-+         $(ALL_TARGETS) $(LIB_TARGETS) $(VERSION_TARGETS) fes dirs\
-          dbcsr_test dbcsr_perf mrproper plumed libcusmm
- 
- ### Master rules ###
--build: dirs deptool libcusmm
-+build: dirs libcusmm
- 	+$(MAKE) -C $(SRCDIR) -f $(MAKEFILE) all.dep
- 	+cp $(LIBCUDA_DEPENDENCIES) $(OBJDIR)/$(VERSION)/libc_cuda.dep
- 	+if [ -e $(LIBCUSMM_DEPENDENCIES) ]; then \
-@@ -112,7 +112,7 @@ build: dirs deptool libcusmm
- 	+cp $(LIBMA_DEPENDENCIES) $(OBJDIR)/$(VERSION)/libc_ma.dep
- 	+$(MAKE) -C $(OBJDIR)/$(VERSION) -f $(MAKEFILE) $(WHAT)
- 
--fes: dirs deptool
-+fes: dirs
- 	+$(MAKE) -C $(SRCDIR)/metadyn_tools/  -f $(MAKEFILE) fes.dep
- 	+$(MAKE) -C $(OBJDIR)/$(VERSION) -f $(MAKEFILE) HACKLIBDEP=yes VERSION=$(VERSION) $(FES) 
- 
-@@ -132,9 +132,6 @@ pretty: dirs
- 	+$(MAKE) -C $(SRCDIR)/dbcsr_lib -f $(MAKEFILE) _pretty_lib3
- 	+$(MAKE) -C $(SRCDIR)/arch_lib  -f $(MAKEFILE) _pretty_lib4
- 
--deptool: dirs
--	+$(MAKE) LDFLAGS=$(MAKDEPF90_LDFLAGS) -C $(TOOLDIR) -f $(MAKEFILE) makedepf90
 -
- libs:
- 	+$(MAKE) -f $(MAKEFILE) VERSION=$(VERSION) WHAT=_lib build
- all:
-@@ -159,7 +156,7 @@ plumedobj: dirs
- #
- # on a parallel build only one task should go a build the deptool
- #
--$(VERSION_TARGETS): dirs deptool
-+$(VERSION_TARGETS): dirs
- 	+$(MAKE) -f $(MAKEFILE) VERSION=$@ build
- 
- $(CLEAN_TARGETS):
-@@ -285,13 +282,13 @@ ifeq ($(HACKDEP),yes)
- 	echo $(ALL_SOURCE_FILES) | awk '{for (i=1;i<=NF;i++) {obj=$$(i) ; sub(".F",".o",obj); if ($$(i)!=obj) print obj,":",$$(i) }}' > $(OBJDIR)/$(VERSION)/all.dep
- else
-    ifeq ($(MC),)
--	$(TOOLDIR)/makedepf90 -I $(SRCDIRS) $(MODSTRING) -free $(ALL_SOURCE_FILES) > $(OBJDIR)/$(VERSION)/all.dep || ( rm -f $(OBJDIR)/$(VERSION)/all.dep  ; exit 1 )
-+	makedepf90 -I $(SRCDIRS) $(MODSTRING) -free $(ALL_SOURCE_FILES) > $(OBJDIR)/$(VERSION)/all.dep || ( rm -f $(OBJDIR)/$(VERSION)/all.dep  ; exit 1 )
-    else
- # if MC is defined, it is our 'module compiler' which generates the .mod file from the source file
- # it is useful in a two-stage compile. Therefore we split the dependency in two parts the .o and the .mod.
- # the awk below assumes our current rule of one mod per file
- # The current module compiler is 'gfortran -fsyntax-only ' which should work fine for gfortran 4.8.0 and higher.
--	$(TOOLDIR)/makedepf90 -I $(SRCDIRS) $(MODSTRING) -free $(ALL_SOURCE_FILES) | \
-+	makedepf90 -I $(SRCDIRS) $(MODSTRING) -free $(ALL_SOURCE_FILES) | \
-             awk '{deps=substr($$0,index($$0,":"),length($$0)-index($$0,":")+1); if ($$2==":") { print $$1,deps } else {print $$2,deps ; print $$1,deps,$$2 }}' > \
-             $(OBJDIR)/$(VERSION)/all.dep || ( rm -f $(OBJDIR)/$(VERSION)/all.dep  ; exit 1 )
-    endif
-@@ -299,7 +296,7 @@ endif
- 
- # this is kind of a hack, fes depends on files in other directories, hence the -I and the -b.
- fes.dep: $(FESOBJS:.o=.F) 
--	$(TOOLDIR)/makedepf90 -I$(SRCDIR) -b. $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/fes.dep || ( rm -f $(OBJDIR)/$(VERSION)/fes.dep  ; exit 1 )
-+	makedepf90 -I$(SRCDIR) -b. $(MODSTRING)  -free $^ > $(OBJDIR)/$(VERSION)/fes.dep || ( rm -f $(OBJDIR)/$(VERSION)/fes.dep  ; exit 1 )
- 
- plumed.dep: $(OBJECTS:.o=.F) $(LIB1_OBJECTS:.o=.F) $(LIB2_OBJECTS:.o=.F) $(LIB4_OBJECTS:.o=.F) $(LIB3_OBJECTS:.o=.F) cp_common_uses.h src-plumed/metadyn.h cp2k.F 
- 
-@@ -426,9 +423,6 @@ dbcsr_performance_driver.o: $(LIB3_ARCHI
- #
- # these are tools, but their integration in the build is ugly at least (e.g. see dependencies).
- #
--makedepf90:
--	-test -d $(TOOLDIR)/makedepf90-build || ( mkdir makedepf90-build ; cp $(TOOLSRC)/makedepf90/* makedepf90-build )
--	{ cd makedepf90-build ; ./configure --prefix=$(TOOLDIR) --bindir=$(TOOLDIR) ; $(MAKE) VERSION="2.8.8cp2k" ; $(MAKE) install ; }
- 
- #
- # the rule how to generate the .o from the .F
---- cp2k-2.5.0/tools/regtesting/do_regtest	2014-01-16 15:35:28.000000000 +0100
-+++ cp2k-2.5.0/tools/regtesting/do_regtest	2014-05-13 11:00:52.984100148 +0200
-@@ -240,8 +240,8 @@
++FCFLAGS    = $(DFLAGS) $(OPTFLAGS) -ffree-form -ffree-line-length-none
++LDFLAGS    = $(FCFLAGS)
++LIBS       = -lsatlas\
++             -lfftw3\
++             -lxc\
++             -lderiv\
++             -lint
+diff -up cp2k-2.6.0/arch/Linux-x86-64-gfortran.ssmp.r cp2k-2.6.0/arch/Linux-x86-64-gfortran.ssmp
+--- cp2k-2.6.0/arch/Linux-x86-64-gfortran.ssmp.r	2014-12-22 01:17:03.067670000 +0100
++++ cp2k-2.6.0/arch/Linux-x86-64-gfortran.ssmp	2015-03-17 22:45:04.022727041 +0100
+@@ -13,17 +13,16 @@ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LAR
+ LIBXC_INC  = $(GCC_DIR)/libxc/2.2.0-gnu/include
+ LIBXC_LIB  = $(GCC_DIR)/libxc/2.2.0-gnu/lib64
+ DFLAGS     = -D__FFTW3 -D__LIBINT -D__LIBXC2\
+-             -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6 -D__MAX_CONTR=4
++             -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@ -D__MAX_CONTR=4
+ CPPFLAGS   = 
+-FCFLAGS    = $(DFLAGS) -O2 -ffast-math -ffree-form -ffree-line-length-none\
+-             -fopenmp -ftree-vectorize -funroll-loops\
++OPTFLAGS   = -O2 -ffast-math -ftree-vectorize -funroll-loops\
+              -mtune=native\
+              -I$(ACML_INC) -I$(FFTW_INC) -I$(LIBINT_INC) -I$(LIBXC_INC)
+-LDFLAGS    = $(FCFLAGS) -static-libgfortran
+-LIBS       = $(ACML_LIB)/libacml.a\
+-             $(FFTW_LIB)/libfftw3.a\
+-             $(FFTW_LIB)/libfftw3_threads.a\
+-             $(LIBXC_LIB)/libxcf90.a\
+-             $(LIBXC_LIB)/libxc.a\
+-             $(LIBINT_LIB)/libderiv.a\
+-             $(LIBINT_LIB)/libint.a
++FCFLAGS    = $(DFLAGS) $(OPTFLAGS) -fopenmp -ffree-form -ffree-line-length-none
++LDFLAGS    = $(FCFLAGS)
++LIBS       = -lsatlas\
++             -lfftw3\
++             -lfftw3_omp\
++             -lxc\
++             -lderiv\
++             -lint
+diff -up cp2k-2.6.0/tools/regtesting/do_regtest.r cp2k-2.6.0/tools/regtesting/do_regtest
+--- cp2k-2.6.0/tools/regtesting/do_regtest.r	2014-11-28 13:32:08.930828000 +0100
++++ cp2k-2.6.0/tools/regtesting/do_regtest	2015-03-17 22:45:04.022727041 +0100
+@@ -241,8 +241,8 @@ job_max_time=${job_max_time:-"600"}
  #
  ###################################################################################
  test_types_file=${dir_base}/${cp2k_dir}/tests/TEST_TYPES
@@ -234,7 +165,7 @@ diff -up cp2k-2.5.0/makefiles/Makefile.r cp2k-2.5.0/makefiles/Makefile
  changelog=${dir_last}/ChangeLog
  changelog_diff=${changelog}.diff
  changelog_new=${changelog}.new
-@@ -688,6 +688,7 @@
+@@ -731,6 +731,7 @@ for dir in ${dirs}; do
       # if value does not exist set to the default of 1.0E-14
       test_tolerance=`grep -v "#" TEST_FILES | ${awk} -v itest=$itest -v def_err_tol=$default_err_tolerance '{c=c+1;if (c==itest) if (NF == 3) { print $3 } else { print def_err_tol } }'`
  
