@@ -3,7 +3,7 @@
 
 Name: cp2k
 Version: 2.6.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 Group: Applications/Engineering
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
@@ -186,8 +186,6 @@ install -pm755 exe/${TARGET}/cp2k.ssmp %{buildroot}%{_bindir}
 rm -rf %{buildroot}
 
 %if 1
-# regtests are failing and timing out on i686 and armv7hl - bug 1204701
-%ifnarch i686 armv7hl
 %check
 cat > tests/fedora.config << __EOF__
 export LC_ALL=C
@@ -205,7 +203,6 @@ pushd tests
 ../tools/regtesting/do_regtest -nosvn -nobuild -config fedora.config
 %{_openmpi_unload}
 popd
-%endif
 %endif
 
 %files common
@@ -228,6 +225,9 @@ popd
 %{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich
 
 %changelog
+* Fri May 01 2015 Dominik Mierzejewski <rpm@greysector.net> - 2.6.0-2
+- re-enable tests on i686 and armv7hl, they seem to complete now
+
 * Tue Mar 17 2015 Dominik Mierzejewski <rpm@greysector.net> - 2.6.0-1
 - update to 2.6.0 release
 - makedepf90 no longer required (replaced with python script)
