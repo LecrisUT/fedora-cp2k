@@ -3,7 +3,7 @@
 
 Name: cp2k
 Version: 2.6.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 Group: Applications/Engineering
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
@@ -225,6 +225,9 @@ popd
 %{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich
 
 %changelog
+* Sat May 02 2015 Kalev Lember <kalevlember@gmail.com> - 2.6.0-3
+- Rebuilt for GCC 5 C++11 ABI change
+
 * Fri May 01 2015 Dominik Mierzejewski <rpm@greysector.net> - 2.6.0-2
 - re-enable tests on i686 and armv7hl, they seem to complete now
 
