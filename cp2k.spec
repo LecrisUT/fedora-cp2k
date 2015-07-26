@@ -3,7 +3,7 @@
 
 Name: cp2k
 Version: 2.6.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 Group: Applications/Engineering
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
@@ -68,8 +68,6 @@ BuildRequires:  blacs-openmpi-devel
 BuildRequires:  elpa-openmpi-devel >= 2015.02.001
 BuildRequires:  scalapack-openmpi-devel
 Requires: %{name}-common = %{version}-%{release}
-Requires: blacs-openmpi%{?_isa}
-Requires: scalapack-openmpi%{?_isa}
 # Libint may have API breakage
 Requires: libint(api)%{?_isa} = %{_libint_apiversion}
 
@@ -87,8 +85,6 @@ BuildRequires:  blacs-mpich-devel
 BuildRequires:  elpa-mpich-devel >= 2015.02.001
 BuildRequires:  scalapack-mpich-devel
 Requires: %{name}-common = %{version}-%{release}
-Requires: blacs-mpich%{?_isa}
-Requires: scalapack-mpich%{?_isa}
 Provides: %{name}-mpich2 = %{version}-%{release}
 Obsoletes: %{name}-mpich2 < 2.4-5
 # Libint may have API breakage
@@ -225,6 +221,9 @@ popd
 %{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich
 
 %changelog
+* Mon Jul 27 2015 Sandro Mani <manisandro@gmail.com> - 2.6.0-5
+- Rebuild for RPM MPI Requires Provides Change
+
 * Wed Jun 17 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.6.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
 
