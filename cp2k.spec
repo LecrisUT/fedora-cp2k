@@ -3,7 +3,7 @@
 
 Name: cp2k
 Version: 2.6.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 Group: Applications/Engineering
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
@@ -221,6 +221,9 @@ popd
 %{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich
 
 %changelog
+* Sun Aug 16 2015 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2.6.0-6
+- Rebuild for MPI provides
+
 * Mon Jul 27 2015 Sandro Mani <manisandro@gmail.com> - 2.6.0-5
 - Rebuild for RPM MPI Requires Provides Change
 
