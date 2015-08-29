@@ -2,8 +2,8 @@
 %define snapshot 20131112
 
 Name: cp2k
-Version: 2.6.0
-Release: 6%{?dist}
+Version: 2.6.1
+Release: 1%{?dist}
 Group: Applications/Engineering
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
@@ -14,7 +14,7 @@ Source0: cp2k-%{version}-%{snapshot}.tar.xz
 %else
 Source0: http://downloads.sourceforge.net/project/cp2k/cp2k-%{version}.tar.bz2
 %endif
-Source1: http://downloads.sourceforge.net/project/cp2k/testresults/cp2k-2_6-branch_LAST-Linux-x86-64-gfortran-popt.tar.bz2
+Source1: http://downloads.sourceforge.net/project/cp2k/testresults/cp2k-2_6_1-branch_LAST-Linux-x86-64-gfortran-pdbg.tar.bz2
 Source4: cp2k-snapshot.sh
 # patch to:
 # use rpm optflags
@@ -23,13 +23,10 @@ Source4: cp2k-snapshot.sh
 # use external makedepf90
 # skip compilation during regtests
 Patch0: %{name}-rpm.patch
-# backport fixes from 2.6 branch r15177
-Patch1: %{name}-r15177.patch
 # port to new ELPA
 Patch2: 0001-elpa-2014-interface-updated.patch
 BuildRequires: atlas-devel >= 3.10.1
 # for regtests
-BuildRequires: bc
 BuildRequires: fftw-devel
 BuildRequires: gcc-gfortran
 BuildRequires: libint-devel >= 1.1.4
@@ -108,10 +105,9 @@ This package contains the documentation and the manual.
 %prep
 %setup -q
 %patch0 -p1 -b .r
-%patch1 -p1 -b .r15177
 %patch2 -p2 -b .elpa
 
-%if 0%{?fedora} >= 21
+%if 0%{?fedora}
 sed -i 's|-lmpiblacsF77init||g' arch/Linux-x86-64-gfortran*
 sed -i 's|-lmpiblacsCinit||g' arch/Linux-x86-64-gfortran*
 %endif
@@ -132,6 +128,7 @@ ln -s Linux-x86-64-gfortran.psmp arch/${TARGET}-mpich.psmp
 sed -i 's/-D__FFTW3/-D__FFTW3 -D__FFTW3_UNALIGNED/g' arch/Linux-x86-64-gfortran*
 %endif
 
+# See cp2k/tools/hfx_tools/libint_tools/README_LIBINT
 # Get libint and libderiv limits
 maxam=`awk '/LIBINT_MAX_AM / {print $3}' %{_includedir}/libint/libint.h`
 maxderiv=`awk '/LIBDERIV_MAX_AM1 / {print $3}' %{_includedir}/libderiv/libderiv.h`
@@ -141,8 +138,7 @@ for f in arch/Linux-x86-64-gfortran.{popt,psmp,sopt,ssmp}; do
 done
 
 tar -xf %{SOURCE1}
-ln -s LAST-Linux-x86-64-gfortran-popt LAST-${TARGET}-sopt
-ln -s LAST-Linux-x86-64-gfortran-popt LAST-${TARGET}-openmpi-popt
+ln -s LAST-Linux-x86-64-gfortran-regtest-pdbg LAST-${TARGET}-openmpi-psmp
 
 
 %build
@@ -186,11 +182,13 @@ rm -rf %{buildroot}
 cat > tests/fedora.config << __EOF__
 export LC_ALL=C
 dir_base=%{_builddir}
-cp2k_version=popt
-cp2k_run_prefix="mpirun -np 2"
+cp2k_version=psmp
+export OMP_NUM_THREADS=2
+numprocs=2
+cp2k_run_prefix="mpiexec -np \${numprocs}"
 dir_triplet=`tools/build_utils/get_arch_code`-openmpi
 cp2k_dir=cp2k-%{version}
-maxtasks=$(echo `getconf _NPROCESSORS_ONLN`/2 | bc)
+maxtasks=$(nproc)
 emptycheck="NO"
 leakcheck="NO"
 __EOF__
@@ -221,6 +219,12 @@ popd
 %{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich
 
 %changelog
+* Mon Aug 24 2015 Dominik Mierzejewski <rpm@greysector.net> - 2.6.1-1
+- update to 2.6.1
+- drop obsolete patch
+- use psmp build for regtesting
+- make our regtesting config more similar to upstream
+
 * Sun Aug 16 2015 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2.6.0-6
 - Rebuild for MPI provides
 
