@@ -20,7 +20,6 @@ Source4: cp2k-snapshot.sh
 # use rpm optflags
 # link with atlas instead of vanilla blas/lapack
 # build with libint and libxc
-# use external makedepf90
 # skip compilation during regtests
 Patch0: %{name}-rpm.patch
 # port to new ELPA
