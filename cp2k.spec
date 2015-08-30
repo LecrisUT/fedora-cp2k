@@ -26,6 +26,7 @@ Patch0: %{name}-rpm.patch
 Patch2: 0001-elpa-2014-interface-updated.patch
 BuildRequires: atlas-devel >= 3.10.1
 # for regtests
+BuildRequires: bc
 BuildRequires: fftw-devel
 BuildRequires: gcc-gfortran
 BuildRequires: libint-devel >= 1.1.4
