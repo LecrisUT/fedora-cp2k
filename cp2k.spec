@@ -108,8 +108,7 @@ This package contains the documentation and the manual.
 %patch2 -p2 -b .elpa
 
 %if 0%{?fedora}
-sed -i 's|-lmpiblacsF77init||g' arch/Linux-x86-64-gfortran*
-sed -i 's|-lmpiblacsCinit||g' arch/Linux-x86-64-gfortran*
+sed -i 's|-lmpiblacsF77init||g;s|-lmpiblacsCinit||g' arch/Linux-x86-64-gfortran*
 %endif
 
 # Generate necessary symlinks
