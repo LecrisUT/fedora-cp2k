@@ -1,6 +1,6 @@
-diff -up cp2k-2.6.0/arch/Linux-x86-64-gfortran.popt.r cp2k-2.6.0/arch/Linux-x86-64-gfortran.popt
---- cp2k-2.6.0/arch/Linux-x86-64-gfortran.popt.r	2014-10-30 09:11:05.836895000 +0100
-+++ cp2k-2.6.0/arch/Linux-x86-64-gfortran.popt	2015-03-17 22:45:20.056977801 +0100
+diff -up cp2k-2.7.0/arch/Linux-x86-64-gfortran.popt.r cp2k-2.7.0/arch/Linux-x86-64-gfortran.popt
+--- cp2k-2.7.0/arch/Linux-x86-64-gfortran.popt.r	2014-10-30 09:11:05.000000000 +0100
++++ cp2k-2.7.0/arch/Linux-x86-64-gfortran.popt	2015-09-06 00:22:14.361166707 +0200
 @@ -1,8 +1,8 @@
  # Tested with: GFortran 4.9.1, MPICH 3.1, LAPACK 3.5.0, ScaLAPACK 2.0.2
  CC         = gcc
@@ -12,14 +12,14 @@ diff -up cp2k-2.6.0/arch/Linux-x86-64-gfortran.popt.r cp2k-2.6.0/arch/Linux-x86-
  AR         = ar -r
  ACML_INC   = $(ACMLPATH)/include
  ACML_LIB   = $(ACMLPATH)/lib
-@@ -13,18 +13,20 @@ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LAR
+@@ -13,18 +13,22 @@ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LAR
  LIBXC_INC  = $(GCC_DIR)/libxc/2.2.0-gnu/include
  LIBXC_LIB  = $(GCC_DIR)/libxc/2.2.0-gnu/lib64
  DFLAGS     = -D__FFTW3 -D__LIBINT -D__LIBXC2\
 -             -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6 -D__MAX_CONTR=4\
+-             -D__parallel -D__SCALAPACK
 +             -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@ -D__MAX_CONTR=4\
-+             -D__ELPA\
-              -D__parallel -D__SCALAPACK
++             -D__parallel -D__SCALAPACK -D__SCALAPACK2 -D__ELPA2 -D__MPI_VERSION=3
  CPPFLAGS   =
 -FCFLAGS    = $(DFLAGS) -O2 -ffast-math -ffree-form -ffree-line-length-none\
 +OPTFLAGS   = -O2 -ffast-math\
@@ -34,6 +34,8 @@ diff -up cp2k-2.6.0/arch/Linux-x86-64-gfortran.popt.r cp2k-2.6.0/arch/Linux-x86-
 -             $(LIBXC_LIB)/libxc.a\
 -             $(LIBINT_LIB)/libderiv.a\
 -             $(LIBINT_LIB)/libint.a
++CFLAGS     = $(DFLAGS) $(OPTFLAGS)
++CXXFLAGS   = $(DFLAGS) $(OPTFLAGS)
 +FCFLAGS    = $(DFLAGS) $(OPTFLAGS) -ffree-form -ffree-line-length-none
 +LDFLAGS    = $(FCFLAGS)
 +LIBS       = -lelpa \
@@ -43,9 +45,10 @@ diff -up cp2k-2.6.0/arch/Linux-x86-64-gfortran.popt.r cp2k-2.6.0/arch/Linux-x86-
 +             -lxc\
 +             -lderiv\
 +             -lint
-diff -up cp2k-2.6.0/arch/Linux-x86-64-gfortran.psmp.r cp2k-2.6.0/arch/Linux-x86-64-gfortran.psmp
---- cp2k-2.6.0/arch/Linux-x86-64-gfortran.psmp.r	2014-12-22 01:17:03.067670000 +0100
-+++ cp2k-2.6.0/arch/Linux-x86-64-gfortran.psmp	2015-03-17 22:45:26.986086166 +0100
++DATA_DIR   = /usr/share/cp2k
+diff -up cp2k-2.7.0/arch/Linux-x86-64-gfortran.psmp.r cp2k-2.7.0/arch/Linux-x86-64-gfortran.psmp
+--- cp2k-2.7.0/arch/Linux-x86-64-gfortran.psmp.r	2014-12-22 01:17:03.000000000 +0100
++++ cp2k-2.7.0/arch/Linux-x86-64-gfortran.psmp	2015-09-06 00:22:10.299198948 +0200
 @@ -1,8 +1,8 @@
  # Tested with: GFortran 4.9.1, MPICH 3.1, LAPACK 3.5.0, ScaLAPACK 2.0.2
  CC         = gcc
@@ -57,14 +60,14 @@ diff -up cp2k-2.6.0/arch/Linux-x86-64-gfortran.psmp.r cp2k-2.6.0/arch/Linux-x86-
  AR         = ar -r
  ACML_INC   = $(ACMLPATH)/include
  ACML_LIB   = $(ACMLPATH)/lib
-@@ -13,19 +13,20 @@ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LAR
+@@ -13,19 +13,22 @@ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LAR
  LIBXC_INC  = $(GCC_DIR)/libxc/2.2.0-gnu/include
  LIBXC_LIB  = $(GCC_DIR)/libxc/2.2.0-gnu/lib64
  DFLAGS     = -D__FFTW3 -D__LIBINT -D__LIBXC2\
 -             -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6 -D__MAX_CONTR=4\
+-             -D__parallel -D__SCALAPACK
 +             -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@ -D__MAX_CONTR=4\
-+             -D__ELPA\
-              -D__parallel -D__SCALAPACK
++             -D__parallel -D__SCALAPACK -D__SCALAPACK2 -D__ELPA2 -D__MPI_VERSION=3
  CPPFLAGS   =
 -FCFLAGS    = $(DFLAGS) -O2 -ffast-math -ffree-form -ffree-line-length-none\
 -             -fopenmp -ftree-vectorize -funroll-loops\
@@ -80,6 +83,8 @@ diff -up cp2k-2.6.0/arch/Linux-x86-64-gfortran.psmp.r cp2k-2.6.0/arch/Linux-x86-
 -             $(LIBXC_LIB)/libxc.a\
 -             $(LIBINT_LIB)/libderiv.a\
 -             $(LIBINT_LIB)/libint.a
++CFLAGS     = $(DFLAGS) $(OPTFLAGS)
++CXXFLAGS   = $(DFLAGS) $(OPTFLAGS)
 +FCFLAGS    = $(DFLAGS) $(OPTFLAGS) -fopenmp -ffree-form -ffree-line-length-none
 +LDFLAGS    = $(FCFLAGS)
 +LIBS       = -lelpa \
@@ -90,10 +95,11 @@ diff -up cp2k-2.6.0/arch/Linux-x86-64-gfortran.psmp.r cp2k-2.6.0/arch/Linux-x86-
 +             -lxc\
 +             -lderiv\
 +             -lint
-diff -up cp2k-2.6.0/arch/Linux-x86-64-gfortran.sopt.r cp2k-2.6.0/arch/Linux-x86-64-gfortran.sopt
---- cp2k-2.6.0/arch/Linux-x86-64-gfortran.sopt.r	2014-12-22 01:17:03.067670000 +0100
-+++ cp2k-2.6.0/arch/Linux-x86-64-gfortran.sopt	2015-03-17 22:45:04.022727041 +0100
-@@ -13,17 +13,16 @@ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LAR
++DATA_DIR   = /usr/share/cp2k
+diff -up cp2k-2.7.0/arch/Linux-x86-64-gfortran.sopt.r cp2k-2.7.0/arch/Linux-x86-64-gfortran.sopt
+--- cp2k-2.7.0/arch/Linux-x86-64-gfortran.sopt.r	2014-12-22 01:17:03.000000000 +0100
++++ cp2k-2.7.0/arch/Linux-x86-64-gfortran.sopt	2015-09-06 00:21:48.178374523 +0200
+@@ -13,17 +13,19 @@ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LAR
  LIBXC_INC  = $(GCC_DIR)/libxc/2.2.0-gnu/include
  LIBXC_LIB  = $(GCC_DIR)/libxc/2.2.0-gnu/lib64
  DFLAGS     = -D__FFTW3 -D__LIBINT -D__LIBXC2\
@@ -113,6 +119,8 @@ diff -up cp2k-2.6.0/arch/Linux-x86-64-gfortran.sopt.r cp2k-2.6.0/arch/Linux-x86-
 -             $(LIBINT_LIB)/libderiv.a\
 -             $(LIBINT_LIB)/libint.a
 -
++CFLAGS     = $(DFLAGS) $(OPTFLAGS)
++CXXFLAGS   = $(DFLAGS) $(OPTFLAGS)
 +FCFLAGS    = $(DFLAGS) $(OPTFLAGS) -ffree-form -ffree-line-length-none
 +LDFLAGS    = $(FCFLAGS)
 +LIBS       = -lsatlas\
@@ -120,10 +128,11 @@ diff -up cp2k-2.6.0/arch/Linux-x86-64-gfortran.sopt.r cp2k-2.6.0/arch/Linux-x86-
 +             -lxc\
 +             -lderiv\
 +             -lint
-diff -up cp2k-2.6.0/arch/Linux-x86-64-gfortran.ssmp.r cp2k-2.6.0/arch/Linux-x86-64-gfortran.ssmp
---- cp2k-2.6.0/arch/Linux-x86-64-gfortran.ssmp.r	2014-12-22 01:17:03.067670000 +0100
-+++ cp2k-2.6.0/arch/Linux-x86-64-gfortran.ssmp	2015-03-17 22:45:04.022727041 +0100
-@@ -13,17 +13,16 @@ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LAR
++DATA_DIR   = /usr/share/cp2k
+diff -up cp2k-2.7.0/arch/Linux-x86-64-gfortran.ssmp.r cp2k-2.7.0/arch/Linux-x86-64-gfortran.ssmp
+--- cp2k-2.7.0/arch/Linux-x86-64-gfortran.ssmp.r	2014-12-22 01:17:03.000000000 +0100
++++ cp2k-2.7.0/arch/Linux-x86-64-gfortran.ssmp	2015-09-06 00:22:00.241278778 +0200
+@@ -13,17 +13,19 @@ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LAR
  LIBXC_INC  = $(GCC_DIR)/libxc/2.2.0-gnu/include
  LIBXC_LIB  = $(GCC_DIR)/libxc/2.2.0-gnu/lib64
  DFLAGS     = -D__FFTW3 -D__LIBINT -D__LIBXC2\
@@ -143,6 +152,8 @@ diff -up cp2k-2.6.0/arch/Linux-x86-64-gfortran.ssmp.r cp2k-2.6.0/arch/Linux-x86-
 -             $(LIBXC_LIB)/libxc.a\
 -             $(LIBINT_LIB)/libderiv.a\
 -             $(LIBINT_LIB)/libint.a
++CFLAGS     = $(DFLAGS) $(OPTFLAGS)
++CXXFLAGS   = $(DFLAGS) $(OPTFLAGS)
 +FCFLAGS    = $(DFLAGS) $(OPTFLAGS) -fopenmp -ffree-form -ffree-line-length-none
 +LDFLAGS    = $(FCFLAGS)
 +LIBS       = -lsatlas\
@@ -151,10 +162,11 @@ diff -up cp2k-2.6.0/arch/Linux-x86-64-gfortran.ssmp.r cp2k-2.6.0/arch/Linux-x86-
 +             -lxc\
 +             -lderiv\
 +             -lint
-diff -up cp2k-2.6.0/tools/regtesting/do_regtest.r cp2k-2.6.0/tools/regtesting/do_regtest
---- cp2k-2.6.0/tools/regtesting/do_regtest.r	2014-11-28 13:32:08.930828000 +0100
-+++ cp2k-2.6.0/tools/regtesting/do_regtest	2015-03-17 22:45:04.022727041 +0100
-@@ -241,8 +241,8 @@ job_max_time=${job_max_time:-"600"}
++DATA_DIR   = /usr/share/cp2k
+diff -up cp2k-2.7.0/tools/regtesting/do_regtest.r cp2k-2.7.0/tools/regtesting/do_regtest
+--- cp2k-2.7.0/tools/regtesting/do_regtest.r	2015-09-01 09:12:22.000000000 +0200
++++ cp2k-2.7.0/tools/regtesting/do_regtest	2015-09-06 00:20:17.995096835 +0200
+@@ -229,8 +229,8 @@ cp2k_postfix=${cp2k_postfix:-"${cp2k_run
  #
  ###################################################################################
  test_types_file=${dir_base}/${cp2k_dir}/tests/TEST_TYPES
@@ -165,11 +177,11 @@ diff -up cp2k-2.6.0/tools/regtesting/do_regtest.r cp2k-2.6.0/tools/regtesting/do
  changelog=${dir_last}/ChangeLog
  changelog_diff=${changelog}.diff
  changelog_new=${changelog}.new
-@@ -731,6 +731,7 @@ for dir in ${dirs}; do
-      # if value does not exist set to the default of 1.0E-14
-      test_tolerance=`grep -v "#" TEST_FILES | ${awk} -v itest=$itest -v def_err_tol=$default_err_tolerance '{c=c+1;if (c==itest) if (NF == 3) { print $3 } else { print def_err_tol } }'`
+@@ -389,6 +389,7 @@ function run_regtest_dir() {
+      test_tolerance=`grep -v "#" TEST_FILES | ${awk} -v itest=$itest -v def_err_tol=$default_err_tolerance '{c=c+1;if (c==itest) if (NF >= 3) { print $3 } else { print def_err_tol } }'`
+      test_ref_value=`grep -v "#" TEST_FILES | ${awk} -v itest=$itest '{c=c+1;if (c==itest) if (NF == 4) { print $4 } }'`
  
 +     echo "Running ${input_file}"
       output_file=${dir_out}/${dir}/${input_file}.out
       output_last=${dir_last}/${dir}/${input_file}.out
-      ( ulimit -t ${job_max_time} ; ${cp2k_prefix} ${input_file} ${cp2k_postfix} &> ${output_file} ) >& /dev/null
+ 

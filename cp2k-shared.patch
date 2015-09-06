@@ -1,0 +1,65 @@
+diff -up cp2k-2.7.0/arch/Linux-x86-64-gfortran.popt.shared cp2k-2.7.0/arch/Linux-x86-64-gfortran.popt
+--- cp2k-2.7.0/arch/Linux-x86-64-gfortran.popt.shared	2015-09-06 00:55:47.642197102 +0200
++++ cp2k-2.7.0/arch/Linux-x86-64-gfortran.popt	2015-09-06 00:55:47.645197079 +0200
+@@ -3,6 +3,7 @@ CC         = gcc
+ CPP        =
+ FC         = mpifort
+ LD         = mpifort
++LD_SHARED  = mpifort -shared
+ AR         = ar -r
+ ACML_INC   = $(ACMLPATH)/include
+ ACML_LIB   = $(ACMLPATH)/lib
+diff -up cp2k-2.7.0/arch/Linux-x86-64-gfortran.psmp.shared cp2k-2.7.0/arch/Linux-x86-64-gfortran.psmp
+--- cp2k-2.7.0/arch/Linux-x86-64-gfortran.psmp.shared	2015-09-06 00:55:47.643197094 +0200
++++ cp2k-2.7.0/arch/Linux-x86-64-gfortran.psmp	2015-09-06 00:55:47.645197079 +0200
+@@ -3,6 +3,7 @@ CC         = gcc
+ CPP        =
+ FC         = mpifort
+ LD         = mpifort
++LD_SHARED  = mpifort -shared
+ AR         = ar -r
+ ACML_INC   = $(ACMLPATH)/include
+ ACML_LIB   = $(ACMLPATH)/lib
+diff -up cp2k-2.7.0/arch/Linux-x86-64-gfortran.sopt.shared cp2k-2.7.0/arch/Linux-x86-64-gfortran.sopt
+--- cp2k-2.7.0/arch/Linux-x86-64-gfortran.sopt.shared	2015-09-06 00:55:47.643197094 +0200
++++ cp2k-2.7.0/arch/Linux-x86-64-gfortran.sopt	2015-09-06 00:55:47.645197079 +0200
+@@ -3,6 +3,7 @@ CC         = gcc
+ CPP        =
+ FC         = gfortran
+ LD         = gfortran
++LD_SHARED  = gfortran -shared
+ AR         = ar -r
+ ACML_INC   = $(ACMLPATH)/include
+ ACML_LIB   = $(ACMLPATH)/lib
+diff -up cp2k-2.7.0/arch/Linux-x86-64-gfortran.ssmp.shared cp2k-2.7.0/arch/Linux-x86-64-gfortran.ssmp
+--- cp2k-2.7.0/arch/Linux-x86-64-gfortran.ssmp.shared	2015-09-06 00:55:47.643197094 +0200
++++ cp2k-2.7.0/arch/Linux-x86-64-gfortran.ssmp	2015-09-06 00:55:47.645197079 +0200
+@@ -3,6 +3,7 @@ CC         = gcc
+ CPP        =
+ FC         = gfortran
+ LD         = gfortran
++LD_SHARED  = gfortran -shared
+ AR         = ar -r
+ ACML_INC   = $(ACMLPATH)/include
+ ACML_LIB   = $(ACMLPATH)/lib
+diff -up cp2k-2.7.0/makefiles/Makefile.shared cp2k-2.7.0/makefiles/Makefile
+--- cp2k-2.7.0/makefiles/Makefile.shared	2015-08-26 09:06:53.000000000 +0200
++++ cp2k-2.7.0/makefiles/Makefile	2015-09-06 00:56:38.478794797 +0200
+@@ -29,6 +29,7 @@ TOOLSRC      := $(CP2KHOME)/tools
+ SRCDIR       := $(CP2KHOME)/src
+ EXEDIR       := $(MAINEXEDIR)/$(ARCH)
+ REVISION     := $(shell $(CP2KHOME)/tools/build_utils/get_revision_number $(SRCDIR))
++ABI_VERSION  := 0
+ 
+ 
+ # Discover programs =========================================================
+@@ -450,7 +451,8 @@ ifneq ($(LIBDIR),)
+ $(LIBDIR)/%:
+ ifneq ($(LD_SHARED),)
+ 	@echo "Creating shared library $@"
+-	@$(LD_SHARED) -o $(@:.a=.so) $^
++	@$(LD_SHARED) -o $(@:.a=.so).$(ABI_VERSION) -Wl,-soname,$(notdir $@).$(ABI_VERSION) $^
++	@ln -s $(notdir $@).$(ABI_VERSION) $@
+ else
+ 	@echo "Updating archive $@"
+ 	@$(AR) $@ $?

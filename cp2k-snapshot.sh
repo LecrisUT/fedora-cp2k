@@ -13,15 +13,15 @@ cleanup() {
 unset CDPATH
 pwd=$(pwd)
 svn=$(date +%Y%m%d)
-svn=20150108
-dirname=cp2k-2.6.0
-url=svn://svn.code.sf.net/p/cp2k/code/branches/cp2k-2_6-branch/cp2k
-rev=15177
+svn=20150906
+dirname=cp2k-2.7.0
+url=svn://svn.code.sf.net/p/cp2k/code/trunk/cp2k
+rev=15831
 
 cd "$tmp"
 svn checkout -r ${rev} ${url} $dirname
 cd $dirname
-tools/get_revision_number . >REVISION
+tools/build_utils/get_revision_number . >REVISION
 find . -type d -name .svn -print0 | xargs -0r rm -rf
 cd ..
 tar Jcf "$pwd"/$dirname-$svn.tar.xz $dirname

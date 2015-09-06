@@ -1,9 +1,10 @@
-%define svn 0
-%define snapshot 20131112
+%define svn 15831
+%define snapshot 20150906
+# TODO OpenCL support: -D__ACC -D__DBCSR_ACC -D__OPENCL
 
 Name: cp2k
-Version: 2.6.1
-Release: 1%{?dist}
+Version: 2.7.0
+Release: 0.1.%{snapshot}svn%{svn}%{?dist}
 Group: Applications/Engineering
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
@@ -13,8 +14,8 @@ URL: http://cp2k.org/
 Source0: cp2k-%{version}-%{snapshot}.tar.xz
 %else
 Source0: http://downloads.sourceforge.net/project/cp2k/cp2k-%{version}.tar.bz2
-%endif
 Source1: http://downloads.sourceforge.net/project/cp2k/testresults/cp2k-2_6_1-branch_LAST-Linux-x86-64-gfortran-pdbg.tar.bz2
+%endif
 Source4: cp2k-snapshot.sh
 # patch to:
 # use rpm optflags
@@ -22,8 +23,8 @@ Source4: cp2k-snapshot.sh
 # build with libint and libxc
 # skip compilation during regtests
 Patch0: %{name}-rpm.patch
-# port to new ELPA
-Patch2: 0001-elpa-2014-interface-updated.patch
+# build shared libraries
+Patch1: cp2k-shared.patch
 BuildRequires: atlas-devel >= 3.10.1
 # for regtests
 BuildRequires: bc
@@ -105,7 +106,7 @@ This package contains the documentation and the manual.
 %prep
 %setup -q
 %patch0 -p1 -b .r
-%patch2 -p2 -b .elpa
+%patch1 -p1 -b .shared
 
 %if 0%{?fedora}
 sed -i 's|-lmpiblacsF77init||g;s|-lmpiblacsCinit||g' arch/Linux-x86-64-gfortran*
@@ -136,42 +137,48 @@ for f in arch/Linux-x86-64-gfortran.{popt,psmp,sopt,ssmp}; do
  sed -i "s|@LIBINT_MAX_AM@|$maxam|g;s|@LIBDERIV_MAX_AM@|$maxderiv|g" $f
 done
 
+%if ! %{svn}
 tar -xf %{SOURCE1}
 ln -s LAST-Linux-x86-64-gfortran-regtest-pdbg LAST-${TARGET}-openmpi-psmp
-
+%endif
 
 %build
 TARGET=$(tools/build_utils/get_arch_code)
-OPTFLAGS_COMMON="%{optflags} -L%{_libdir}/atlas"
+OPTFLAGS_COMMON="%{optflags} -L%{_libdir}/atlas -fPIC"
+for v in opt smp ; do
 pushd makefiles
     %{_openmpi_load}
-        make OPTFLAGS="${OPTFLAGS_COMMON} -I%{_fmoddir}/openmpi" %{?_smp_mflags} ARCH="${TARGET}-openmpi" VERSION=popt
-        make OPTFLAGS="${OPTFLAGS_COMMON} -I%{_fmoddir}/openmpi" %{?_smp_mflags} ARCH="${TARGET}-openmpi" VERSION=psmp
+        make OPTFLAGS="${OPTFLAGS_COMMON} -I%{_fmoddir}/openmpi" %{?_smp_mflags} ARCH="${TARGET}-openmpi" VERSION=p${v}
     %{_openmpi_unload}
     %{_mpich_load}
-        make OPTFLAGS="${OPTFLAGS_COMMON} -I%{_fmoddir}/mpich" %{?_smp_mflags} ARCH="${TARGET}-mpich" VERSION=popt
-        make OPTFLAGS="${OPTFLAGS_COMMON} -I%{_fmoddir}/mpich" %{?_smp_mflags} ARCH="${TARGET}-mpich" VERSION=psmp
+        make OPTFLAGS="${OPTFLAGS_COMMON} -I%{_fmoddir}/mpich" %{?_smp_mflags} ARCH="${TARGET}-mpich" VERSION=p${v}
     %{_mpich_unload}
 
-    make OPTFLAGS="${OPTFLAGS_COMMON}" %{?_smp_mflags} ARCH="${TARGET}" VERSION=sopt
-    make OPTFLAGS="${OPTFLAGS_COMMON}" %{?_smp_mflags} ARCH="${TARGET}" VERSION=ssmp
+    make OPTFLAGS="${OPTFLAGS_COMMON}" %{?_smp_mflags} ARCH="${TARGET}" VERSION=s${v}
 popd
+done
 
 %install
 TARGET=$(tools/build_utils/get_arch_code)
-install -d %{buildroot}%{_bindir}
+for v in opt smp ; do
 %{_openmpi_load}
-    mkdir -p %{buildroot}%{_libdir}/openmpi%{?_opt_cc_suffix}/bin/
-    install -pm755 exe/${TARGET}-openmpi/cp2k.popt %{buildroot}%{_libdir}/openmpi%{?_opt_cc_suffix}/bin/cp2k.popt_openmpi
-    install -pm755 exe/${TARGET}-openmpi/cp2k.psmp %{buildroot}%{_libdir}/openmpi%{?_opt_cc_suffix}/bin/cp2k.psmp_openmpi
+    mkdir -p %{buildroot}{${MPI_BIN},${MPI_LIB}}
+    install -pm755 exe/${TARGET}-openmpi/cp2k.p${v} %{buildroot}${MPI_BIN}/cp2k.p${v}_openmpi
+    install -pm755 exe/${TARGET}-openmpi/cp2k_shell.p${v} %{buildroot}${MPI_BIN}/cp2k_shell.p${v}_openmpi
+    install -pm755 lib/${TARGET}-openmpi/p${v}/lib*.p${v}.so.* %{buildroot}${MPI_LIB}/
 %{_openmpi_unload}
 %{_mpich_load}
-    mkdir -p %{buildroot}%{_libdir}/mpich%{?_opt_cc_suffix}/bin/
-    install -pm755 exe/${TARGET}-mpich/cp2k.popt %{buildroot}%{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.popt_mpich
-    install -pm755 exe/${TARGET}-mpich/cp2k.psmp %{buildroot}%{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich
+    mkdir -p %{buildroot}{${MPI_BIN},${MPI_LIB}}
+    install -pm755 exe/${TARGET}-mpich/cp2k.p${v} %{buildroot}${MPI_BIN}/cp2k.p${v}_mpich
+    install -pm755 exe/${TARGET}-mpich/cp2k_shell.p${v} %{buildroot}${MPI_BIN}/cp2k_shell.p${v}_mpich
+    install -pm755 lib/${TARGET}-mpich/p${v}/lib*.p${v}.so.* %{buildroot}${MPI_LIB}/
 %{_mpich_unload}
-install -pm755 exe/${TARGET}/cp2k.sopt %{buildroot}%{_bindir}
-install -pm755 exe/${TARGET}/cp2k.ssmp %{buildroot}%{_bindir}
+mkdir -p %{buildroot}{%{_bindir},%{_libdir},%{_datadir}/cp2k}
+install -pm755 exe/${TARGET}/cp2k.s${v} %{buildroot}%{_bindir}
+install -pm755 exe/${TARGET}/cp2k_shell.s${v} %{buildroot}%{_bindir}
+install -pm755 lib/${TARGET}/s${v}/lib*.s${v}.so.* %{buildroot}%{_libdir}/
+cp -pr data/* %{buildroot}%{_datadir}/cp2k/
+done
 
 %clean
 rm -rf %{buildroot}
@@ -193,6 +200,8 @@ leakcheck="NO"
 __EOF__
 pushd tests
 %{_openmpi_load}
+export CP2K_DATA_DIR=%{buildroot}/usr/share/cp2k/
+export LD_LIBRARY_PATH=%{LD_LIBRARY_PATH}:%{buildroot}${MPI_LIB}
 ../tools/regtesting/do_regtest -nosvn -nobuild -config fedora.config
 %{_openmpi_unload}
 popd
@@ -201,23 +210,42 @@ popd
 %files common
 %defattr(-,root,root,-)
 %doc COPYRIGHT README
+%{_datadir}/cp2k
 
 %files
 %defattr(-,root,root,-)
 %{_bindir}/cp2k.sopt
 %{_bindir}/cp2k.ssmp
+%{_bindir}/cp2k_shell.sopt
+%{_bindir}/cp2k_shell.ssmp
+%{_libdir}/lib*.sopt.so.*
+%{_libdir}/lib*.ssmp.so.*
 
 %files openmpi
 %defattr(-,root,root,-)
 %{_libdir}/openmpi%{?_opt_cc_suffix}/bin/cp2k.popt_openmpi
 %{_libdir}/openmpi%{?_opt_cc_suffix}/bin/cp2k.psmp_openmpi
+%{_libdir}/openmpi%{?_opt_cc_suffix}/bin/cp2k_shell.popt_openmpi
+%{_libdir}/openmpi%{?_opt_cc_suffix}/bin/cp2k_shell.psmp_openmpi
+%{_libdir}/openmpi%{?_opt_cc_suffix}/lib/lib*.popt.so.*
+%{_libdir}/openmpi%{?_opt_cc_suffix}/lib/lib*.psmp.so.*
 
 %files mpich
 %defattr(-,root,root,-)
 %{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.popt_mpich
 %{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich
+%{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k_shell.popt_mpich
+%{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k_shell.psmp_mpich
+%{_libdir}/mpich%{?_opt_cc_suffix}/lib/lib*.popt.so.*
+%{_libdir}/mpich%{?_opt_cc_suffix}/lib/lib*.psmp.so.*
 
 %changelog
+* Sun Sep 06 2015 Dominik Mierzejewski <rpm@greysector.net> - 2.7.0-0.1.20150906svn15831
+- update to SVN trunk HEAD (r15831)
+- drop obsolete patch
+- build shared libraries and include cp2k_shell
+- include data files
+
 * Mon Aug 24 2015 Dominik Mierzejewski <rpm@greysector.net> - 2.6.1-1
 - update to 2.6.1
 - drop obsolete patch
