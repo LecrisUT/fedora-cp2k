@@ -1,5 +1,5 @@
-%define svn 15831
-%define snapshot 20150906
+%define svn 15859
+%define snapshot 20150908
 # TODO OpenCL support: -D__ACC -D__DBCSR_ACC -D__OPENCL
 
 Name: cp2k
@@ -25,6 +25,8 @@ Source4: cp2k-snapshot.sh
 Patch0: %{name}-rpm.patch
 # build shared libraries
 Patch1: cp2k-shared.patch
+# fix compilation of MPI code
+Patch2: cp2k-mpi.patch
 BuildRequires: atlas-devel >= 3.10.1
 # for regtests
 BuildRequires: bc
@@ -107,6 +109,7 @@ This package contains the documentation and the manual.
 %setup -q
 %patch0 -p1 -b .r
 %patch1 -p1 -b .shared
+%patch2 -p1 -b .mpi
 
 %if 0%{?fedora}
 sed -i 's|-lmpiblacsF77init||g;s|-lmpiblacsCinit||g' arch/Linux-x86-64-gfortran*
@@ -240,11 +243,12 @@ popd
 %{_libdir}/mpich%{?_opt_cc_suffix}/lib/lib*.psmp.so.*
 
 %changelog
-* Sun Sep 06 2015 Dominik Mierzejewski <rpm@greysector.net> - 2.7.0-0.1.20150906svn15831
-- update to SVN trunk HEAD (r15831)
+* Tue Sep 08 2015 Dominik Mierzejewski <rpm@greysector.net> - 2.7.0-0.1.20150908svn15859
+- update to SVN trunk HEAD (r15859)
 - drop obsolete patch
 - build shared libraries and include cp2k_shell
 - include data files
+- fix compilation of MPI code on 32-bit platforms
 
 * Mon Aug 24 2015 Dominik Mierzejewski <rpm@greysector.net> - 2.6.1-1
 - update to 2.6.1

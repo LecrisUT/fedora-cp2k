@@ -59,7 +59,7 @@ diff -up cp2k-2.7.0/makefiles/Makefile.shared cp2k-2.7.0/makefiles/Makefile
  	@echo "Creating shared library $@"
 -	@$(LD_SHARED) -o $(@:.a=.so) $^
 +	@$(LD_SHARED) -o $(@:.a=.so).$(ABI_VERSION) -Wl,-soname,$(notdir $@).$(ABI_VERSION) $^
-+	@ln -s $(notdir $@).$(ABI_VERSION) $@
++	@ln -sf $(notdir $@).$(ABI_VERSION) $@
  else
  	@echo "Updating archive $@"
  	@$(AR) $@ $?
