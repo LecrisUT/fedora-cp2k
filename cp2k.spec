@@ -1,10 +1,10 @@
-%define svn 15859
-%define snapshot 20150908
+%global svn 15878
+%global snapshot 20150911
 # TODO OpenCL support: -D__ACC -D__DBCSR_ACC -D__OPENCL
 
 Name: cp2k
 Version: 2.7.0
-Release: 0.1.%{snapshot}svn%{svn}%{?dist}
+Release: 0.2.%{snapshot}svn%{svn}%{?dist}
 Group: Applications/Engineering
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
@@ -25,8 +25,8 @@ Source4: cp2k-snapshot.sh
 Patch0: %{name}-rpm.patch
 # build shared libraries
 Patch1: cp2k-shared.patch
-# fix compilation of MPI code
-Patch2: cp2k-mpi.patch
+# don't assume Linux/ppc64 is Linux-bgl-ibm
+Patch2: cp2k-ppc64.patch
 BuildRequires: atlas-devel >= 3.10.1
 # for regtests
 BuildRequires: bc
@@ -109,7 +109,7 @@ This package contains the documentation and the manual.
 %setup -q
 %patch0 -p1 -b .r
 %patch1 -p1 -b .shared
-%patch2 -p1 -b .mpi
+%patch2 -p1 -b .ppc64
 
 %if 0%{?fedora}
 sed -i 's|-lmpiblacsF77init||g;s|-lmpiblacsCinit||g' arch/Linux-x86-64-gfortran*
@@ -187,6 +187,8 @@ done
 rm -rf %{buildroot}
 
 %if 1
+# regtests take 11+ hours on armv7hl
+%ifnarch armv7hl
 %check
 cat > tests/fedora.config << __EOF__
 export LC_ALL=C
@@ -208,6 +210,7 @@ export LD_LIBRARY_PATH=%{LD_LIBRARY_PATH}:%{buildroot}${MPI_LIB}
 ../tools/regtesting/do_regtest -nosvn -nobuild -config fedora.config
 %{_openmpi_unload}
 popd
+%endif
 %endif
 
 %files common
@@ -243,6 +246,12 @@ popd
 %{_libdir}/mpich%{?_opt_cc_suffix}/lib/lib*.psmp.so.*
 
 %changelog
+* Fri Sep 11 2015 Dominik Mierzejewski <rpm@greysector.net> - 2.7.0-0.2.20150911svn15878
+- update to SVN trunk HEAD (r15878)
+- drop obsolete patch
+- fix ppc64 platform detection
+- don't run regtests on armv7hl for now (too slow)
+
 * Tue Sep 08 2015 Dominik Mierzejewski <rpm@greysector.net> - 2.7.0-0.1.20150908svn15859
 - update to SVN trunk HEAD (r15859)
 - drop obsolete patch
