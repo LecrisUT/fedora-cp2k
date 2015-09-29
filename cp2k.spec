@@ -4,7 +4,7 @@
 
 Name: cp2k
 Version: 2.7.0
-Release: 0.2.%{snapshot}svn%{svn}%{?dist}
+Release: 0.3.%{snapshot}svn%{svn}%{?dist}
 Group: Applications/Engineering
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
@@ -246,6 +246,9 @@ popd
 %{_libdir}/mpich%{?_opt_cc_suffix}/lib/lib*.psmp.so.*
 
 %changelog
+* Tue Sep 29 2015 Peter Robinson <pbrobinson@fedoraproject.org> 2.7.0-0.3.20150911svn15878
+- Rebuild (MPI)
+
 * Fri Sep 11 2015 Dominik Mierzejewski <rpm@greysector.net> - 2.7.0-0.2.20150911svn15878
 - update to SVN trunk HEAD (r15878)
 - drop obsolete patch
