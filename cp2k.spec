@@ -4,7 +4,7 @@
 
 Name: cp2k
 Version: 2.7.0
-Release: 0.3.%{snapshot}svn%{svn}%{?dist}
+Release: 0.4.%{snapshot}svn%{svn}%{?dist}
 Group: Applications/Engineering
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
@@ -246,6 +246,9 @@ popd
 %{_libdir}/mpich%{?_opt_cc_suffix}/lib/lib*.psmp.so.*
 
 %changelog
+* Wed Feb 03 2016 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.0-0.4.20150911svn15878
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
+
 * Tue Sep 29 2015 Peter Robinson <pbrobinson@fedoraproject.org> 2.7.0-0.3.20150911svn15878
 - Rebuild (MPI)
 
