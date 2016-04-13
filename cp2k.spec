@@ -1,10 +1,13 @@
-%global svn 15878
+%global svn 0
 %global snapshot 20150911
 # TODO OpenCL support: -D__ACC -D__DBCSR_ACC -D__OPENCL
 
+%global __provides_exclude_from ^%{_libdir}/cp2k/lib.*\\.so$
+%global __requires_exclude ^libcp2k.*\\.so.*$
+
 Name: cp2k
-Version: 2.7.0
-Release: 0.4.%{snapshot}svn%{svn}%{?dist}
+Version: 3.0
+Release: 1%{?dist}
 Group: Applications/Engineering
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
@@ -13,8 +16,7 @@ URL: http://cp2k.org/
 # run cp2k-snapshot.sh to produce this
 Source0: cp2k-%{version}-%{snapshot}.tar.xz
 %else
-Source0: http://downloads.sourceforge.net/project/cp2k/cp2k-%{version}.tar.bz2
-Source1: http://downloads.sourceforge.net/project/cp2k/testresults/cp2k-2_6_1-branch_LAST-Linux-x86-64-gfortran-pdbg.tar.bz2
+Source0: https://downloads.sourceforge.net/project/cp2k/cp2k-%{version}.tar.bz2
 %endif
 Source4: cp2k-snapshot.sh
 # patch to:
@@ -24,8 +26,8 @@ Source4: cp2k-snapshot.sh
 Patch0: %{name}-rpm.patch
 # build shared libraries
 Patch1: cp2k-shared.patch
-# don't assume Linux/ppc64 is Linux-bgl-ibm
-Patch2: cp2k-ppc64.patch
+# restore support for libxc-2.1.2
+Patch2: cp2k-libxc212.patch
 BuildRequires: atlas-devel >= 3.10.1
 # for regtests
 BuildRequires: bc
@@ -108,18 +110,17 @@ This package contains the documentation and the manual.
 %setup -q
 %patch0 -p1 -b .r
 %patch1 -p1 -b .shared
-%patch2 -p1 -b .ppc64
+%patch2 -p1 -b .libxc212
+sed -i 's|@libdir@|%{_libdir}|' makefiles/Makefile
 
 %if 0%{?fedora}
 sed -i 's|-lmpiblacsF77init||g;s|-lmpiblacsCinit||g' arch/Linux-x86-64-gfortran*
 %endif
 
 # Generate necessary symlinks
-TARGET=$(tools/build_utils/get_arch_code)
-%ifnarch x86_64
+TARGET=Linux-%{_target_cpu}-gfortran
 ln -s Linux-x86-64-gfortran.sopt arch/${TARGET}.sopt
 ln -s Linux-x86-64-gfortran.ssmp arch/${TARGET}.ssmp
-%endif
 ln -s Linux-x86-64-gfortran.popt arch/${TARGET}-openmpi.popt
 ln -s Linux-x86-64-gfortran.popt arch/${TARGET}-mpich.popt
 ln -s Linux-x86-64-gfortran.psmp arch/${TARGET}-openmpi.psmp
@@ -139,46 +140,42 @@ for f in arch/Linux-x86-64-gfortran.{popt,psmp,sopt,ssmp}; do
  sed -i "s|@LIBINT_MAX_AM@|$maxam|g;s|@LIBDERIV_MAX_AM@|$maxderiv|g" $f
 done
 
-%if ! %{svn}
-tar -xf %{SOURCE1}
-ln -s LAST-Linux-x86-64-gfortran-regtest-pdbg LAST-${TARGET}-openmpi-psmp
-%endif
-
 %build
-TARGET=$(tools/build_utils/get_arch_code)
-OPTFLAGS_COMMON="%{optflags} -L%{_libdir}/atlas -fPIC"
+TARGET=Linux-%{_target_cpu}-gfortran
+OPTFLAGS_COMMON="%{optflags} -fPIC -L%{_libdir}/atlas -I%{_fmoddir}"
+LDFLAGS_COMMON="${OPTFLAGS_COMMON} %{__global_ldflags}"
 for v in opt smp ; do
 pushd makefiles
     %{_openmpi_load}
-        make OPTFLAGS="${OPTFLAGS_COMMON} -I%{_fmoddir}/openmpi" %{?_smp_mflags} ARCH="${TARGET}-openmpi" VERSION=p${v}
+        make OPTFLAGS="${OPTFLAGS_COMMON} -I%{_fmoddir}/openmpi" LDFLAGS="${LDFLAGS_COMMON} -Wl,-rpath,${MPI_LIB}/cp2k" %{?_smp_mflags} ARCH="${TARGET}-openmpi" VERSION=p${v}
     %{_openmpi_unload}
     %{_mpich_load}
-        make OPTFLAGS="${OPTFLAGS_COMMON} -I%{_fmoddir}/mpich" %{?_smp_mflags} ARCH="${TARGET}-mpich" VERSION=p${v}
+        make OPTFLAGS="${OPTFLAGS_COMMON} -I%{_fmoddir}/mpich" LDFLAGS="${LDFLAGS_COMMON} -Wl,-rpath,${MPI_LIB}/cp2k" %{?_smp_mflags} ARCH="${TARGET}-mpich" VERSION=p${v}
     %{_mpich_unload}
 
-    make OPTFLAGS="${OPTFLAGS_COMMON}" %{?_smp_mflags} ARCH="${TARGET}" VERSION=s${v}
+    make OPTFLAGS="${OPTFLAGS_COMMON}" LDFLAGS="${LDFLAGS_COMMON} -Wl,-rpath,%{_libdir}/cp2k" %{?_smp_mflags} ARCH="${TARGET}" VERSION=s${v}
 popd
 done
 
 %install
-TARGET=$(tools/build_utils/get_arch_code)
+TARGET=Linux-%{_target_cpu}-gfortran
+mkdir -p %{buildroot}{%{_bindir},%{_libdir}/cp2k,%{_datadir}/cp2k}
 for v in opt smp ; do
 %{_openmpi_load}
-    mkdir -p %{buildroot}{${MPI_BIN},${MPI_LIB}}
+    mkdir -p %{buildroot}{${MPI_BIN},${MPI_LIB}/cp2k}
     install -pm755 exe/${TARGET}-openmpi/cp2k.p${v} %{buildroot}${MPI_BIN}/cp2k.p${v}_openmpi
     install -pm755 exe/${TARGET}-openmpi/cp2k_shell.p${v} %{buildroot}${MPI_BIN}/cp2k_shell.p${v}_openmpi
-    install -pm755 lib/${TARGET}-openmpi/p${v}/lib*.p${v}.so.* %{buildroot}${MPI_LIB}/
+    install -pm755 lib/${TARGET}-openmpi/p${v}/lib*.p${v}.so %{buildroot}${MPI_LIB}/cp2k/
 %{_openmpi_unload}
 %{_mpich_load}
-    mkdir -p %{buildroot}{${MPI_BIN},${MPI_LIB}}
+    mkdir -p %{buildroot}{${MPI_BIN},${MPI_LIB}/cp2k}
     install -pm755 exe/${TARGET}-mpich/cp2k.p${v} %{buildroot}${MPI_BIN}/cp2k.p${v}_mpich
     install -pm755 exe/${TARGET}-mpich/cp2k_shell.p${v} %{buildroot}${MPI_BIN}/cp2k_shell.p${v}_mpich
-    install -pm755 lib/${TARGET}-mpich/p${v}/lib*.p${v}.so.* %{buildroot}${MPI_LIB}/
+    install -pm755 lib/${TARGET}-mpich/p${v}/lib*.p${v}.so %{buildroot}${MPI_LIB}/cp2k/
 %{_mpich_unload}
-mkdir -p %{buildroot}{%{_bindir},%{_libdir},%{_datadir}/cp2k}
 install -pm755 exe/${TARGET}/cp2k.s${v} %{buildroot}%{_bindir}
 install -pm755 exe/${TARGET}/cp2k_shell.s${v} %{buildroot}%{_bindir}
-install -pm755 lib/${TARGET}/s${v}/lib*.s${v}.so.* %{buildroot}%{_libdir}/
+install -pm755 lib/${TARGET}/s${v}/lib*.s${v}.so %{buildroot}%{_libdir}/cp2k/
 cp -pr data/* %{buildroot}%{_datadir}/cp2k/
 done
 
@@ -192,21 +189,23 @@ rm -rf %{buildroot}
 cat > tests/fedora.config << __EOF__
 export LC_ALL=C
 dir_base=%{_builddir}
-cp2k_version=psmp
-export OMP_NUM_THREADS=2
-numprocs=2
-cp2k_run_prefix="mpiexec -np \${numprocs}"
-dir_triplet=`tools/build_utils/get_arch_code`-openmpi
-cp2k_dir=cp2k-%{version}
-maxtasks=$(nproc)
-emptycheck="NO"
-leakcheck="NO"
 __EOF__
 pushd tests
 %{_openmpi_load}
 export CP2K_DATA_DIR=%{buildroot}/usr/share/cp2k/
-export LD_LIBRARY_PATH=%{LD_LIBRARY_PATH}:%{buildroot}${MPI_LIB}
-../tools/regtesting/do_regtest -nosvn -nobuild -config fedora.config
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:%{buildroot}${MPI_LIB}/cp2k
+tools/regtesting/do_regtest \
+ -arch Linux-%{_target_cpu}-gfortran-openmpi \
+ -config fedora.config \
+ -cp2kdir cp2k-%{version} \
+ -jobmaxtime 600 \
+ -mpiranks 2 \
+ -nobuild \
+ -noemptycheck \
+ -noreset \
+ -nosvn \
+ -version psmp \
+
 %{_openmpi_unload}
 popd
 %endif
@@ -216,6 +215,7 @@ popd
 %defattr(-,root,root,-)
 %doc COPYRIGHT README
 %{_datadir}/cp2k
+%dir %{_libdir}/cp2k
 
 %files
 %defattr(-,root,root,-)
@@ -223,28 +223,40 @@ popd
 %{_bindir}/cp2k.ssmp
 %{_bindir}/cp2k_shell.sopt
 %{_bindir}/cp2k_shell.ssmp
-%{_libdir}/lib*.sopt.so.*
-%{_libdir}/lib*.ssmp.so.*
+%{_libdir}/cp2k/lib*.sopt.so
+%{_libdir}/cp2k/lib*.ssmp.so
 
 %files openmpi
 %defattr(-,root,root,-)
-%{_libdir}/openmpi%{?_opt_cc_suffix}/bin/cp2k.popt_openmpi
-%{_libdir}/openmpi%{?_opt_cc_suffix}/bin/cp2k.psmp_openmpi
-%{_libdir}/openmpi%{?_opt_cc_suffix}/bin/cp2k_shell.popt_openmpi
-%{_libdir}/openmpi%{?_opt_cc_suffix}/bin/cp2k_shell.psmp_openmpi
-%{_libdir}/openmpi%{?_opt_cc_suffix}/lib/lib*.popt.so.*
-%{_libdir}/openmpi%{?_opt_cc_suffix}/lib/lib*.psmp.so.*
+%{_libdir}/openmpi/bin/cp2k.popt_openmpi
+%{_libdir}/openmpi/bin/cp2k.psmp_openmpi
+%{_libdir}/openmpi/bin/cp2k_shell.popt_openmpi
+%{_libdir}/openmpi/bin/cp2k_shell.psmp_openmpi
+%dir %{_libdir}/openmpi/lib/cp2k
+%{_libdir}/openmpi/lib/cp2k/lib*.popt.so
+%{_libdir}/openmpi/lib/cp2k/lib*.psmp.so
 
 %files mpich
 %defattr(-,root,root,-)
-%{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.popt_mpich
-%{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k.psmp_mpich
-%{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k_shell.popt_mpich
-%{_libdir}/mpich%{?_opt_cc_suffix}/bin/cp2k_shell.psmp_mpich
-%{_libdir}/mpich%{?_opt_cc_suffix}/lib/lib*.popt.so.*
-%{_libdir}/mpich%{?_opt_cc_suffix}/lib/lib*.psmp.so.*
+%{_libdir}/mpich/bin/cp2k.popt_mpich
+%{_libdir}/mpich/bin/cp2k.psmp_mpich
+%{_libdir}/mpich/bin/cp2k_shell.popt_mpich
+%{_libdir}/mpich/bin/cp2k_shell.psmp_mpich
+%dir %{_libdir}/mpich/lib/cp2k
+%{_libdir}/mpich/lib/cp2k/lib*.popt.so
+%{_libdir}/mpich/lib/cp2k/lib*.psmp.so
 
 %changelog
+* Sun Apr 10 2016 Dominik Mierzejewski <rpm@greysector.net> - 3.0-1
+- update to 3.0 release (#1217862)
+- specify target manually instead of using get_arch_code, it's been removed upstream
+- move shared libraries to private directory and don't invent ABI version
+- separate regtest results tarball is no longer necessary
+- bring back support for building with libxc-2.1.2
+- fix paths for MPI-enabled libraries
+- revamp regtest script calling
+- disable regtests for now, they are hanging in tests/QS/regtest-ri-rpa (#1326661)
+
 * Wed Feb 03 2016 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.0-0.4.20150911svn15878
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 
