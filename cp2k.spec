@@ -261,8 +261,8 @@ popd
 * Tue Sep 08 2015 Dominik Mierzejewski <rpm@greysector.net> - 2.7.0-0.1.20150908svn15859
 - update to SVN trunk HEAD (r15859)
 - drop obsolete patch
-- build shared libraries and include cp2k_shell
-- include data files
+- build shared libraries and include cp2k_shell (#1132973)
+- include data files (#1220730)
 - fix compilation of MPI code on 32-bit platforms
 
 * Mon Aug 24 2015 Dominik Mierzejewski <rpm@greysector.net> - 2.6.1-1
