@@ -8,7 +8,6 @@
 Name: cp2k
 Version: 3.0
 Release: 1%{?dist}
-Group: Applications/Engineering
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
 URL: http://cp2k.org/
@@ -28,12 +27,12 @@ Patch0: %{name}-rpm.patch
 Patch1: cp2k-shared.patch
 # restore support for libxc-2.1.2
 Patch2: cp2k-libxc212.patch
-BuildRequires: atlas-devel >= 3.10.1
+BuildRequires: atlas-devel
 # for regtests
 BuildRequires: bc
 BuildRequires: fftw-devel
 BuildRequires: gcc-gfortran
-BuildRequires: libint-devel >= 1.1.4
+BuildRequires: libint-devel
 BuildRequires: libxc-devel
 BuildRequires: python
 BuildRequires: /usr/bin/hostname
@@ -42,9 +41,6 @@ BuildRequires: /usr/bin/hostname
 Requires: libint(api)%{?_isa} = %{_libint_apiversion}
 
 Requires: %{name}-common = %{version}-%{release}
-Obsoletes: %{name}-smp < 2.4-3
-Provides: %{name}-smp = %{version}-%{release}
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %global cp2k_desc_base \
 CP2K is a freely available (GPL) program, written in Fortran 95, to\
@@ -62,7 +58,6 @@ CP2K does not implement Car-Parinello Molecular Dynamics (CPMD).
 This package contains the non-MPI single process and multi-threaded versions.
 
 %package openmpi
-Group: Applications/Engineering
 Summary: Molecular simulations software - openmpi version
 BuildRequires:  openmpi-devel
 BuildRequires:  blacs-openmpi-devel
@@ -79,15 +74,12 @@ This package contains the parallel single- and multi-threaded versions
 using OpenMPI.
 
 %package mpich
-Group: Applications/Engineering
 Summary: Molecular simulations software - mpich version
 BuildRequires:  mpich-devel
 BuildRequires:  blacs-mpich-devel
 BuildRequires:  elpa-mpich-devel >= 2015.02.001
 BuildRequires:  scalapack-mpich-devel
 Requires: %{name}-common = %{version}-%{release}
-Provides: %{name}-mpich2 = %{version}-%{release}
-Obsoletes: %{name}-mpich2 < 2.4-5
 # Libint may have API breakage
 Requires: libint(api)%{?_isa} = %{_libint_apiversion}
 
@@ -98,7 +90,6 @@ This package contains the parallel single- and multi-threaded versions
 using mpich.
 
 %package common
-Group: Applications/Engineering
 Summary: Molecular simulations software - common files
 
 %description common
@@ -179,18 +170,14 @@ install -pm755 lib/${TARGET}/s${v}/lib*.s${v}.so %{buildroot}%{_libdir}/cp2k/
 cp -pr data/* %{buildroot}%{_datadir}/cp2k/
 done
 
-%clean
-rm -rf %{buildroot}
-
-%if 1
+%if 0
 # regtests take 11+ hours on armv7hl
 %ifnarch armv7hl
 %check
-cat > tests/fedora.config << __EOF__
+cat > fedora.config << __EOF__
 export LC_ALL=C
 dir_base=%{_builddir}
 __EOF__
-pushd tests
 %{_openmpi_load}
 export CP2K_DATA_DIR=%{buildroot}/usr/share/cp2k/
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:%{buildroot}${MPI_LIB}/cp2k
@@ -207,18 +194,16 @@ tools/regtesting/do_regtest \
  -version psmp \
 
 %{_openmpi_unload}
-popd
 %endif
 %endif
 
 %files common
-%defattr(-,root,root,-)
-%doc COPYRIGHT README
+%license COPYRIGHT
+%doc README
 %{_datadir}/cp2k
 %dir %{_libdir}/cp2k
 
 %files
-%defattr(-,root,root,-)
 %{_bindir}/cp2k.sopt
 %{_bindir}/cp2k.ssmp
 %{_bindir}/cp2k_shell.sopt
@@ -227,7 +212,6 @@ popd
 %{_libdir}/cp2k/lib*.ssmp.so
 
 %files openmpi
-%defattr(-,root,root,-)
 %{_libdir}/openmpi/bin/cp2k.popt_openmpi
 %{_libdir}/openmpi/bin/cp2k.psmp_openmpi
 %{_libdir}/openmpi/bin/cp2k_shell.popt_openmpi
@@ -237,7 +221,6 @@ popd
 %{_libdir}/openmpi/lib/cp2k/lib*.psmp.so
 
 %files mpich
-%defattr(-,root,root,-)
 %{_libdir}/mpich/bin/cp2k.popt_mpich
 %{_libdir}/mpich/bin/cp2k.psmp_mpich
 %{_libdir}/mpich/bin/cp2k_shell.popt_mpich
@@ -256,6 +239,8 @@ popd
 - fix paths for MPI-enabled libraries
 - revamp regtest script calling
 - disable regtests for now, they are hanging in tests/QS/regtest-ri-rpa (#1326661)
+- clean-up spec file (drop unnecessary stuff)
+- use license macro
 
 * Wed Feb 03 2016 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.0-0.4.20150911svn15878
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
