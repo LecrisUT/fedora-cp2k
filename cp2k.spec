@@ -110,12 +110,12 @@ sed -i 's|-lmpiblacsF77init||g;s|-lmpiblacsCinit||g' arch/Linux-x86-64-gfortran*
 
 # Generate necessary symlinks
 TARGET=Linux-%{_target_cpu}-gfortran
-ln -s Linux-x86-64-gfortran.sopt arch/${TARGET}.sopt
-ln -s Linux-x86-64-gfortran.ssmp arch/${TARGET}.ssmp
-ln -s Linux-x86-64-gfortran.popt arch/${TARGET}-openmpi.popt
-ln -s Linux-x86-64-gfortran.popt arch/${TARGET}-mpich.popt
-ln -s Linux-x86-64-gfortran.psmp arch/${TARGET}-openmpi.psmp
-ln -s Linux-x86-64-gfortran.psmp arch/${TARGET}-mpich.psmp
+for v in opt smp ; do
+    ln -s Linux-x86-64-gfortran.s${v} arch/${TARGET}.s${v}
+    for m in mpich openmpi ; do
+        ln -s Linux-x86-64-gfortran.p${v} arch/${TARGET}-${m}.p${v}
+    done
+done
 
 # fix crashes in fftw on i686. Need to run on original file, otherwise symlinks will be replaced with copies.
 %ifarch i686
