@@ -201,13 +201,13 @@ tools/regtesting/do_regtest \
 %license COPYRIGHT
 %doc README
 %{_datadir}/cp2k
-%dir %{_libdir}/cp2k
 
 %files
 %{_bindir}/cp2k.sopt
 %{_bindir}/cp2k.ssmp
 %{_bindir}/cp2k_shell.sopt
 %{_bindir}/cp2k_shell.ssmp
+%dir %{_libdir}/cp2k
 %{_libdir}/cp2k/lib*.sopt.so
 %{_libdir}/cp2k/lib*.ssmp.so
 
