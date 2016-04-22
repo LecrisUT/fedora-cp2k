@@ -1,0 +1,15 @@
+diff -up cp2k-3.0/src/xc/xc_libxc_wrap.F.libxc3 cp2k-3.0/src/xc/xc_libxc_wrap.F
+--- cp2k-3.0/src/xc/xc_libxc_wrap.F.libxc3	2016-04-22 06:31:15.945897084 +0200
++++ cp2k-3.0/src/xc/xc_libxc_wrap.F	2016-04-22 06:33:15.893896283 +0200
+@@ -63,7 +63,11 @@ MODULE xc_libxc_wrap
+                                              XC_LDA_X,&
+                                              XC_LDA_X_1D,&
+                                              XC_MGGA_X_M11_L,&
++#if ( XC_MAJOR_VERSION == 2)
+                                              XC_MGGA_X_MS2H,&
++#else
++                                             XC_HYB_MGGA_X_MS2H,&
++#endif
+                                              XC_MGGA_X_TB09
+   USE kinds,                           ONLY: dp
+   USE xc_f90_lib_m,                    ONLY: xc_f90_func_end,&

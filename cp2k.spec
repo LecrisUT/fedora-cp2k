@@ -25,8 +25,8 @@ Source4: cp2k-snapshot.sh
 Patch0: %{name}-rpm.patch
 # build shared libraries
 Patch1: cp2k-shared.patch
-# restore support for libxc-2.1.2
-Patch2: cp2k-libxc212.patch
+# Support libxc 3
+Patch2: cp2k-3.0-libxc3.patch
 BuildRequires: atlas-devel
 # for regtests
 BuildRequires: bc
@@ -101,7 +101,7 @@ This package contains the documentation and the manual.
 %setup -q
 %patch0 -p1 -b .r
 %patch1 -p1 -b .shared
-%patch2 -p1 -b .libxc212
+%patch2 -p1 -b .libxc3
 sed -i 's|@libdir@|%{_libdir}|' makefiles/Makefile
 
 %if 0%{?fedora}
