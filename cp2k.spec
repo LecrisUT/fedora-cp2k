@@ -7,7 +7,7 @@
 
 Name: cp2k
 Version: 3.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
 URL: http://cp2k.org/
@@ -230,6 +230,9 @@ tools/regtesting/do_regtest \
 %{_libdir}/mpich/lib/cp2k/lib*.psmp.so
 
 %changelog
+* Thu Apr 21 2016 Susi Lehtola <jussilehtola@fedoraproject.org> - 3.0-2
+- Build against libxc 3.0.0.
+
 * Sun Apr 10 2016 Dominik Mierzejewski <rpm@greysector.net> - 3.0-1
 - update to 3.0 release (#1217862)
 - specify target manually instead of using get_arch_code, it's been removed upstream
