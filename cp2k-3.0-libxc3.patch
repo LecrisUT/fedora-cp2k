@@ -1,13 +1,22 @@
 diff -up cp2k-3.0/src/xc/xc_libxc_wrap.F.libxc3 cp2k-3.0/src/xc/xc_libxc_wrap.F
 --- cp2k-3.0/src/xc/xc_libxc_wrap.F.libxc3	2016-04-22 06:31:15.945897084 +0200
-+++ cp2k-3.0/src/xc/xc_libxc_wrap.F	2016-04-22 06:33:15.893896283 +0200
-@@ -63,7 +63,11 @@ MODULE xc_libxc_wrap
++++ cp2k-3.0/src/xc/xc_libxc_wrap.F	2016-04-22 06:49:31.263895742 +0200
+@@ -56,14 +56,19 @@ MODULE xc_libxc_wrap
+                                              XC_HYB_GGA_XC_O3LYP,&
+                                              XC_HYB_GGA_XC_X3LYP,&
+                                              XC_HYB_GGA_X_N12_SX,&
+-                                             XC_HYB_MGGA_X_M11,&
+                                              XC_LDA_C_1D_CSC,&
+                                              XC_LDA_C_2D_PRM,&
+                                              XC_LDA_C_XALPHA,&
                                               XC_LDA_X,&
                                               XC_LDA_X_1D,&
                                               XC_MGGA_X_M11_L,&
 +#if ( XC_MAJOR_VERSION == 2)
++                                             XC_HYB_MGGA_X_M11,&
                                               XC_MGGA_X_MS2H,&
 +#else
++                                             XC_HYB_MGGA_XC_M11,&
 +                                             XC_HYB_MGGA_X_MS2H,&
 +#endif
                                               XC_MGGA_X_TB09
