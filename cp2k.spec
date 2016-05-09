@@ -2,12 +2,12 @@
 %global snapshot 20150911
 # TODO OpenCL support: -D__ACC -D__DBCSR_ACC -D__OPENCL
 
-%global __provides_exclude_from ^%{_libdir}/cp2k/lib.*\\.so$
-%global __requires_exclude ^libcp2k.*\\.so.*$
+%global __provides_exclude_from ^%{_libdir}/(cp2k/lib|(mpich|openmpi)/lib/cp2k).*\\.so$
+%global __requires_exclude ^lib(cp2k|clsmm|dbcsr|micsmm).*\\.so.*$
 
 Name: cp2k
 Version: 3.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
 URL: http://cp2k.org/
@@ -230,6 +230,9 @@ tools/regtesting/do_regtest \
 %{_libdir}/mpich/lib/cp2k/lib*.psmp.so
 
 %changelog
+* Mon May 09 2016 Dominik Mierzejewski <rpm@greysector.net> - 3.0-3
+- filter out all private Requires: and Provides: (#1332985)
+
 * Thu Apr 21 2016 Susi Lehtola <jussilehtola@fedoraproject.org> - 3.0-2
 - Build against libxc 3.0.0.
 
