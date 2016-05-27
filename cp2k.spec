@@ -7,7 +7,7 @@
 
 Name: cp2k
 Version: 3.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
 URL: http://cp2k.org/
@@ -22,9 +22,8 @@ Source4: cp2k-snapshot.sh
 # use rpm optflags
 # link with atlas instead of vanilla blas/lapack
 # build with libint and libxc
-Patch0: %{name}-rpm.patch
 # build shared libraries
-Patch1: cp2k-shared.patch
+Patch0: %{name}-rpm.patch
 # Support libxc 3
 Patch2: cp2k-3.0-libxc3.patch
 BuildRequires: atlas-devel
@@ -100,7 +99,6 @@ This package contains the documentation and the manual.
 %prep
 %setup -q
 %patch0 -p1 -b .r
-%patch1 -p1 -b .shared
 %patch2 -p1 -b .libxc3
 sed -i 's|@libdir@|%{_libdir}|' makefiles/Makefile
 
@@ -230,6 +228,9 @@ tools/regtesting/do_regtest \
 %{_libdir}/mpich/lib/cp2k/lib*.psmp.so
 
 %changelog
+* Thu May 26 2016 Dominik Mierzejewski <rpm@greysector.net> - 3.0-4
+- merge cp2k-shared.patch into cp2k-rpm.patch
+
 * Mon May 09 2016 Dominik Mierzejewski <rpm@greysector.net> - 3.0-3
 - filter out all private Requires: and Provides: (#1332985)
 
