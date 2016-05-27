@@ -135,14 +135,13 @@ OPTFLAGS_COMMON="%{optflags} -fPIC -L%{_libdir}/atlas -I%{_fmoddir}"
 LDFLAGS_COMMON="${OPTFLAGS_COMMON} %{__global_ldflags}"
 for v in opt smp ; do
 pushd makefiles
+    make OPTFLAGS="${OPTFLAGS_COMMON}" LDFLAGS="${LDFLAGS_COMMON} -Wl,-rpath,%{_libdir}/cp2k" %{?_smp_mflags} ARCH="${TARGET}" VERSION=s${v}
     %{_openmpi_load}
         make OPTFLAGS="${OPTFLAGS_COMMON} -I%{_fmoddir}/openmpi" LDFLAGS="${LDFLAGS_COMMON} -Wl,-rpath,${MPI_LIB}/cp2k" %{?_smp_mflags} ARCH="${TARGET}-openmpi" VERSION=p${v}
     %{_openmpi_unload}
     %{_mpich_load}
         make OPTFLAGS="${OPTFLAGS_COMMON} -I%{_fmoddir}/mpich" LDFLAGS="${LDFLAGS_COMMON} -Wl,-rpath,${MPI_LIB}/cp2k" %{?_smp_mflags} ARCH="${TARGET}-mpich" VERSION=p${v}
     %{_mpich_unload}
-
-    make OPTFLAGS="${OPTFLAGS_COMMON}" LDFLAGS="${LDFLAGS_COMMON} -Wl,-rpath,%{_libdir}/cp2k" %{?_smp_mflags} ARCH="${TARGET}" VERSION=s${v}
 popd
 done
 
@@ -150,6 +149,9 @@ done
 TARGET=Linux-%{_target_cpu}-gfortran
 mkdir -p %{buildroot}{%{_bindir},%{_libdir}/cp2k,%{_datadir}/cp2k}
 for v in opt smp ; do
+install -pm755 exe/${TARGET}/cp2k.s${v} %{buildroot}%{_bindir}
+install -pm755 exe/${TARGET}/cp2k_shell.s${v} %{buildroot}%{_bindir}
+install -pm755 lib/${TARGET}/s${v}/lib*.s${v}.so %{buildroot}%{_libdir}/cp2k/
 %{_openmpi_load}
     mkdir -p %{buildroot}{${MPI_BIN},${MPI_LIB}/cp2k}
     install -pm755 exe/${TARGET}-openmpi/cp2k.p${v} %{buildroot}${MPI_BIN}/cp2k.p${v}_openmpi
@@ -162,9 +164,6 @@ for v in opt smp ; do
     install -pm755 exe/${TARGET}-mpich/cp2k_shell.p${v} %{buildroot}${MPI_BIN}/cp2k_shell.p${v}_mpich
     install -pm755 lib/${TARGET}-mpich/p${v}/lib*.p${v}.so %{buildroot}${MPI_LIB}/cp2k/
 %{_mpich_unload}
-install -pm755 exe/${TARGET}/cp2k.s${v} %{buildroot}%{_bindir}
-install -pm755 exe/${TARGET}/cp2k_shell.s${v} %{buildroot}%{_bindir}
-install -pm755 lib/${TARGET}/s${v}/lib*.s${v}.so %{buildroot}%{_libdir}/cp2k/
 cp -pr data/* %{buildroot}%{_datadir}/cp2k/
 done
 
@@ -230,6 +229,7 @@ tools/regtesting/do_regtest \
 %changelog
 * Thu May 26 2016 Dominik Mierzejewski <rpm@greysector.net> - 3.0-4
 - merge cp2k-shared.patch into cp2k-rpm.patch
+- build and install serial version first
 
 * Mon May 09 2016 Dominik Mierzejewski <rpm@greysector.net> - 3.0-3
 - filter out all private Requires: and Provides: (#1332985)
