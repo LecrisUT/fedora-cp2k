@@ -7,7 +7,7 @@
 
 Name: cp2k
 Version: 3.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
 URL: http://cp2k.org/
@@ -227,6 +227,9 @@ tools/regtesting/do_regtest \
 %{_libdir}/mpich/lib/cp2k/lib*.psmp.so
 
 %changelog
+* Sat Oct 22 2016 Orion Poplawski <orion@cora.nwra.com> - 3.0-5
+- Rebuild for openmpi 2.0
+
 * Thu May 26 2016 Dominik Mierzejewski <rpm@greysector.net> - 3.0-4
 - merge cp2k-shared.patch into cp2k-rpm.patch
 - build and install serial version first
