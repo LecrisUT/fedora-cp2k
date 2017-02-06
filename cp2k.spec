@@ -7,7 +7,7 @@
 
 Name: cp2k
 Version: 3.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
 URL: http://cp2k.org/
@@ -227,6 +227,9 @@ tools/regtesting/do_regtest \
 %{_libdir}/mpich/lib/cp2k/lib*.psmp.so
 
 %changelog
+* Mon Feb 06 2017 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 3.0-6
+- Rebuild for libgfortran.so.4
+
 * Sat Oct 22 2016 Orion Poplawski <orion@cora.nwra.com> - 3.0-5
 - Rebuild for openmpi 2.0
 
