@@ -5,9 +5,15 @@
 %global __provides_exclude_from ^%{_libdir}/(cp2k/lib|(mpich|openmpi)/lib/cp2k).*\\.so$
 %global __requires_exclude ^lib(cp2k|clsmm|dbcsr|micsmm).*\\.so.*$
 
+%{!?openblas_arches:%global openblas_arches x86_64 %{ix86} armv7hl %{power64} aarch64}
+%ifnarch %{openblas_arches}
+# matches openblas ExclusiveArch
+%bcond_without atlas
+%endif
+
 Name: cp2k
-Version: 3.0
-Release: 6%{?dist}
+Version: 4.1
+Release: 1%{?dist}
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
 URL: http://cp2k.org/
@@ -20,13 +26,21 @@ Source0: https://downloads.sourceforge.net/project/cp2k/cp2k-%{version}.tar.bz2
 Source4: cp2k-snapshot.sh
 # patch to:
 # use rpm optflags
-# link with atlas instead of vanilla blas/lapack
+# link with openblas or atlas instead of vanilla blas/lapack
 # build with libint and libxc
 # build shared libraries
 Patch0: %{name}-rpm.patch
 # Support libxc 3
-Patch2: cp2k-3.0-libxc3.patch
+Patch2: cp2k-libxc3.patch
+# Backport Bug fix for multiple Tersoff and Siepmann-Sprik potentials
+Patch10: cp2k-r17483.patch
+# Backport USE_FINER_GRID with nonlocal vdW functionals
+Patch11: cp2k-r17748.patch
+%if %{with atlas}
 BuildRequires: atlas-devel
+%else
+BuildRequires: openblas-devel
+%endif
 # for regtests
 BuildRequires: bc
 BuildRequires: fftw-devel
@@ -100,6 +114,8 @@ This package contains the documentation and the manual.
 %setup -q
 %patch0 -p1 -b .r
 %patch2 -p1 -b .libxc3
+%patch10 -p0
+%patch11 -p0
 sed -i 's|@libdir@|%{_libdir}|' makefiles/Makefile
 
 %if 0%{?fedora}
@@ -127,12 +143,20 @@ maxderiv=`awk '/LIBDERIV_MAX_AM1 / {print $3}' %{_includedir}/libderiv/libderiv.
 # Plug them in the configuration
 for f in arch/Linux-x86-64-gfortran.{popt,psmp,sopt,ssmp}; do
  sed -i "s|@LIBINT_MAX_AM@|$maxam|g;s|@LIBDERIV_MAX_AM@|$maxderiv|g" $f
+%if %{with atlas}
+ sed -i 's|@BLAS@|satlas|' $f
+%else
+ sed -i 's|@BLAS@|openblas|' $f
+%endif
 done
 
 %build
 TARGET=Linux-%{_target_cpu}-gfortran
-OPTFLAGS_COMMON="%{optflags} -fPIC -L%{_libdir}/atlas -I%{_fmoddir}"
+OPTFLAGS_COMMON="%{optflags} -fPIC -I%{_fmoddir}"
 LDFLAGS_COMMON="${OPTFLAGS_COMMON} %{__global_ldflags}"
+%if %{with atlas}
+LDFLAGS_COMMON="${LDFLAGS_COMMON} -L%{_libdir}/atlas"
+%endif
 for v in opt smp ; do
 pushd makefiles
     make OPTFLAGS="${OPTFLAGS_COMMON}" LDFLAGS="${LDFLAGS_COMMON} -Wl,-rpath,%{_libdir}/cp2k" %{?_smp_mflags} ARCH="${TARGET}" VERSION=s${v}
@@ -167,22 +191,22 @@ install -pm755 lib/${TARGET}/s${v}/lib*.s${v}.so %{buildroot}%{_libdir}/cp2k/
 cp -pr data/* %{buildroot}%{_datadir}/cp2k/
 done
 
-%if 0
-# regtests take 11+ hours on armv7hl
-%ifnarch armv7hl
+%if 1
+# regtests take 11+ hours on armv7hl and ~72h on s390x
+%ifnarch armv7hl s390x
 %check
 cat > fedora.config << __EOF__
 export LC_ALL=C
 dir_base=%{_builddir}
 __EOF__
 %{_openmpi_load}
-export CP2K_DATA_DIR=%{buildroot}/usr/share/cp2k/
+export CP2K_DATA_DIR=%{buildroot}%{_datadir}/cp2k/
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:%{buildroot}${MPI_LIB}/cp2k
 tools/regtesting/do_regtest \
  -arch Linux-%{_target_cpu}-gfortran-openmpi \
  -config fedora.config \
  -cp2kdir cp2k-%{version} \
- -jobmaxtime 600 \
+ -maxtasks 4 \
  -mpiranks 2 \
  -nobuild \
  -noemptycheck \
@@ -227,6 +251,11 @@ tools/regtesting/do_regtest \
 %{_libdir}/mpich/lib/cp2k/lib*.psmp.so
 
 %changelog
+* Thu Jun 15 2017 Dominik Mierzejewski <rpm@greysector.net> - 4.1-1
+- update to 4.1 + two backported patches
+- build with openblas on supported arches (following scalapack and elpa)
+- don't run tests on armv7hl and s390x (too slow)
+
 * Mon Feb 06 2017 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 3.0-6
 - Rebuild for libgfortran.so.4
 
