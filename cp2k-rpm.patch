@@ -1,6 +1,6 @@
 diff -up cp2k-4.1/arch/Linux-x86-64-gfortran.popt.r cp2k-4.1/arch/Linux-x86-64-gfortran.popt
---- cp2k-4.1/arch/Linux-x86-64-gfortran.popt.r	2017-02-08 12:17:12.913249533 +0100
-+++ cp2k-4.1/arch/Linux-x86-64-gfortran.popt	2017-02-08 12:28:11.272556216 +0100
+--- cp2k-4.1/arch/Linux-x86-64-gfortran.popt.r	2016-07-07 10:30:49.492206000 +0200
++++ cp2k-4.1/arch/Linux-x86-64-gfortran.popt	2017-06-18 22:49:07.280728741 +0200
 @@ -1,8 +1,9 @@
  # Tested with: GFortran 4.9.2, MPICH 3.1, LAPACK 3.5.0, ScaLAPACK 2.0.2
  CC         = gcc
@@ -13,14 +13,14 @@ diff -up cp2k-4.1/arch/Linux-x86-64-gfortran.popt.r cp2k-4.1/arch/Linux-x86-64-g
  AR         = ar -r
  ACML_INC   = $(ACMLPATH)/include
  ACML_LIB   = $(ACMLPATH)/lib
-@@ -13,18 +14,23 @@ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LAR
+@@ -13,18 +14,24 @@ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LAR
  LIBXC_INC  = $(GCC_DIR)/libxc/2.2.2-gnu/include
  LIBXC_LIB  = $(GCC_DIR)/libxc/2.2.2-gnu/lib64
  DFLAGS     = -D__FFTW3 -D__LIBINT -D__LIBXC2 -D__MPI_VERSION=3\
 -             -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6 -D__MAX_CONTR=4\
 -             -D__parallel -D__SCALAPACK
 +             -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@ -D__MAX_CONTR=4\
-+             -D__parallel -D__SCALAPACK -D__SCALAPACK2 -D__ELPA3 -D__MPI_VERSION=3
++             -D__parallel -D__SCALAPACK -D__SCALAPACK2 -D__ELPA3 -D__MPI_VERSION=3 @LIBSMM_DEFS@
  CPPFLAGS   =
 -FCFLAGS    = $(DFLAGS) -O2 -ffast-math -ffree-form -ffree-line-length-none\
 +OPTFLAGS   = -O2 -ffast-math\
@@ -39,8 +39,9 @@ diff -up cp2k-4.1/arch/Linux-x86-64-gfortran.popt.r cp2k-4.1/arch/Linux-x86-64-g
 +CXXFLAGS   = $(DFLAGS) $(OPTFLAGS)
 +FCFLAGS    = $(DFLAGS) $(OPTFLAGS) -ffree-form -ffree-line-length-none
 +LDFLAGS    = $(FCFLAGS)
-+LIBS       = -lelpa \
-+             -lscalapack -lmpiblacsF77init -lmpiblacs -lmpiblacsCinit -lstdc++\
++LIBS       = -lelpa\
++             @LIBSMM_LIBS@\
++             -lscalapack -lmpiblacs -lstdc++\
 +             -l@BLAS@\
 +             -lfftw3\
 +             -lxcf90\
@@ -49,8 +50,8 @@ diff -up cp2k-4.1/arch/Linux-x86-64-gfortran.popt.r cp2k-4.1/arch/Linux-x86-64-g
 +             -lint
 +DATA_DIR   = /usr/share/cp2k
 diff -up cp2k-4.1/arch/Linux-x86-64-gfortran.psmp.r cp2k-4.1/arch/Linux-x86-64-gfortran.psmp
---- cp2k-4.1/arch/Linux-x86-64-gfortran.psmp.r	2017-02-08 12:17:12.913249533 +0100
-+++ cp2k-4.1/arch/Linux-x86-64-gfortran.psmp	2017-02-08 12:26:29.734892803 +0100
+--- cp2k-4.1/arch/Linux-x86-64-gfortran.psmp.r	2016-07-07 10:30:49.492206000 +0200
++++ cp2k-4.1/arch/Linux-x86-64-gfortran.psmp	2017-06-18 22:49:04.357730822 +0200
 @@ -1,8 +1,9 @@
  # Tested with: GFortran 4.9.2, MPICH 3.1, LAPACK 3.5.0, ScaLAPACK 2.0.2
  CC         = gcc
@@ -63,14 +64,14 @@ diff -up cp2k-4.1/arch/Linux-x86-64-gfortran.psmp.r cp2k-4.1/arch/Linux-x86-64-g
  AR         = ar -r
  ACML_INC   = $(ACMLPATH)/include
  ACML_LIB   = $(ACMLPATH)/lib
-@@ -13,19 +14,24 @@ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LAR
+@@ -13,19 +14,25 @@ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LAR
  LIBXC_INC  = $(GCC_DIR)/libxc/2.2.2-gnu/include
  LIBXC_LIB  = $(GCC_DIR)/libxc/2.2.2-gnu/lib64
  DFLAGS     = -D__FFTW3 -D__LIBINT -D__LIBXC2 -D__MPI_VERSION=3\
 -             -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6 -D__MAX_CONTR=4\
 -             -D__parallel -D__SCALAPACK
 +             -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@ -D__MAX_CONTR=4\
-+             -D__parallel -D__SCALAPACK -D__SCALAPACK2 -D__ELPA3 -D__MPI_VERSION=3
++             -D__parallel -D__SCALAPACK -D__SCALAPACK2 -D__ELPA3 -D__MPI_VERSION=3 @LIBSMM_DEFS@
  CPPFLAGS   =
 -FCFLAGS    = $(DFLAGS) -O2 -ffast-math -ffree-form -ffree-line-length-none\
 +OPTFLAGS   = -O2 -ffast-math -ftree-vectorize -funroll-loops\
@@ -90,8 +91,9 @@ diff -up cp2k-4.1/arch/Linux-x86-64-gfortran.psmp.r cp2k-4.1/arch/Linux-x86-64-g
 +CXXFLAGS   = $(DFLAGS) $(OPTFLAGS)
 +FCFLAGS    = $(DFLAGS) $(OPTFLAGS) -fopenmp -ffree-form -ffree-line-length-none
 +LDFLAGS    = $(FCFLAGS)
-+LIBS       = -lelpa \
-+             -lscalapack -lmpiblacsF77init -lmpiblacs -lmpiblacsCinit -lstdc++\
++LIBS       = -lelpa\
++             @LIBSMM_LIBS@\
++             -lscalapack -lmpiblacs -lstdc++\
 +             -l@BLAS@\
 +             -lfftw3\
 +             -lfftw3_omp\
@@ -102,7 +104,7 @@ diff -up cp2k-4.1/arch/Linux-x86-64-gfortran.psmp.r cp2k-4.1/arch/Linux-x86-64-g
 +DATA_DIR   = /usr/share/cp2k
 diff -up cp2k-4.1/arch/Linux-x86-64-gfortran.sopt.r cp2k-4.1/arch/Linux-x86-64-gfortran.sopt
 --- cp2k-4.1/arch/Linux-x86-64-gfortran.sopt.r	2016-07-07 10:30:49.492206000 +0200
-+++ cp2k-4.1/arch/Linux-x86-64-gfortran.sopt	2017-02-08 12:28:26.892658295 +0100
++++ cp2k-4.1/arch/Linux-x86-64-gfortran.sopt	2017-06-18 22:49:17.297721605 +0200
 @@ -3,6 +3,7 @@ CC         = gcc
  CPP        =
  FC         = gfortran
@@ -111,12 +113,12 @@ diff -up cp2k-4.1/arch/Linux-x86-64-gfortran.sopt.r cp2k-4.1/arch/Linux-x86-64-g
  AR         = ar -r
  ACML_INC   = $(ACMLPATH)/include
  ACML_LIB   = $(ACMLPATH)/lib
-@@ -13,16 +14,20 @@ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LAR
+@@ -13,16 +14,21 @@ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LAR
  LIBXC_INC  = $(GCC_DIR)/libxc/2.2.2-gnu/include
  LIBXC_LIB  = $(GCC_DIR)/libxc/2.2.2-gnu/lib64
  DFLAGS     = -D__FFTW3 -D__LIBINT -D__LIBXC2\
 -             -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6 -D__MAX_CONTR=4
-+             -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@ -D__MAX_CONTR=4
++             -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@ -D__MAX_CONTR=4 @LIBSMM_DEFS@
  CPPFLAGS   = 
 -FCFLAGS    = $(DFLAGS) -O2 -ffast-math -ffree-form -ffree-line-length-none\
 +OPTFLAGS   = -O2 -ffast-math\
@@ -135,6 +137,7 @@ diff -up cp2k-4.1/arch/Linux-x86-64-gfortran.sopt.r cp2k-4.1/arch/Linux-x86-64-g
 +FCFLAGS    = $(DFLAGS) $(OPTFLAGS) -ffree-form -ffree-line-length-none
 +LDFLAGS    = $(FCFLAGS)
 +LIBS       = -l@BLAS@\
++             @LIBSMM_LIBS@\
 +             -lfftw3\
 +             -lxcf90\
 +             -lxc\
@@ -143,7 +146,7 @@ diff -up cp2k-4.1/arch/Linux-x86-64-gfortran.sopt.r cp2k-4.1/arch/Linux-x86-64-g
 +DATA_DIR   = /usr/share/cp2k
 diff -up cp2k-4.1/arch/Linux-x86-64-gfortran.ssmp.r cp2k-4.1/arch/Linux-x86-64-gfortran.ssmp
 --- cp2k-4.1/arch/Linux-x86-64-gfortran.ssmp.r	2014-12-22 01:17:03.067670000 +0100
-+++ cp2k-4.1/arch/Linux-x86-64-gfortran.ssmp	2017-02-08 12:28:31.709689775 +0100
++++ cp2k-4.1/arch/Linux-x86-64-gfortran.ssmp	2017-06-18 22:49:26.255715225 +0200
 @@ -3,6 +3,7 @@ CC         = gcc
  CPP        =
  FC         = gfortran
@@ -152,12 +155,12 @@ diff -up cp2k-4.1/arch/Linux-x86-64-gfortran.ssmp.r cp2k-4.1/arch/Linux-x86-64-g
  AR         = ar -r
  ACML_INC   = $(ACMLPATH)/include
  ACML_LIB   = $(ACMLPATH)/lib
-@@ -13,17 +14,20 @@ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LAR
+@@ -13,17 +14,21 @@ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LAR
  LIBXC_INC  = $(GCC_DIR)/libxc/2.2.0-gnu/include
  LIBXC_LIB  = $(GCC_DIR)/libxc/2.2.0-gnu/lib64
  DFLAGS     = -D__FFTW3 -D__LIBINT -D__LIBXC2\
 -             -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6 -D__MAX_CONTR=4
-+             -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@ -D__MAX_CONTR=4
++             -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@ -D__MAX_CONTR=4 @LIBSMM_DEFS@
  CPPFLAGS   = 
 -FCFLAGS    = $(DFLAGS) -O2 -ffast-math -ffree-form -ffree-line-length-none\
 -             -fopenmp -ftree-vectorize -funroll-loops\
@@ -177,6 +180,7 @@ diff -up cp2k-4.1/arch/Linux-x86-64-gfortran.ssmp.r cp2k-4.1/arch/Linux-x86-64-g
 +FCFLAGS    = $(DFLAGS) $(OPTFLAGS) -fopenmp -ffree-form -ffree-line-length-none
 +LDFLAGS    = $(FCFLAGS)
 +LIBS       = -l@BLAS@\
++             @LIBSMM_LIBS@\
 +             -lfftw3\
 +             -lfftw3_omp\
 +             -lxcf90\
@@ -186,7 +190,7 @@ diff -up cp2k-4.1/arch/Linux-x86-64-gfortran.ssmp.r cp2k-4.1/arch/Linux-x86-64-g
 +DATA_DIR   = /usr/share/cp2k
 diff -up cp2k-4.1/tools/regtesting/do_regtest.r cp2k-4.1/tools/regtesting/do_regtest
 --- cp2k-4.1/tools/regtesting/do_regtest.r	2016-07-06 14:01:51.466471000 +0200
-+++ cp2k-4.1/tools/regtesting/do_regtest	2017-02-08 12:17:12.914249539 +0100
++++ cp2k-4.1/tools/regtesting/do_regtest	2017-06-18 22:44:26.959928409 +0200
 @@ -247,8 +247,8 @@ cp2k_postfix=${cp2k_postfix:-"${cp2k_run
  #
  ###################################################################################

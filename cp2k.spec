@@ -13,7 +13,7 @@
 
 Name: cp2k
 Version: 4.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
 URL: http://cp2k.org/
@@ -47,6 +47,9 @@ BuildRequires: fftw-devel
 BuildRequires: gcc-gfortran
 BuildRequires: libint-devel
 BuildRequires: libxc-devel
+%ifarch x86_64
+BuildRequires: libxsmm-devel
+%endif
 BuildRequires: python
 BuildRequires: /usr/bin/hostname
 
@@ -118,10 +121,6 @@ This package contains the documentation and the manual.
 %patch11 -p0
 sed -i 's|@libdir@|%{_libdir}|' makefiles/Makefile
 
-%if 0%{?fedora}
-sed -i 's|-lmpiblacsF77init||g;s|-lmpiblacsCinit||g' arch/Linux-x86-64-gfortran*
-%endif
-
 # Generate necessary symlinks
 TARGET=Linux-%{_target_cpu}-gfortran
 for v in opt smp ; do
@@ -148,6 +147,11 @@ for f in arch/Linux-x86-64-gfortran.{popt,psmp,sopt,ssmp}; do
 %else
  sed -i 's|@BLAS@|openblas|' $f
 %endif
+%ifarch x86_64
+ sed -i 's|@LIBSMM_DEFS@|-D__LIBXSMM|;s|@LIBSMM_LIBS@|-lxsmmf -lxsmm -ldl|' $f
+%else
+ sed -i 's|@LIBSMM_DEFS@||;s|@LIBSMM_LIBS@||' $f
+%endif
 done
 
 %build
@@ -157,17 +161,15 @@ LDFLAGS_COMMON="${OPTFLAGS_COMMON} %{__global_ldflags}"
 %if %{with atlas}
 LDFLAGS_COMMON="${LDFLAGS_COMMON} -L%{_libdir}/atlas"
 %endif
-for v in opt smp ; do
 pushd makefiles
-    make OPTFLAGS="${OPTFLAGS_COMMON}" LDFLAGS="${LDFLAGS_COMMON} -Wl,-rpath,%{_libdir}/cp2k" %{?_smp_mflags} ARCH="${TARGET}" VERSION=s${v}
+    make OPTFLAGS="${OPTFLAGS_COMMON}" LDFLAGS="${LDFLAGS_COMMON} -Wl,-rpath,%{_libdir}/cp2k" %{?_smp_mflags} ARCH="${TARGET}" VERSION="sopt ssmp"
     %{_openmpi_load}
-        make OPTFLAGS="${OPTFLAGS_COMMON} -I%{_fmoddir}/openmpi" LDFLAGS="${LDFLAGS_COMMON} -Wl,-rpath,${MPI_LIB}/cp2k" %{?_smp_mflags} ARCH="${TARGET}-openmpi" VERSION=p${v}
+        make OPTFLAGS="${OPTFLAGS_COMMON} -I%{_fmoddir}/openmpi" LDFLAGS="${LDFLAGS_COMMON} -Wl,-rpath,${MPI_LIB}/cp2k" %{?_smp_mflags} ARCH="${TARGET}-openmpi" VERSION="popt psmp"
     %{_openmpi_unload}
     %{_mpich_load}
-        make OPTFLAGS="${OPTFLAGS_COMMON} -I%{_fmoddir}/mpich" LDFLAGS="${LDFLAGS_COMMON} -Wl,-rpath,${MPI_LIB}/cp2k" %{?_smp_mflags} ARCH="${TARGET}-mpich" VERSION=p${v}
+        make OPTFLAGS="${OPTFLAGS_COMMON} -I%{_fmoddir}/mpich" LDFLAGS="${LDFLAGS_COMMON} -Wl,-rpath,${MPI_LIB}/cp2k" %{?_smp_mflags} ARCH="${TARGET}-mpich" VERSION="popt psmp"
     %{_mpich_unload}
 popd
-done
 
 %install
 TARGET=Linux-%{_target_cpu}-gfortran
@@ -188,8 +190,8 @@ install -pm755 lib/${TARGET}/s${v}/lib*.s${v}.so %{buildroot}%{_libdir}/cp2k/
     install -pm755 exe/${TARGET}-mpich/cp2k_shell.p${v} %{buildroot}${MPI_BIN}/cp2k_shell.p${v}_mpich
     install -pm755 lib/${TARGET}-mpich/p${v}/lib*.p${v}.so %{buildroot}${MPI_LIB}/cp2k/
 %{_mpich_unload}
-cp -pr data/* %{buildroot}%{_datadir}/cp2k/
 done
+cp -pr data/* %{buildroot}%{_datadir}/cp2k/
 
 %if 1
 # regtests take 11+ hours on armv7hl and ~72h on s390x
@@ -251,6 +253,11 @@ tools/regtesting/do_regtest \
 %{_libdir}/mpich/lib/cp2k/lib*.psmp.so
 
 %changelog
+* Sat Jun 17 2017 Dominik Mierzejewski <rpm@greysector.net> - 4.1-2
+- build with libxsmm on x86_64 for improved matrix multiplication performance
+- simplify some loops
+- drop support for old blacs (even EL6 has scalapack with blacs now)
+
 * Thu Jun 15 2017 Dominik Mierzejewski <rpm@greysector.net> - 4.1-1
 - update to 4.1 + two backported patches
 - build with openblas on supported arches (following scalapack and elpa)
