@@ -13,7 +13,7 @@
 
 Name: cp2k
 Version: 4.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
 URL: http://cp2k.org/
@@ -253,6 +253,9 @@ tools/regtesting/do_regtest \
 %{_libdir}/mpich/lib/cp2k/lib*.psmp.so
 
 %changelog
+* Mon Oct 23 2017 Susi Lehtola <susi.lehtola@iki.fi> - 4.1-5
+- Rebuild against libxc 4.
+
 * Wed Aug 02 2017 Fedora Release Engineering <releng@fedoraproject.org> - 4.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
 
