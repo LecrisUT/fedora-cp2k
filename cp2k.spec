@@ -30,8 +30,8 @@ Source4: cp2k-snapshot.sh
 # build with libint and libxc
 # build shared libraries
 Patch0: %{name}-rpm.patch
-# Support libxc 3
-Patch2: cp2k-libxc3.patch
+# Support libxc 4
+Patch2: cp2k-libxc4.patch
 # Backport Bug fix for multiple Tersoff and Siepmann-Sprik potentials
 Patch10: cp2k-r17483.patch
 # Backport USE_FINER_GRID with nonlocal vdW functionals
