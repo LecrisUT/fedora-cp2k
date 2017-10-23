@@ -116,7 +116,7 @@ This package contains the documentation and the manual.
 %prep
 %setup -q
 %patch0 -p1 -b .r
-%patch2 -p1 -b .libxc3
+%patch2 -p1 -b .libxc4
 %patch10 -p0
 %patch11 -p0
 sed -i 's|@libdir@|%{_libdir}|' makefiles/Makefile
