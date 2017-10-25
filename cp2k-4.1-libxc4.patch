@@ -1,6 +1,6 @@
 diff -up cp2k-4.1/src/xc/xc_libxc_wrap.F.libxc4 cp2k-4.1/src/xc/xc_libxc_wrap.F
 --- cp2k-4.1/src/xc/xc_libxc_wrap.F.libxc4	2016-06-21 13:30:13.753895000 +0200
-+++ cp2k-4.1/src/xc/xc_libxc_wrap.F	2017-10-23 16:17:56.224695039 +0200
++++ cp2k-4.1/src/xc/xc_libxc_wrap.F	2017-10-25 19:36:55.588725192 +0200
 @@ -58,14 +58,16 @@ MODULE xc_libxc_wrap
                                               XC_HYB_GGA_XC_O3LYP,&
                                               XC_HYB_GGA_XC_X3LYP,&
@@ -91,7 +91,7 @@ diff -up cp2k-4.1/src/xc/xc_libxc_wrap.F.libxc4 cp2k-4.1/src/xc/xc_libxc_wrap.F
 -         CASE (XC_GGA_X_WPBEH)
 -            CALL xc_f90_gga_x_wpbeh_set_par(xc_func, params(1))
 -         END SELECT
-+         CALL xc_f90_func_set_ext_params(xc_func, params)
++         CALL xc_f90_func_set_ext_params(xc_func, params(1))
        END IF
  
        IF (IAND(xc_f90_info_flags(xc_info), XC_FLAGS_HAVE_EXC) == XC_FLAGS_HAVE_EXC) THEN
