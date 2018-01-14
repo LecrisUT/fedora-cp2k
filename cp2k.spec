@@ -11,9 +11,11 @@
 %bcond_without atlas
 %endif
 
+%bcond_with check
+
 Name: cp2k
-Version: 4.1
-Release: 5%{?dist}
+Version: 5.1
+Release: 1%{?dist}
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
 URL: http://cp2k.org/
@@ -32,10 +34,6 @@ Source4: cp2k-snapshot.sh
 Patch0: %{name}-rpm.patch
 # Support libxc 4
 Patch2: cp2k-4.1-libxc4.patch
-# Backport Bug fix for multiple Tersoff and Siepmann-Sprik potentials
-Patch10: cp2k-r17483.patch
-# Backport USE_FINER_GRID with nonlocal vdW functionals
-Patch11: cp2k-r17748.patch
 %if %{with atlas}
 BuildRequires: atlas-devel
 %else
@@ -48,9 +46,10 @@ BuildRequires: gcc-gfortran
 BuildRequires: libint-devel
 BuildRequires: libxc-devel
 %ifarch x86_64
-BuildRequires: libxsmm-devel
+# See https://bugzilla.redhat.com/show_bug.cgi?id=1515404
+BuildRequires: libxsmm-devel >= 1.8.1-3
 %endif
-BuildRequires: python
+BuildRequires: python2
 BuildRequires: /usr/bin/hostname
 
 # Libint can break the API between releases
@@ -77,7 +76,7 @@ This package contains the non-MPI single process and multi-threaded versions.
 Summary: Molecular simulations software - openmpi version
 BuildRequires:  openmpi-devel
 BuildRequires:  blacs-openmpi-devel
-BuildRequires:  elpa-openmpi-devel >= 2015.02.001
+BuildRequires:  elpa-openmpi-devel >= 2017.05.002
 BuildRequires:  scalapack-openmpi-devel
 Requires: %{name}-common = %{version}-%{release}
 # Libint may have API breakage
@@ -93,7 +92,7 @@ using OpenMPI.
 Summary: Molecular simulations software - mpich version
 BuildRequires:  mpich-devel
 BuildRequires:  blacs-mpich-devel
-BuildRequires:  elpa-mpich-devel >= 2015.02.001
+BuildRequires:  elpa-mpich-devel >= 2017.05.002
 BuildRequires:  scalapack-mpich-devel
 Requires: %{name}-common = %{version}-%{release}
 # Libint may have API breakage
@@ -117,8 +116,6 @@ This package contains the documentation and the manual.
 %setup -q
 %patch0 -p1 -b .r
 %patch2 -p1 -b .libxc4
-%patch10 -p0
-%patch11 -p0
 sed -i 's|@libdir@|%{_libdir}|' makefiles/Makefile
 
 # Generate necessary symlinks
@@ -193,31 +190,46 @@ install -pm755 lib/${TARGET}/s${v}/lib*.s${v}.so %{buildroot}%{_libdir}/cp2k/
 done
 cp -pr data/* %{buildroot}%{_datadir}/cp2k/
 
-%if 1
+%if %{with check}
 # regtests take 11+ hours on armv7hl and ~72h on s390x
-%ifnarch armv7hl s390x
 %check
 cat > fedora.config << __EOF__
 export LC_ALL=C
 dir_base=%{_builddir}
 __EOF__
-%{_openmpi_load}
+. /etc/profile.d/modules.sh
 export CP2K_DATA_DIR=%{buildroot}%{_datadir}/cp2k/
-export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:%{buildroot}${MPI_LIB}/cp2k
-tools/regtesting/do_regtest \
- -arch Linux-%{_target_cpu}-gfortran-openmpi \
- -config fedora.config \
- -cp2kdir cp2k-%{version} \
- -maxtasks 4 \
- -mpiranks 2 \
- -nobuild \
- -noemptycheck \
- -noreset \
- -nosvn \
- -version psmp \
+for thr in opt smp ; do
+  for mpi in '' mpich openmpi ; do
+    if [ -n "$mpi" ]; then
+      module load mpi/${mpi}-%{_arch}
+      libdir=${MPI_LIB}/cp2k
+      mpiopts="-maxtasks 4 -mpiranks 2"
+      par=p
+      suf="-${mpi}"
+    else
+      libdir=%{_libdir}/cp2k
+      mpiopts=""
+      par=s
+      suf=""
+    fi
+    export LD_LIBRARY_PATH=%{buildroot}${libdir}
+    tools/regtesting/do_regtest \
+      -arch Linux-%{_target_cpu}-gfortran${suf} \
+      -config fedora.config \
+      -cp2kdir cp2k-%{version} \
+      ${mpiopts} \
+      -nobuild \
+      -noemptycheck \
+      -noreset \
+      -nosvn \
+      -version ${par}${thr} \
 
-%{_openmpi_unload}
-%endif
+    if [ -n "$mpi" ]; then
+      module unload mpi/${mpi}-%{_arch}
+    fi
+  done
+done
 %endif
 
 %files common
@@ -253,6 +265,11 @@ tools/regtesting/do_regtest \
 %{_libdir}/mpich/lib/cp2k/lib*.psmp.so
 
 %changelog
+* Tue Nov 07 2017 Dominik Mierzejewski <rpm@greysector.net> - 5.1-1
+- update to 5.1
+- conditionalize testing and disable by default as they take too long
+- test all flavors, not just OpenMPI ssmp
+
 * Mon Oct 23 2017 Susi Lehtola <susi.lehtola@iki.fi> - 4.1-5
 - Rebuild against libxc 4.
 
