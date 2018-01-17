@@ -1,0 +1,67 @@
+diff -up cp2k-5.1/src/mpiwrap/message_passing.F.32bit cp2k-5.1/src/mpiwrap/message_passing.F
+--- cp2k-5.1/src/mpiwrap/message_passing.F.32bit	2018-01-16 22:46:43.814949555 +0100
++++ cp2k-5.1/src/mpiwrap/message_passing.F	2018-01-17 23:38:54.992113487 +0100
+@@ -82,7 +82,7 @@ MODULE message_passing
+    INTEGER, PARAMETER, PUBLIC :: mp_status_size = MPI_STATUS_SIZE
+    INTEGER, PARAMETER, PUBLIC :: mp_proc_null = MPI_PROC_NULL
+    ! Set max allocatable memory by MPI to 2 GiByte
+-   INTEGER(KIND=MPI_ADDRESS_KIND), PARAMETER, PRIVATE :: mp_max_memory_size = 2*INT(2, KIND=MPI_ADDRESS_KIND)**30
++   INTEGER(KIND=MPI_ADDRESS_KIND), PARAMETER, PRIVATE :: mp_max_memory_size = HUGE(INT(1,KIND=int_4))
+ 
+ #if __MPI_VERSION > 2
+    INTEGER, PARAMETER, PUBLIC :: mp_max_library_version_string = MPI_MAX_LIBRARY_VERSION_STRING
+@@ -91,6 +91,7 @@ MODULE message_passing
+ #endif
+ 
+    INTEGER, PARAMETER, PUBLIC :: file_offset = MPI_OFFSET_KIND
++   INTEGER, PARAMETER, PUBLIC :: address_kind = MPI_ADDRESS_KIND
+    INTEGER, PARAMETER, PUBLIC :: file_amode_create = MPI_MODE_CREATE
+    INTEGER, PARAMETER, PUBLIC :: file_amode_rdonly = MPI_MODE_RDONLY
+    INTEGER, PARAMETER, PUBLIC :: file_amode_wronly = MPI_MODE_WRONLY
+@@ -110,6 +111,7 @@ MODULE message_passing
+    INTEGER, PARAMETER, PUBLIC :: mp_max_library_version_string = 1
+ 
+    INTEGER, PARAMETER, PUBLIC :: file_offset = int_8
++   INTEGER, PARAMETER, PUBLIC :: address_kind = int_8
+    INTEGER, PARAMETER, PUBLIC :: file_amode_create = 1
+    INTEGER, PARAMETER, PUBLIC :: file_amode_rdonly = 2
+    INTEGER, PARAMETER, PUBLIC :: file_amode_wronly = 4
+@@ -642,7 +644,7 @@ MODULE message_passing
+ 
+    TYPE mp_file_indexing_meta_type
+       INTEGER, DIMENSION(:), POINTER   :: index
+-      INTEGER(kind=file_offset), &
++      INTEGER(kind=address_kind), &
+          DIMENSION(:), POINTER         :: chunks
+    END TYPE mp_file_indexing_meta_type
+ 
+@@ -3570,7 +3572,7 @@ CONTAINS
+       INTEGER, INTENT(IN)                       :: count
+       INTEGER, DIMENSION(1:count), &
+          INTENT(IN), TARGET                     :: lengths
+-      INTEGER(kind=file_offset), &
++      INTEGER(kind=address_kind), &
+          DIMENSION(1:count), INTENT(in), TARGET :: displs
+       TYPE(mp_file_descriptor_type)             :: type_descriptor
+ 
+diff -up cp2k-5.1/src/pw/realspace_grid_cube.F.32bit cp2k-5.1/src/pw/realspace_grid_cube.F
+--- cp2k-5.1/src/pw/realspace_grid_cube.F.32bit	2017-05-05 14:18:00.000000000 +0200
++++ cp2k-5.1/src/pw/realspace_grid_cube.F	2018-01-17 23:41:34.529356460 +0100
+@@ -12,7 +12,7 @@ MODULE realspace_grid_cube
+    USE cp_log_handling,                 ONLY: cp_logger_get_default_io_unit
+    USE kinds,                           ONLY: dp
+    USE message_passing,                 ONLY: &
+-        file_amode_rdonly, file_offset, mp_bcast, mp_file_close, mp_file_descriptor_type, &
++        file_amode_rdonly, file_offset, address_kind, mp_bcast, mp_file_close, mp_file_descriptor_type, &
+         mp_file_open, mp_file_read_all_chv, mp_file_type_free, mp_file_type_hindexed_make_chv, &
+         mp_file_type_set_view_chv, mp_maxloc, mp_recv, mp_send, mp_sum, mp_sync, mpi_character_size
+    USE pw_grid_types,                   ONLY: PW_MODE_LOCAL
+@@ -366,7 +366,7 @@ CONTAINS
+       INTEGER, DIMENSION(3)                              :: lbounds, lbounds_local, npoints, &
+                                                             npoints_local, ubounds, ubounds_local
+       INTEGER, ALLOCATABLE, DIMENSION(:), TARGET         :: blocklengths
+-      INTEGER(kind=file_offset), ALLOCATABLE, &
++      INTEGER(kind=address_kind), ALLOCATABLE, &
+          DIMENSION(:), TARGET                            :: displacements
+       INTEGER(kind=file_offset)                          :: BOF
+       INTEGER :: extunit, gid, i, ientry, ip, islice, j, k, master, my_rank, nat, ndum, nslices, &

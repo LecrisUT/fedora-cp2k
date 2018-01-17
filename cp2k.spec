@@ -32,6 +32,8 @@ Source4: cp2k-snapshot.sh
 # build with libint and libxc
 # build shared libraries
 Patch0: %{name}-rpm.patch
+# fix build failure on 32bit arches
+Patch1: %{name}-32bit.patch
 # Support libxc 4
 Patch2: cp2k-4.1-libxc4.patch
 %if %{with atlas}
@@ -115,6 +117,7 @@ This package contains the documentation and the manual.
 %prep
 %setup -q
 %patch0 -p1 -b .r
+%patch1 -p1 -b .32bit
 %patch2 -p1 -b .libxc4
 sed -i 's|@libdir@|%{_libdir}|' makefiles/Makefile
 
@@ -265,10 +268,11 @@ done
 %{_libdir}/mpich/lib/cp2k/lib*.psmp.so
 
 %changelog
-* Tue Nov 07 2017 Dominik Mierzejewski <rpm@greysector.net> - 5.1-1
+* Wed Jan 17 2018 Dominik Mierzejewski <rpm@greysector.net> - 5.1-1
 - update to 5.1
 - conditionalize testing and disable by default as they take too long
 - test all flavors, not just OpenMPI ssmp
+- fix compilation on 32bit architectures
 
 * Mon Oct 23 2017 Susi Lehtola <susi.lehtola@iki.fi> - 4.1-5
 - Rebuild against libxc 4.
