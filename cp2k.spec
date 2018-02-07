@@ -15,7 +15,7 @@
 
 Name: cp2k
 Version: 5.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
 URL: http://cp2k.org/
@@ -268,6 +268,9 @@ done
 %{_libdir}/mpich/lib/cp2k/lib*.psmp.so
 
 %changelog
+* Wed Feb 07 2018 Fedora Release Engineering <releng@fedoraproject.org> - 5.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
+
 * Wed Jan 17 2018 Dominik Mierzejewski <rpm@greysector.net> - 5.1-1
 - update to 5.1
 - conditionalize testing and disable by default as they take too long
