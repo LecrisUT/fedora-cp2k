@@ -1,0 +1,3289 @@
+Index: INSTALL
+===================================================================
+--- INSTALL	(revision 18252)
++++ INSTALL	(working copy)
+@@ -142,13 +142,13 @@
+   * Link to a blas/scalapack library that accelerates large DGEMMs (e.g. libsci_acc)
+ 
+ ==== 2k. libxc (optional, wider choice of xc functionals) ====
+-  * The version 2.2.2 (or later) of libxc needs to be downloaded
++  * The version 4.0.3 (or later) of libxc needs to be downloaded
+     (http://www.tddft.org/programs/octopus/wiki/index.php/Libxc) and installed.
+     During the installation, the directory $(LIBXC_DIR)/lib and
+     $(LIBXC_DIR)/include are created.
+-  * Note, the deprecated flags -D__LIBXC2 and -D__LIBXC3 are aliases to -D__LIBXC.
++  * Note, the former deprecated flags -D__LIBXC2 and -D__LIBXC3 are ignored.
+   * Add -D__LIBXC to DFLAGS, -I$(LIBXC_DIR)/include to FCFLAGS and
+-    -L$(LIBXC_DIR)/lib -lxcf90 -lxc to LIBS.
++    -L$(LIBXC_DIR)/lib -lxcf03 -lxc to LIBS.
+ 
+ ==== 2l. ELPA (optional, improved performance for diagonalization) ====
+ Library ELPA for the solution of the eigenvalue problem
+Index: arch/Darwin-IntelMacintosh-gfortran.ssmp
+===================================================================
+--- arch/Darwin-IntelMacintosh-gfortran.ssmp	(revision 18252)
++++ arch/Darwin-IntelMacintosh-gfortran.ssmp	(working copy)
+@@ -11,5 +11,5 @@
+ LDFLAGS  = $(FCFLAGS) 
+ LIBS     = -framework Accelerate \
+            -L/opt/local/lib \
+-           -lxcf90 -lxc \
++           -lxcf03 -lxc \
+            -lderiv -lint
+Index: arch/IBM-BGQ-MPI.popt
+===================================================================
+--- arch/IBM-BGQ-MPI.popt	(revision 18252)
++++ arch/IBM-BGQ-MPI.popt	(working copy)
+@@ -14,7 +14,7 @@
+ FC       = mpixlf95_r
+ LD       = mpixlf95_r
+ AR       = ar -r
+-LIBXC_INCLUDE=$(HOME)/libxc-2.2.2-install/include
++LIBXC_INCLUDE=$(HOME)/libxc-4.0.4-install/include
+ DFLAGS   = -D__FFTW3 -D__parallel -D__SCALAPACK -D__LIBINT -D__LIBXC2 -D__MPI_VERSION=2
+ CPPFLAGS = $(DFLAGS) -I$(FFTW3_INCLUDE) -I$(LIBXC_INCLUDE)
+ FCFLAGS  = -O3 -qstrict -q64 -qarch=qp -qtune=qp \
+@@ -25,6 +25,6 @@
+            -L$(FFTW3_LIB) -lfftw3 \
+            -L$(SCALAPACK_LIB) -lscalapack \
+            -L$(LAPACK_LIB) -llapack \
+-           -L$(HOME)/libxc-2.2.2-install/lib -lxcf90 -lxc \
++           -L$(HOME)/libxc-4.0.4-install/lib -lxcf03 -lxc \
+            -L/bgsys/local/lib -lesslbg \
+            -lmass 
+Index: arch/Linux-x86-64-gfortran-regtest.pdbg
+===================================================================
+--- arch/Linux-x86-64-gfortran-regtest.pdbg	(revision 18252)
++++ arch/Linux-x86-64-gfortran-regtest.pdbg	(working copy)
+@@ -12,8 +12,8 @@
+ FFTW_LIB   = $(GCC_DIR)/fftw/3.3-gnu-regtest/lib64
+ LIBINT_INC = $(GCC_DIR)/libint/1.1.4-default-gnu-regtest/include
+ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-default-gnu-regtest/lib64
+-LIBXC_INC  = $(GCC_DIR)/libxc/3.0.0-gnu-regtest/include
+-LIBXC_LIB  = $(GCC_DIR)/libxc/3.0.0-gnu-regtest/lib64
++LIBXC_INC  = $(GCC_DIR)/libxc/4.0.4-gnu-regtest/include
++LIBXC_LIB  = $(GCC_DIR)/libxc/4.0.4-gnu-regtest/lib64
+ DFLAGS     = -D__ELPA=201605 -D__FFTW3 -D__LIBINT -D__LIBXC -D__MPI_VERSION=3 -D__PLUMED2\
+              -D__parallel -D__SCALAPACK
+ CPPFLAGS   =
+@@ -34,7 +34,7 @@
+              $(LIBPATH)/liblapack-gnu-regtest.a\
+              $(LIBPATH)/libblas-gnu-regtest.a\
+              $(FFTW_LIB)/libfftw3.a\
+-             $(LIBXC_LIB)/libxcf90.a\
++             $(LIBXC_LIB)/libxcf03.a\
+              $(LIBXC_LIB)/libxc.a\
+              $(LIBINT_LIB)/libderiv.a\
+              $(LIBINT_LIB)/libint.a
+Index: arch/Linux-x86-64-gfortran-regtest.psmp
+===================================================================
+--- arch/Linux-x86-64-gfortran-regtest.psmp	(revision 18252)
++++ arch/Linux-x86-64-gfortran-regtest.psmp	(working copy)
+@@ -12,8 +12,8 @@
+ FFTW_LIB   = $(GCC_DIR)/fftw/3.3-gnu-regtest/lib64
+ LIBINT_INC = $(GCC_DIR)/libint/1.1.4-default-gnu-regtest/include
+ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-default-gnu-regtest/lib64
+-LIBXC_INC  = $(GCC_DIR)/libxc/3.0.0-gnu-regtest/include
+-LIBXC_LIB  = $(GCC_DIR)/libxc/3.0.0-gnu-regtest/lib64
++LIBXC_INC  = $(GCC_DIR)/libxc/4.0.4-gnu-regtest/include
++LIBXC_LIB  = $(GCC_DIR)/libxc/4.0.4-gnu-regtest/lib64
+ DFLAGS     = -D__ELPA=201605 -D__FFTW3 -D__LIBINT -D__LIBXC -D__MPI_VERSION=3 -D__PLUMED2\
+              -D__parallel -D__SCALAPACK
+ CPPFLAGS   =
+@@ -35,7 +35,7 @@
+              $(LIBPATH)/libblas-gnu-regtest.a\
+              $(FFTW_LIB)/libfftw3.a\
+              $(FFTW_LIB)/libfftw3_threads.a\
+-             $(LIBXC_LIB)/libxcf90.a\
++             $(LIBXC_LIB)/libxcf03.a\
+              $(LIBXC_LIB)/libxc.a\
+              $(LIBINT_LIB)/libderiv.a\
+              $(LIBINT_LIB)/libint.a
+Index: arch/Linux-x86-64-gfortran-regtest.sdbg
+===================================================================
+--- arch/Linux-x86-64-gfortran-regtest.sdbg	(revision 18252)
++++ arch/Linux-x86-64-gfortran-regtest.sdbg	(working copy)
+@@ -8,8 +8,8 @@
+ FFTW_LIB   = $(GCC_DIR)/fftw/3.3-gnu-regtest/lib64
+ LIBINT_INC = $(GCC_DIR)/libint/1.1.4-default-gnu-regtest/include
+ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-default-gnu-regtest/lib64
+-LIBXC_INC  = $(GCC_DIR)/libxc/3.0.0-gnu-regtest/include
+-LIBXC_LIB  = $(GCC_DIR)/libxc/3.0.0-gnu-regtest/lib64
++LIBXC_INC  = $(GCC_DIR)/libxc/4.0.4-gnu-regtest/include
++LIBXC_LIB  = $(GCC_DIR)/libxc/4.0.4-gnu-regtest/lib64
+ DFLAGS     = -D__FFTW3 -D__LIBINT -D__LIBXC
+ CPPFLAGS   =
+ WFLAGS     = -Waliasing -Wampersand -Wc-binding-type -Wconversion\
+@@ -25,7 +25,7 @@
+ LIBS       = $(LIBPATH)/liblapack-gnu-regtest.a\
+              $(LIBPATH)/libblas-gnu-regtest.a\
+              $(FFTW_LIB)/libfftw3.a\
+-             $(LIBXC_LIB)/libxcf90.a\
++             $(LIBXC_LIB)/libxcf03.a\
+              $(LIBXC_LIB)/libxc.a\
+              $(LIBINT_LIB)/libderiv.a\
+              $(LIBINT_LIB)/libint.a
+Index: arch/Linux-x86-64-gfortran-regtest.ssmp
+===================================================================
+--- arch/Linux-x86-64-gfortran-regtest.ssmp	(revision 18252)
++++ arch/Linux-x86-64-gfortran-regtest.ssmp	(working copy)
+@@ -8,8 +8,8 @@
+ FFTW_LIB   = $(GCC_DIR)/fftw/3.3-gnu-regtest/lib64
+ LIBINT_INC = $(GCC_DIR)/libint/1.1.4-default-gnu-regtest/include
+ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-default-gnu-regtest/lib64
+-LIBXC_INC  = $(GCC_DIR)/libxc/3.0.0-gnu-regtest/include
+-LIBXC_LIB  = $(GCC_DIR)/libxc/3.0.0-gnu-regtest/lib64
++LIBXC_INC  = $(GCC_DIR)/libxc/4.0.4-gnu-regtest/include
++LIBXC_LIB  = $(GCC_DIR)/libxc/4.0.4-gnu-regtest/lib64
+ DFLAGS     = -D__FFTW3 -D__LIBINT -D__LIBXC
+ CPPFLAGS   =
+ WFLAGS     = -Waliasing -Wampersand -Wc-binding-type -Wconversion\
+@@ -26,7 +26,7 @@
+              $(LIBPATH)/libblas-gnu-regtest.a\
+              $(FFTW_LIB)/libfftw3.a\
+              $(FFTW_LIB)/libfftw3_threads.a\
+-             $(LIBXC_LIB)/libxcf90.a\
++             $(LIBXC_LIB)/libxcf03.a\
+              $(LIBXC_LIB)/libxc.a\
+              $(LIBINT_LIB)/libderiv.a\
+              $(LIBINT_LIB)/libint.a
+Index: arch/Linux-x86-64-gfortran.popt
+===================================================================
+--- arch/Linux-x86-64-gfortran.popt	(revision 18252)
++++ arch/Linux-x86-64-gfortran.popt	(working copy)
+@@ -8,8 +8,8 @@
+ FFTW_LIB   = $(GCC_DIR)/fftw/3.3-gnu/lib64
+ LIBINT_INC = $(GCC_DIR)/libint/1.1.4-LARGE_L-gnu/include
+ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LARGE_L-gnu/lib64
+-LIBXC_INC  = $(GCC_DIR)/libxc/3.0.0-gnu/include
+-LIBXC_LIB  = $(GCC_DIR)/libxc/3.0.0-gnu/lib64
++LIBXC_INC  = $(GCC_DIR)/libxc/4.0.4-gnu/include
++LIBXC_LIB  = $(GCC_DIR)/libxc/4.0.4-gnu/lib64
+ DFLAGS     = -D__FFTW3 -D__LIBINT -D__LIBXC -D__MPI_VERSION=3\
+              -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6 -D__MAX_CONTR=4\
+              -D__parallel -D__SCALAPACK
+@@ -23,7 +23,7 @@
+              $(LIBPATH)/liblapack-gnu.a\
+              $(LIBPATH)/libblas-gnu.a\
+              $(FFTW_LIB)/libfftw3.a\
+-             $(LIBXC_LIB)/libxcf90.a\
++             $(LIBXC_LIB)/libxcf03.a\
+              $(LIBXC_LIB)/libxc.a\
+              $(LIBINT_LIB)/libderiv.a\
+              $(LIBINT_LIB)/libint.a
+Index: arch/Linux-x86-64-gfortran.psmp
+===================================================================
+--- arch/Linux-x86-64-gfortran.psmp	(revision 18252)
++++ arch/Linux-x86-64-gfortran.psmp	(working copy)
+@@ -8,8 +8,8 @@
+ FFTW_LIB   = $(GCC_DIR)/fftw/3.3-gnu/lib64
+ LIBINT_INC = $(GCC_DIR)/libint/1.1.4-LARGE_L-gnu/include
+ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LARGE_L-gnu/lib64
+-LIBXC_INC  = $(GCC_DIR)/libxc/3.0.0-gnu/include
+-LIBXC_LIB  = $(GCC_DIR)/libxc/3.0.0-gnu/lib64
++LIBXC_INC  = $(GCC_DIR)/libxc/4.0.4-gnu/include
++LIBXC_LIB  = $(GCC_DIR)/libxc/4.0.4-gnu/lib64
+ DFLAGS     = -D__FFTW3 -D__LIBINT -D__LIBXC -D__MPI_VERSION=3\
+              -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6 -D__MAX_CONTR=4\
+              -D__parallel -D__SCALAPACK
+@@ -24,7 +24,7 @@
+              $(LIBPATH)/libblas-gnu.a\
+              $(FFTW_LIB)/libfftw3.a\
+              $(FFTW_LIB)/libfftw3_threads.a\
+-             $(LIBXC_LIB)/libxcf90.a\
++             $(LIBXC_LIB)/libxcf03.a\
+              $(LIBXC_LIB)/libxc.a\
+              $(LIBINT_LIB)/libderiv.a\
+              $(LIBINT_LIB)/libint.a
+Index: arch/Linux-x86-64-gfortran.sdbg
+===================================================================
+--- arch/Linux-x86-64-gfortran.sdbg	(revision 18252)
++++ arch/Linux-x86-64-gfortran.sdbg	(working copy)
+@@ -8,8 +8,8 @@
+ FFTW_LIB   = $(GCC_DIR)/fftw/3.3-gnu-regtest/lib64
+ LIBINT_INC = $(GCC_DIR)/libint/1.1.4-default-gnu-regtest/include
+ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-default-gnu-regtest/lib64
+-LIBXC_INC  = $(GCC_DIR)/libxc/2.2.2-gnu-regtest/include
+-LIBXC_LIB  = $(GCC_DIR)/libxc/2.2.2-gnu-regtest/lib64
++LIBXC_INC  = $(GCC_DIR)/libxc/4.0.4-gnu-regtest/include
++LIBXC_LIB  = $(GCC_DIR)/libxc/4.0.4-gnu-regtest/lib64
+ DFLAGS     = -D__FFTW3 -D__LIBINT -D__LIBXC2
+ CPPFLAGS   =
+ WFLAGS     = -Waliasing -Wampersand -Wc-binding-type -Wconversion\
+@@ -24,7 +24,7 @@
+ LIBS       = $(LIBPATH)/liblapack-gnu-regtest.a\
+              $(LIBPATH)/libblas-gnu-regtest.a\
+              $(FFTW_LIB)/libfftw3.a\
+-             $(LIBXC_LIB)/libxcf90.a\
++             $(LIBXC_LIB)/libxcf03.a\
+              $(LIBXC_LIB)/libxc.a\
+              $(LIBINT_LIB)/libderiv.a\
+              $(LIBINT_LIB)/libint.a
+Index: arch/Linux-x86-64-gfortran.sopt
+===================================================================
+--- arch/Linux-x86-64-gfortran.sopt	(revision 18252)
++++ arch/Linux-x86-64-gfortran.sopt	(working copy)
+@@ -8,8 +8,8 @@
+ FFTW_LIB   = $(GCC_DIR)/fftw/3.3-gnu/lib64
+ LIBINT_INC = $(GCC_DIR)/libint/1.1.4-LARGE_L-gnu/include
+ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LARGE_L-gnu/lib64
+-LIBXC_INC  = $(GCC_DIR)/libxc/3.0.0-gnu/include
+-LIBXC_LIB  = $(GCC_DIR)/libxc/3.0.0-gnu/lib64
++LIBXC_INC  = $(GCC_DIR)/libxc/4.0.4-gnu/include
++LIBXC_LIB  = $(GCC_DIR)/libxc/4.0.4-gnu/lib64
+ DFLAGS     = -D__FFTW3 -D__LIBINT -D__LIBXC\
+              -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6 -D__MAX_CONTR=4
+ CPPFLAGS   = 
+@@ -21,7 +21,7 @@
+ LIBS       = $(LIBPATH)/liblapack-gnu.a\
+              $(LIBPATH)/libblas-gnu.a\
+              $(FFTW_LIB)/libfftw3.a\
+-             $(LIBXC_LIB)/libxcf90.a\
++             $(LIBXC_LIB)/libxcf03.a\
+              $(LIBXC_LIB)/libxc.a\
+              $(LIBINT_LIB)/libderiv.a\
+              $(LIBINT_LIB)/libint.a\
+Index: arch/Linux-x86-64-gfortran.ssmp
+===================================================================
+--- arch/Linux-x86-64-gfortran.ssmp	(revision 18252)
++++ arch/Linux-x86-64-gfortran.ssmp	(working copy)
+@@ -8,8 +8,8 @@
+ FFTW_LIB   = $(GCC_DIR)/fftw/3.3-gnu/lib64
+ LIBINT_INC = $(GCC_DIR)/libint/1.1.4-LARGE_L-gnu/include
+ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LARGE_L-gnu/lib64
+-LIBXC_INC  = $(GCC_DIR)/libxc/3.0.0-gnu/include
+-LIBXC_LIB  = $(GCC_DIR)/libxc/3.0.0-gnu/lib64
++LIBXC_INC  = $(GCC_DIR)/libxc/4.0.4-gnu/include
++LIBXC_LIB  = $(GCC_DIR)/libxc/4.0.4-gnu/lib64
+ DFLAGS     = -D__FFTW3 -D__LIBINT -D__LIBXC\
+              -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6 -D__MAX_CONTR=4
+ CPPFLAGS   = 
+@@ -22,7 +22,7 @@
+              $(LIBPATH)/libblas-gnu.a\
+              $(FFTW_LIB)/libfftw3.a\
+              $(FFTW_LIB)/libfftw3_threads.a\
+-             $(LIBXC_LIB)/libxcf90.a\
++             $(LIBXC_LIB)/libxcf03.a\
+              $(LIBXC_LIB)/libxc.a\
+              $(LIBINT_LIB)/libderiv.a\
+              $(LIBINT_LIB)/libint.a
+Index: arch/Linux-x86-64-intel-mic.psmp
+===================================================================
+--- arch/Linux-x86-64-intel-mic.psmp	(revision 18252)
++++ arch/Linux-x86-64-intel-mic.psmp	(working copy)
+@@ -155,7 +155,7 @@
+ ifneq (,$(LIBXCROOT))
+   DFLAGS  += -D__LIBXC2
+   IFLAGS  += -I$(LIBXCROOT)/include
+-  LIBS    += $(LIBXCROOT)/lib/libxcf90.a $(LIBXCROOT)/lib/libxc.a
++  LIBS    += $(LIBXCROOT)/lib/libxcf03.a $(LIBXCROOT)/lib/libxc.a
+ endif
+ 
+ ifneq (,$(LIBXSTREAMROOT))
+Index: src/atom_output.F
+===================================================================
+--- src/atom_output.F	(revision 18252)
++++ src/atom_output.F	(working copy)
+@@ -1,6 +1,6 @@
+ !--------------------------------------------------------------------------------------------------!
+ !   CP2K: A general program to perform molecular dynamics simulations                              !
+-!   Copyright (C) 2000 - 2017  CP2K developers group                                               !
++!   Copyright (C) 2000 - 2018  CP2K developers group                                               !
+ !--------------------------------------------------------------------------------------------------!
+ 
+ ! **************************************************************************************************
+@@ -22,8 +22,11 @@
+         do_rhf_atom, do_rks_atom, do_rohf_atom, do_sczoramp_atom, do_uhf_atom, do_uks_atom, &
+         do_zoramp_atom, poly_conf, xc_none
+    USE input_cp2k_check,                ONLY: xc_functionals_expand
+-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
++   USE input_section_types,             ONLY: section_vals_duplicate,&
++                                              section_vals_get,&
++                                              section_vals_get_subs_vals,&
+                                               section_vals_get_subs_vals2,&
++                                              section_vals_release,&
+                                               section_vals_type,&
+                                               section_vals_val_get
+    USE kinds,                           ONLY: default_string_length,&
+@@ -469,10 +472,11 @@
+       CHARACTER(len=10*default_string_length)            :: reference
+       CHARACTER(len=160)                                 :: shortform
+       CHARACTER(len=20)                                  :: tmpStr
+-      CHARACTER(len=80), DIMENSION(:), POINTER           :: func_name
+-      INTEGER                                            :: ifun, ifunc_name, il, meth, myfun, reltyp
++      INTEGER                                            :: i_rep, ifun, il, meth, myfun, n_rep, &
++                                                            reltyp
+       LOGICAL                                            :: lsd
+-      TYPE(section_vals_type), POINTER                   :: xc_fun, xc_fun_section, xc_section
++      TYPE(section_vals_type), POINTER                   :: libxc_fun, xc_fun, xc_fun_section, &
++                                                            xc_section
+ 
+       NULLIFY (xc_fun, xc_fun_section, xc_section)
+ 
+@@ -567,20 +571,24 @@
+                ifun = ifun+1
+                xc_fun => section_vals_get_subs_vals2(xc_fun_section, i_section=ifun)
+                IF (.NOT. ASSOCIATED(xc_fun)) EXIT
+-               CALL xc_functional_get_info(xc_fun, lsd=lsd, reference=reference, &
+-                                           shortform=shortform, ifunc_name=1)
+-               IF (TRIM(xc_fun%section%name) == "LIBXC") THEN
+-                  CALL libxc_version_info(tmpStr)
+-                  WRITE (iw, fmt="(A,A,A)") ' FUNCTIONAL| LIBXC Vers. ', TRIM(tmpStr(1:5)), &
+-                     ' (Marques, Oliveira, Burnus, CPC 183, 2272 (2012))'
+-                  WRITE (iw, fmt="(' FUNCTIONAL| ',a,':')") TRIM(shortform)
++               IF (TRIM(xc_fun%section%name) /= "LIBXC") THEN
++                  CALL xc_functional_get_info(xc_fun, lsd=lsd, reference=reference, shortform=shortform)
++                  WRITE (iw, fmt="(' FUNCTIONAL| ',a,':')") &
++                     TRIM(xc_fun%section%name)
+                   DO il = 1, LEN_TRIM(reference), 67
+                      WRITE (iw, fmt="(' FUNCTIONAL| ',a67)") reference(il:)
+                   END DO
+-                  CALL section_vals_val_get(xc_fun, "functional", c_vals=func_name)
+-                  DO ifunc_name = 2, SIZE(func_name)
+-                     CALL xc_functional_get_info(xc_fun, lsd=lsd, reference=reference, &
+-                                                 shortform=shortform, ifunc_name=ifunc_name)
++               ELSE
++                  ! LIBXC is the only repeatable functional section - for each we need
++                  ! NOT the single values, but the whole section_vals_type independently
++                  CALL section_vals_get(xc_fun, n_repetition=n_rep)
++                  DO i_rep = 1, n_rep
++                     NULLIFY (libxc_fun)
++                     CALL section_vals_duplicate(xc_fun, libxc_fun, i_rep_start=i_rep, i_rep_end=i_rep)
++                     IF (.NOT. ASSOCIATED(libxc_fun)) EXIT
++                     CALL xc_functional_get_info(libxc_fun, lsd=lsd, reference=reference, shortform=shortform)
++                     CALL section_vals_release(libxc_fun)
++                     CALL libxc_version_info(tmpStr)
+                      WRITE (iw, fmt="(A,A,A)") ' FUNCTIONAL| LIBXC Vers. ', TRIM(tmpStr(1:5)), &
+                         ' (Marques, Oliveira, Burnus, CPC 183, 2272 (2012))'
+                      WRITE (iw, fmt="(' FUNCTIONAL| ',a,':')") TRIM(shortform)
+@@ -588,12 +596,6 @@
+                         WRITE (iw, fmt="(' FUNCTIONAL| ',a67)") reference(il:)
+                      END DO
+                   END DO
+-               ELSE
+-                  WRITE (iw, fmt="(' FUNCTIONAL| ',a,':')") &
+-                     TRIM(xc_fun%section%name)
+-                  DO il = 1, LEN_TRIM(reference), 67
+-                     WRITE (iw, fmt="(' FUNCTIONAL| ',a67)") reference(il:)
+-                  END DO
+                END IF
+             END DO
+          END IF
+Index: src/common/bibliography.F
+===================================================================
+--- src/common/bibliography.F	(revision 18252)
++++ src/common/bibliography.F	(working copy)
+@@ -1,6 +1,6 @@
+ !--------------------------------------------------------------------------------------------------!
+ !   CP2K: A general program to perform molecular dynamics simulations                              !
+-!   Copyright (C) 2000 - 2017  CP2K developers group                                               !
++!   Copyright (C) 2000 - 2018  CP2K developers group                                               !
+ !--------------------------------------------------------------------------------------------------!
+ 
+ ! **************************************************************************************************
+@@ -80,8 +80,8 @@
+                             Gilbert2008, Schonherr2014, Ceriotti2014, BaniHashemian2016, &
+                             Kapil2016, Heinzmann1976, Ehrhardt1985, Rybkin2016, West2006, &
+                             Bates2013, Andermatt2016, Zhu2016, Schuett2016, Lu2004, &
+-                            Becke1988b, Migliore2009, Mavros2015, Holmberg2017, Marek2014
+-
++                            Becke1988b, Migliore2009, Mavros2015, Holmberg2017, Marek2014, &
++                            Lehtola2018
+ CONTAINS
+ 
+ ! **************************************************************************************************
+@@ -2100,6 +2100,28 @@
+                          "ER"), &
+                          DOI="10.1016/j.cpc.2012.05.007")
+ 
++      CALL add_reference(key=Lehtola2018, ISI_record=s2a( &
++                         "AU Lehtola, S", &
++                         "   Steigemann, C", &
++                         "   Oliveira, MJT", &
++                         "   Marques, MAL", &
++                         "AF Lehtola, Susi", &
++                         "   Steigemann, Conrad", &
++                         "   Oliveira, Micael J. T.", &
++                         "   Marques, Miguel A. L.", &
++                         "TI Recent developments in libxc - A comprehensive library of functionals", &
++                         "   for density functional theory", &
++                         "SO SoftwareX", &
++                         "SN 2352-7110", &
++                         "PD JAN", &
++                         "PY 2018", &
++                         "VL 7", &
++                         "BP 1", &
++                         "EP 5", &
++                         "DI 10.1016/j.softx.2017.11.002", &
++                         "ER"), &
++                         DOI="10.1016/j.softx.2017.11.002")
++
+       CALL add_reference(key=Jones2011, ISI_record=s2a( &
+                          "AU Jones, Andrew", &
+                          "   Leimkuhler, Ben", &
+Index: src/cp2k_info.F
+===================================================================
+--- src/cp2k_info.F	(revision 18252)
++++ src/cp2k_info.F	(working copy)
+@@ -1,6 +1,6 @@
+ !--------------------------------------------------------------------------------------------------!
+ !   CP2K: A general program to perform molecular dynamics simulations                              !
+-!   Copyright (C) 2000 - 2017  CP2K developers group                                               !
++!   Copyright (C) 2000 - 2018  CP2K developers group                                               !
+ !--------------------------------------------------------------------------------------------------!
+ 
+ ! **************************************************************************************************
+@@ -102,9 +102,6 @@
+ #if defined(__FFTW3)
+       flags = TRIM(flags)//" fftw3"
+ #endif
+-#if defined(__LIBXC2) || defined(__LIBXC3)
+-#define __LIBXC
+-#endif
+ #if defined(__LIBXC)
+       flags = TRIM(flags)//" libxc"
+ #endif
+@@ -295,7 +292,7 @@
+       WRITE (iunit, '(T2,A)') '!   Copyright (C) 2004, 2005, 2006, 2007  CP2K developers group               !'
+       WRITE (iunit, '(T2,A)') '!   Copyright (C) 2008, 2009, 2010, 2011  CP2K developers group               !'
+       WRITE (iunit, '(T2,A)') '!   Copyright (C) 2012, 2013, 2014, 2015  CP2K developers group               !'
+-      WRITE (iunit, '(T2,A)') '!   Copyright (C) 2016                    CP2K developers group               !'
++      WRITE (iunit, '(T2,A)') '!   Copyright (C) 2016, 2017, 2018        CP2K developers group               !'
+       WRITE (iunit, '(T2,A)') '!                                                                             !'
+       WRITE (iunit, '(T2,A)') '!   This program is free software; you can redistribute it and/or modify      !'
+       WRITE (iunit, '(T2,A)') '!   it under the terms of the GNU General Public License as published by      !'
+Index: src/input_cp2k_xc.F
+===================================================================
+--- src/input_cp2k_xc.F	(revision 18252)
++++ src/input_cp2k_xc.F	(working copy)
+@@ -1,6 +1,6 @@
+ !--------------------------------------------------------------------------------------------------!
+ !   CP2K: A general program to perform molecular dynamics simulations                              !
+-!   Copyright (C) 2000 - 2017  CP2K developers group                                               !
++!   Copyright (C) 2000 - 2018  CP2K developers group                                               !
+ !--------------------------------------------------------------------------------------------------!
+ 
+ ! **************************************************************************************************
+@@ -12,8 +12,8 @@
+ MODULE input_cp2k_xc
+    USE bibliography,                    ONLY: &
+         Becke1988, Becke1997, BeckeRoussel1989, Goedecker1996, Grimme2006, Grimme2010, Grimme2011, &
+-        Heyd2004, Lee1988, Marques2012, Ortiz1994, Perdew1981, Perdew1996, Perdew2008, &
+-        Proynov2007, Tao2003, Tran2013, Vosko1980, Wellendorff2012, Zhang1998
++        Heyd2004, Lee1988, Lehtola2018, Marques2012, Ortiz1994, Perdew1981, Perdew1996, &
++        Perdew2008, Proynov2007, Tao2003, Tran2013, Vosko1980, Wellendorff2012, Zhang1998
+    USE cp_output_handling,              ONLY: add_last_numeric,&
+                                               cp_print_key_section_create,&
+                                               high_print_level
+@@ -220,7 +220,7 @@
+ 
+       CALL section_create(subsection, name="HCTH", &
+                           description="Uses the HCTH class of functionals", &
+-                          n_keywords=0, n_subsections=0, repeats=.TRUE.)
++                          n_keywords=0, n_subsections=0, repeats=.FALSE.)
+       CALL keyword_create(keyword, name="PARAMETER_SET", &
+                           description="Which version of the parameters should be used", &
+                           usage="PARAMETER_SET 407", &
+@@ -270,14 +270,14 @@
+ 
+       CALL create_libxc_section(subsection, "LIBXC", &
+                                 "Uses functionals from LIBXC, see also "// &
+-                                "http://www.tddft.org/programs/octopus/wiki/index.php/Libxc_functionals ", &
+-                                "FUNCTIONAL GGA_X_PBE GGA_C_PBE")
++                                "https://gitlab.com/libxc/libxc/wikis/Functionals-list-4.0.4", &
++                                "FUNCTIONAL GGA_X_PBE")
+       CALL section_add_subsection(section, subsection)
+       CALL section_release(subsection)
+ 
+       CALL create_libxc_section(subsection, "KE_LIBXC", &
+                                 "To be used for KG runs. Uses kinetic energy functionals from LIBXC, "// &
+-                                "see also http://www.tddft.org/programs/octopus/wiki/index.php/Libxc_functionals ", &
++                                "https://gitlab.com/libxc/libxc/wikis/Functionals-list-4.0.4", &
+                                 "FUNCTIONAL GGA_K_LLP")
+       CALL section_add_subsection(section, subsection)
+       CALL section_release(subsection)
+@@ -747,30 +747,31 @@
+       CPASSERT(name == "LIBXC" .OR. name == "KE_LIBXC")
+       NULLIFY (keyword)
+       CALL section_create(section, name, description, &
+-                          n_keywords=3, n_subsections=0, repeats=.FALSE., &
+-                          citations=(/Marques2012/))
++                          n_keywords=3, n_subsections=0, repeats=.TRUE., &
++                          citations=(/Marques2012, Lehtola2018/))
+       CALL keyword_create(keyword, "_SECTION_PARAMETERS_", &
+-                          description="activates the functional", &
++                          description="activates functionals from libxc library", &
+                           lone_keyword_l_val=.TRUE., default_l_val=.FALSE.)
+       CALL section_add_keyword(section, keyword)
+       CALL keyword_release(keyword)
+       CALL keyword_create(keyword, name="FUNCTIONAL", &
+-                          description="names of the functionals, see also "// &
+-                          "http://www.tddft.org/programs/octopus/wiki/index.php/Libxc_functionals ."// &
++                          description="name of the functional, see also "// &
++                          "https://gitlab.com/libxc/libxc/wikis/Functionals-list-4.0.4 "// &
+                           "The precise list of available functionals depends on "// &
+-                          "the version of libxc interfaced (currently 2.2.2).", &
++                          "the version of libxc interfaced (currently 4.0.4)", &
+                           usage=usage, type_of_var=char_t, n_var=-1)
+       CALL section_add_keyword(section, keyword)
+       CALL keyword_release(keyword)
+       CALL keyword_create(keyword, name="SCALE", &
+-                          description="scaling factors of the functionals", &
+-                          usage="SCALE 1.0 1.0", type_of_var=real_t, &
+-                          default_r_vals=(/1.0_dp/), n_var=-1)
++                          description="scaling factors for the functional", &
++                          usage="SCALE 0.8", type_of_var=real_t, &
++                          default_r_val=1.0_dp)
+       CALL section_add_keyword(section, keyword)
+       CALL keyword_release(keyword)
+       CALL keyword_create(keyword, name="PARAMETERS", &
+-                          description="parameters of the functionals", &
+-                          type_of_var=real_t, default_r_vals=(/1e20_dp/), n_var=-1)
++                          description="list of external parameters for the functional", &
++                          usage="PARAMETERS 0.3 [0.5 [1.4]]", type_of_var=real_t, &
++                          default_r_vals=(/HUGE(0.0_dp)/), n_var=-1)
+       CALL section_add_keyword(section, keyword)
+       CALL keyword_release(keyword)
+    END SUBROUTINE
+Index: src/xc/xc_derivatives.F
+===================================================================
+--- src/xc/xc_derivatives.F	(revision 18252)
++++ src/xc/xc_derivatives.F	(working copy)
+@@ -1,16 +1,18 @@
+ !--------------------------------------------------------------------------------------------------!
+ !   CP2K: A general program to perform molecular dynamics simulations                              !
+-!   Copyright (C) 2000 - 2017  CP2K developers group                                               !
++!   Copyright (C) 2000 - 2018  CP2K developers group                                               !
+ !--------------------------------------------------------------------------------------------------!
+ 
+ ! **************************************************************************************************
+ MODULE xc_derivatives
+ 
+-   USE input_section_types,             ONLY: section_vals_get_subs_vals2,&
++   USE input_section_types,             ONLY: section_vals_duplicate,&
++                                              section_vals_get,&
++                                              section_vals_get_subs_vals2,&
++                                              section_vals_release,&
+                                               section_vals_type,&
+                                               section_vals_val_get
+-   USE kinds,                           ONLY: default_string_length,&
+-                                              dp
++   USE kinds,                           ONLY: dp
+    USE xc_b97,                          ONLY: b97_lda_eval,&
+                                               b97_lda_info,&
+                                               b97_lsd_eval,&
+@@ -139,17 +141,15 @@
+ !> \param needs the flags corresponding to the inputs needed by this
+ !>        functional are set to true (the flags not needed aren't touched)
+ !> \param max_deriv the maximal derivative available
+-!> \param ifunc_name ...
+ !> \author fawzi
+ ! **************************************************************************************************
+    SUBROUTINE xc_functional_get_info(functional, lsd, reference, shortform, &
+-                                     needs, max_deriv, ifunc_name)
++                                     needs, max_deriv)
+       TYPE(section_vals_type), POINTER                   :: functional
+       LOGICAL, INTENT(in)                                :: lsd
+       CHARACTER(LEN=*), INTENT(OUT), OPTIONAL            :: reference, shortform
+       TYPE(xc_rho_cflags_type), INTENT(inout), OPTIONAL  :: needs
+       INTEGER, INTENT(out), OPTIONAL                     :: max_deriv
+-      INTEGER, INTENT(in), OPTIONAL                      :: ifunc_name
+ 
+       CHARACTER(len=*), PARAMETER :: routineN = 'xc_functional_get_info', &
+          routineP = moduleN//':'//routineN
+@@ -229,11 +229,9 @@
+          ENDIF
+       CASE ("LIBXC", "KE_LIBXC")
+          IF (lsd) THEN
+-            CALL libxc_lsd_info(functional, reference, shortform, needs, max_deriv, &
+-                                ifunc_name)
++            CALL libxc_lsd_info(functional, reference, shortform, needs, max_deriv)
+          ELSE
+-            CALL libxc_lda_info(functional, reference, shortform, needs, max_deriv, &
+-                                ifunc_name)
++            CALL libxc_lda_info(functional, reference, shortform, needs, max_deriv)
+          ENDIF
+       CASE ("CS1")
+          IF (lsd) THEN
+@@ -340,13 +338,11 @@
+ !>        the code all the derivatives might be calculated, you should ignore
+ !>        them when adding derivatives of various functionals they might contain
+ !>        the derivative of just one functional)
+-!> \param ifunc_name ...
+ !> \par History
+ !>      11.2003 created [fawzi]
+ !> \author fawzi
+ ! **************************************************************************************************
+-   SUBROUTINE xc_functional_eval(functional, lsd, rho_set, deriv_set, &
+-                                 deriv_order, ifunc_name)
++   SUBROUTINE xc_functional_eval(functional, lsd, rho_set, deriv_set, deriv_order)
+ 
+       TYPE(section_vals_type), POINTER                   :: functional
+       LOGICAL, INTENT(in)                                :: lsd
+@@ -353,7 +349,6 @@
+       TYPE(xc_rho_set_type), POINTER                     :: rho_set
+       TYPE(xc_derivative_set_type), POINTER              :: deriv_set
+       INTEGER, INTENT(IN)                                :: deriv_order
+-      INTEGER, INTENT(in), OPTIONAL                      :: ifunc_name
+ 
+       CHARACTER(len=*), PARAMETER :: routineN = 'xc_functional_eval', &
+          routineP = moduleN//':'//routineN
+@@ -435,9 +430,9 @@
+          ENDIF
+       CASE ("LIBXC", "KE_LIBXC")
+          IF (lsd) THEN
+-            CALL libxc_lsd_eval(rho_set, deriv_set, deriv_order, functional, ifunc_name)
++            CALL libxc_lsd_eval(rho_set, deriv_set, deriv_order, functional)
+          ELSE
+-            CALL libxc_lda_eval(rho_set, deriv_set, deriv_order, functional, ifunc_name)
++            CALL libxc_lda_eval(rho_set, deriv_set, deriv_order, functional)
+          ENDIF
+       CASE ("CS1")
+          IF (lsd) THEN
+@@ -582,10 +577,8 @@
+       CHARACTER(len=*), PARAMETER :: routineN = 'xc_functionals_eval', &
+          routineP = moduleN//':'//routineN
+ 
+-      CHARACTER(len=default_string_length), &
+-         DIMENSION(:), POINTER                           :: func_name
+-      INTEGER                                            :: ifun, ifunc_name
+-      TYPE(section_vals_type), POINTER                   :: xc_fun
++      INTEGER                                            :: i_rep, ifun, n_rep
++      TYPE(section_vals_type), POINTER                   :: libxc_fun, xc_fun
+ 
+       CPASSERT(ASSOCIATED(functionals))
+       ifun = 0
+@@ -593,21 +586,26 @@
+          ifun = ifun+1
+          xc_fun => section_vals_get_subs_vals2(functionals, i_section=ifun)
+          IF (.NOT. ASSOCIATED(xc_fun)) EXIT
+-         CALL xc_functional_eval(xc_fun, &
+-                                 lsd=lsd, &
+-                                 rho_set=rho_set, &
+-                                 deriv_set=deriv_set, &
+-                                 deriv_order=deriv_order, &
+-                                 ifunc_name=1)
+-         IF (TRIM(xc_fun%section%name) == "LIBXC") THEN
+-            CALL section_vals_val_get(xc_fun, "functional", c_vals=func_name)
+-            DO ifunc_name = 2, SIZE(func_name)
+-               CALL xc_functional_eval(xc_fun, &
++         IF (TRIM(xc_fun%section%name) /= "LIBXC") THEN
++            CALL xc_functional_eval(xc_fun, &
++                                    lsd=lsd, &
++                                    rho_set=rho_set, &
++                                    deriv_set=deriv_set, &
++                                    deriv_order=deriv_order)
++         ELSE
++            ! LIBXC is the only repeatable functional section - for each we need
++            ! NOT the single values, but the whole section_vals_type independently
++            CALL section_vals_get(xc_fun, n_repetition=n_rep)
++            DO i_rep = 1, n_rep
++               NULLIFY (libxc_fun)
++               CALL section_vals_duplicate(xc_fun, libxc_fun, i_rep_start=i_rep, i_rep_end=i_rep)
++               IF (.NOT. ASSOCIATED(libxc_fun)) EXIT
++               CALL xc_functional_eval(libxc_fun, &
+                                        lsd=lsd, &
+                                        rho_set=rho_set, &
+                                        deriv_set=deriv_set, &
+-                                       deriv_order=deriv_order, &
+-                                       ifunc_name=ifunc_name)
++                                       deriv_order=deriv_order)
++               CALL section_vals_release(libxc_fun)
+             END DO
+          END IF
+       END DO
+@@ -634,10 +632,9 @@
+       CHARACTER(len=*), PARAMETER :: routineN = 'xc_functionals_get_needs', &
+          routineP = moduleN//':'//routineN
+ 
+-      CHARACTER(len=80), DIMENSION(:), POINTER           :: func_name
+-      INTEGER                                            :: ifun, ifunc_name
++      INTEGER                                            :: i_rep, ifun, n_rep
+       LOGICAL                                            :: my_add_basic_components
+-      TYPE(section_vals_type), POINTER                   :: xc_fun
++      TYPE(section_vals_type), POINTER                   :: libxc_fun, xc_fun
+ 
+       my_add_basic_components = .FALSE.
+       IF (PRESENT(add_basic_components)) my_add_basic_components = add_basic_components
+@@ -644,19 +641,28 @@
+ 
+       CPASSERT(ASSOCIATED(functionals))
+       CALL xc_rho_cflags_setall(needs, .FALSE.)
++
+       ifun = 0
+       DO
+          ifun = ifun+1
+          xc_fun => section_vals_get_subs_vals2(functionals, i_section=ifun)
+          IF (.NOT. ASSOCIATED(xc_fun)) EXIT
+-         CALL xc_functional_get_info(xc_fun, lsd=lsd, needs=needs, ifunc_name=1)
+-         IF (TRIM(xc_fun%section%name) == "LIBXC") THEN
+-            CALL section_vals_val_get(xc_fun, "functional", c_vals=func_name)
+-            DO ifunc_name = 2, SIZE(func_name)
+-               CALL xc_functional_get_info(xc_fun, lsd=lsd, needs=needs, ifunc_name=ifunc_name)
++         IF (TRIM(xc_fun%section%name) /= "LIBXC") THEN
++            CALL xc_functional_get_info(xc_fun, lsd=lsd, needs=needs)
++         ELSE
++            ! LIBXC is the only repeatable functional section - for each we need
++            ! NOT the single values, but the whole section_vals_type independently
++            CALL section_vals_get(xc_fun, n_repetition=n_rep)
++            DO i_rep = 1, n_rep
++               NULLIFY (libxc_fun)
++               CALL section_vals_duplicate(xc_fun, libxc_fun, i_rep_start=i_rep, i_rep_end=i_rep)
++               IF (.NOT. ASSOCIATED(libxc_fun)) EXIT
++               CALL xc_functional_get_info(libxc_fun, lsd=lsd, needs=needs)
++               CALL section_vals_release(libxc_fun)
+             END DO
+          END IF
+       END DO
++
+       IF (my_add_basic_components) THEN
+          IF (lsd) THEN
+             needs%rho_spin = .TRUE.
+Index: src/xc/xc_libxc.F
+===================================================================
+--- src/xc/xc_libxc.F	(revision 18252)
++++ src/xc/xc_libxc.F	(working copy)
+@@ -1,6 +1,6 @@
+ !--------------------------------------------------------------------------------------------------!
+ !   CP2K: A general program to perform molecular dynamics simulations                              !
+-!   Copyright (C) 2000 - 2017  CP2K developers group                                               !
++!   Copyright (C) 2000 - 2018  CP2K developers group                                               !
+ !--------------------------------------------------------------------------------------------------!
+ 
+ ! **************************************************************************************************
+@@ -9,17 +9,6 @@
+ !>      LibXC:
+ !>      (Marques, Oliveira, Burnus, CPC 183, 2272 (2012)).
+ !>
+-!>      For subsequent versions of libxc, the following should be updated if
+-!>      necessary:
+-!>      1) The list of functionals for which it is possible to provide input
+-!>         parameters (in 'xc_libxc_wrap_functional_set_params'). For more
+-!>         information on the parameters, see subroutines xc_f90_xxx_set_par
+-!>         in libxc.f90 of the libxc package or xc_f90_lib_m.F.
+-!>         only checked for functionals up to 2.0.1
+-!>      2) Reactivate the functionals which are working correctly
+-!>         (in 'xc_libxc_wrap_functional_buggy').
+-!>         only checked for functionals up to 3.x.x
+-!>
+ !>      WARNING: In the subroutine libxc_lsd_calc, it could be that the
+ !>      ordering for the 1st index of v2lapltau, v2rholapl, v2rhotau,
+ !>      v2sigmalapl and v2sigmatau is not correct. For the moment it does not
+@@ -30,13 +19,12 @@
+ !>      01.2013 created [F. Tran]
+ !>      07.2014 updates to versions 2.1 [JGH]
+ !>      08.2015 refactoring [A. Gloess (agloess)]
++!>      01.2018 refactoring [A. Gloess (agloess)]
+ !> \author F. Tran
+ ! **************************************************************************************************
+ MODULE xc_libxc
+-#if defined(__LIBXC2) || defined(__LIBXC3)
+-#define __LIBXC
+-#endif
+-  USE bibliography,                    ONLY: Marques2012,&
++  USE bibliography,                    ONLY: Lehtola2018,&
++                                             Marques2012,&
+                                              cite_reference
+ 
+   USE input_section_types,             ONLY: section_vals_type,&
+@@ -51,27 +39,29 @@
+   USE xc_rho_set_types,                ONLY: xc_rho_set_get,&
+                                              xc_rho_set_type
+ #if defined (__LIBXC)
+-  USE xc_libxc_wrap,                   ONLY: xc_f90_pointer_t,&
+-                                             xc_f90_func_init,&
+-                                             xc_f90_func_end,&
+-                                             xc_f90_info_family,&
+-                                             xc_f90_info_kind,&
+-                                             xc_f90_info_name,&
+-                                             xc_f90_gga_exc,&
+-                                             xc_f90_gga_exc_vxc,&
+-                                             xc_f90_gga_fxc,&
+-                                             xc_f90_gga_vxc,&
+-                                             xc_f90_lda,&
+-                                             xc_f90_lda_exc,&
+-                                             xc_f90_lda_exc_vxc,&
+-                                             xc_f90_lda_fxc,&
+-                                             xc_f90_lda_kxc,&
+-                                             xc_f90_lda_vxc,&
+-                                             xc_f90_mgga,&
+-                                             xc_f90_mgga_exc,&
+-                                             xc_f90_mgga_exc_vxc,&
+-                                             xc_f90_mgga_fxc,&
+-                                             xc_f90_mgga_vxc,&
++  USE xc_libxc_wrap,                   ONLY: xc_f03_func_t,&
++                                             xc_f03_func_init,&
++                                             xc_f03_func_end,&
++                                             xc_f03_func_info_t,&
++                                             xc_f03_func_get_info,&
++                                             xc_f03_func_info_get_family,&
++                                             xc_f03_func_info_get_kind,&
++                                             xc_f03_func_info_get_name,&
++                                             xc_f03_gga_exc,&
++                                             xc_f03_gga_exc_vxc,&
++                                             xc_f03_gga_fxc,&
++                                             xc_f03_gga_vxc,&
++                                             xc_f03_lda,&
++                                             xc_f03_lda_exc,&
++                                             xc_f03_lda_exc_vxc,&
++                                             xc_f03_lda_fxc,&
++                                             xc_f03_lda_kxc,&
++                                             xc_f03_lda_vxc,&
++                                             xc_f03_mgga,&
++                                             xc_f03_mgga_exc,&
++                                             xc_f03_mgga_exc_vxc,&
++                                             xc_f03_mgga_fxc,&
++                                             xc_f03_mgga_vxc,&
+                                              XC_POLARIZED,&
+                                              XC_UNPOLARIZED,&
+                                              XC_FAMILY_LDA,&
+@@ -86,8 +76,7 @@
+                                              xc_libxc_wrap_version,&
+                                              xc_libxc_wrap_functional_get_number,&
+                                              xc_libxc_wrap_needs_laplace,&
+-                                             xc_libxc_wrap_functional_set_params,&
+-                                             xc_libxc_wrap_functional_buggy
++                                             xc_libxc_wrap_functional_set_params
+ #endif
+ 
+ #include "../base/base_uses.f90"
+@@ -110,65 +99,59 @@
+ !> \param needs the components needed by this functional are set to
+ !>        true (does not set the unneeded components to false)
+ !> \param max_deriv maximum implemented derivative of the xc functional
+-!> \param ifunc_name the index of the functional as given in the input file
+ !> \author F. Tran
+ ! **************************************************************************************************
+-   SUBROUTINE libxc_lda_info(libxc_params, reference, shortform, needs, max_deriv, ifunc_name)
++   SUBROUTINE libxc_lda_info(libxc_params, reference, shortform, needs, max_deriv)
+ 
+       TYPE(section_vals_type), POINTER         :: libxc_params
+       CHARACTER(LEN=*), INTENT(OUT), OPTIONAL  :: reference, shortform
+       TYPE(xc_rho_cflags_type), &
+-         INTENT(inout), OPTIONAL                :: needs
++         INTENT(inout), OPTIONAL               :: needs
+       INTEGER, INTENT(out), OPTIONAL           :: max_deriv
+-      INTEGER, INTENT(in)                      :: ifunc_name
+ 
+       CHARACTER(len=*), PARAMETER :: routineN = 'libxc_lda_info', &
+                                      routineP = moduleN//':'//routineN
+ 
+ #if defined (__LIBXC)
+-      CHARACTER(LEN=120)                       :: s1, s2
+-      CHARACTER(LEN=default_string_length), &
+-         DIMENSION(:), POINTER                  :: func_name
++      CHARACTER(LEN=128)                       :: s1, s2
++      CHARACTER(LEN=default_string_length)     :: func_name
+       INTEGER                                  :: func_id
+-      REAL(KIND=dp)                            :: sc
+-      REAL(KIND=dp), DIMENSION(:), POINTER     :: scale
+-      TYPE(xc_f90_pointer_t)                   :: xc_func, xc_info
++      REAL(KIND=dp)                            :: func_scale
++      TYPE(xc_f03_func_t)                      :: xc_func
++      TYPE(xc_f03_func_info_t)                 :: xc_info
+ 
+-      CALL section_vals_val_get(libxc_params, "functional", c_vals=func_name)
+-      CALL section_vals_val_get(libxc_params, "scale", r_vals=scale)
++      CALL section_vals_val_get(libxc_params, "functional", c_val=func_name)
++      CALL section_vals_val_get(libxc_params, "scale", r_val=func_scale)
+ 
+       CALL cite_reference(Marques2012)
++      CALL cite_reference(Lehtola2018)
+ 
+-      IF ((SIZE(scale) == 1) .AND. (ABS(SCALE(1)-1.0_dp) < 1.0e-10_dp)) THEN
+-         sc = 1.0_dp
+-      ELSE
+-         sc = SCALE(ifunc_name)
+-      ENDIF
++      IF (ABS(func_scale-1.0_dp) < 1.0e-10_dp) func_scale = 1.0_dp
+ 
+-      func_id = xc_libxc_wrap_functional_get_number(func_name(ifunc_name))
+-      CALL xc_libxc_wrap_functional_buggy(func_id)
++      func_id = xc_libxc_wrap_functional_get_number(func_name)
+ !$OMP CRITICAL(libxc_init)
+-      CALL xc_f90_func_init(xc_func, xc_info, func_id, XC_UNPOLARIZED)
++      CALL xc_f03_func_init(xc_func, func_id, XC_UNPOLARIZED)
++      xc_info = xc_f03_func_get_info(xc_func)
+ !$OMP END CRITICAL(libxc_init)
+ !$OMP BARRIER
+ 
+-      CALL xc_f90_info_name(xc_info, s1)
+-      SELECT CASE (xc_f90_info_kind (xc_info))
++      s1 = xc_f03_func_info_get_name(xc_info)
++      SELECT CASE (xc_f03_func_info_get_kind (xc_info))
+       CASE (XC_EXCHANGE); WRITE (s2, '(a)') "exchange"
+       CASE (XC_CORRELATION); WRITE (s2, '(a)') "correlation"
+       CASE (XC_EXCHANGE_CORRELATION); WRITE (s2, '(a)') "exchange-correlation"
+       CASE (XC_KINETIC); WRITE (s2, '(a)') "kinetic"
+       CASE default
+-         CPABORT(TRIM(func_name(ifunc_name))//": this XC_KIND is currently not supported.")
++         CPABORT(TRIM(func_name)//": this XC_KIND is currently not supported.")
+       END SELECT
+       IF (PRESENT(shortform)) THEN
+          shortform = TRIM(s1)//' ('//TRIM(s2)//')'
+       END IF
+       IF (PRESENT(reference)) THEN
+-         CALL xc_libxc_wrap_info_refs(xc_info, XC_UNPOLARIZED, sc, reference)
++         CALL xc_libxc_wrap_info_refs(xc_info, XC_UNPOLARIZED, func_scale, reference)
+       END IF
+       IF (PRESENT(needs)) THEN
+-         SELECT CASE (xc_f90_info_family (xc_info))
++         SELECT CASE (xc_f03_func_info_get_family (xc_info))
+          CASE (XC_FAMILY_LDA)
+             needs%rho = .TRUE.
+          CASE (XC_FAMILY_GGA, XC_FAMILY_HYB_GGA)
+@@ -180,11 +163,11 @@
+             needs%tau = .TRUE.
+             needs%laplace_rho = xc_libxc_wrap_needs_laplace(func_id)
+          CASE default
+-            CPABORT(TRIM(func_name(ifunc_name))//": this XC_FAMILY is currently not supported.")
++            CPABORT(TRIM(func_name)//": this XC_FAMILY is currently not supported.")
+          END SELECT
+       END IF
+       IF (PRESENT(max_deriv)) THEN
+-         SELECT CASE (xc_f90_info_family (xc_info))
++         SELECT CASE (xc_f03_func_info_get_family (xc_info))
+          CASE (XC_FAMILY_LDA)
+             max_deriv = 3
+          CASE (XC_FAMILY_GGA, XC_FAMILY_HYB_GGA)
+@@ -192,12 +175,17 @@
+          CASE (XC_FAMILY_MGGA)
+             max_deriv = 1
+          CASE default
+-            CPABORT(TRIM(func_name(ifunc_name))//": this XC_FAMILY is currently not supported.")
++            CPABORT(TRIM(func_name)//": this XC_FAMILY is currently not supported.")
+          END SELECT
+       END IF
+ 
+-      CALL xc_f90_func_end(xc_func)
++      CALL xc_f03_func_end(xc_func)
+ #else
++      MARK_USED(libxc_params)
++      MARK_USED(reference)
++      MARK_USED(shortform)
++      MARK_USED(needs)
++      MARK_USED(max_deriv)
+       CPABORT("In order to use libxc you need to download and install it")
+ #endif
+ 
+@@ -211,65 +199,59 @@
+ !> \param needs the components needed by this functional are set to
+ !>        true (does not set the unneeded components to false)
+ !> \param max_deriv maximum implemented derivative of the xc functional
+-!> \param ifunc_name the index of the functional as given in the input file
+ !> \author F. Tran
+ ! **************************************************************************************************
+-   SUBROUTINE libxc_lsd_info(libxc_params, reference, shortform, needs, max_deriv, ifunc_name)
++   SUBROUTINE libxc_lsd_info(libxc_params, reference, shortform, needs, max_deriv)
+ 
+       TYPE(section_vals_type), POINTER         :: libxc_params
+       CHARACTER(LEN=*), INTENT(OUT), OPTIONAL  :: reference, shortform
+       TYPE(xc_rho_cflags_type), &
+-         INTENT(inout), OPTIONAL                :: needs
++         INTENT(inout), OPTIONAL               :: needs
+       INTEGER, INTENT(out), OPTIONAL           :: max_deriv
+-      INTEGER, INTENT(in)                      :: ifunc_name
+ 
+       CHARACTER(len=*), PARAMETER :: routineN = 'libxc_lsd_info', &
+                                      routineP = moduleN//':'//routineN
+ 
+ #if defined (__LIBXC)
+-      CHARACTER(LEN=120)                       :: s1, s2
+-      CHARACTER(LEN=default_string_length), &
+-         DIMENSION(:), POINTER                  :: func_name
++      CHARACTER(LEN=128)                       :: s1, s2
++      CHARACTER(LEN=default_string_length)     :: func_name
+       INTEGER                                  :: func_id
+-      REAL(KIND=dp)                            :: sc
+-      REAL(KIND=dp), DIMENSION(:), POINTER     :: scale
+-      TYPE(xc_f90_pointer_t)                   :: xc_func, xc_info
++      REAL(KIND=dp)                            :: func_scale
++      TYPE(xc_f03_func_t)                      :: xc_func
++      TYPE(xc_f03_func_info_t)                 :: xc_info
+ 
+-      CALL section_vals_val_get(libxc_params, "functional", c_vals=func_name)
+-      CALL section_vals_val_get(libxc_params, "scale", r_vals=scale)
++      CALL section_vals_val_get(libxc_params, "functional", c_val=func_name)
++      CALL section_vals_val_get(libxc_params, "scale", r_val=func_scale)
+ 
+       CALL cite_reference(Marques2012)
++      CALL cite_reference(Lehtola2018)
+ 
+-      IF ((SIZE(scale) == 1) .AND. (ABS(SCALE(1)-1.0_dp) < 1.0e-10_dp)) THEN
+-         sc = 1.0_dp
+-      ELSE
+-         sc = SCALE(ifunc_name)
+-      ENDIF
++      IF (ABS(func_scale-1.0_dp) < 1.0e-10_dp) func_scale = 1.0_dp
+ 
+-      func_id = xc_libxc_wrap_functional_get_number(func_name(ifunc_name))
+-      CALL xc_libxc_wrap_functional_buggy(func_id)
++      func_id = xc_libxc_wrap_functional_get_number(func_name)
+ !$OMP CRITICAL(libxc_init)
+-      CALL xc_f90_func_init(xc_func, xc_info, func_id, XC_POLARIZED)
++      CALL xc_f03_func_init(xc_func, func_id, XC_POLARIZED)
++      xc_info = xc_f03_func_get_info(xc_func)
+ !$OMP END CRITICAL(libxc_init)
+ !$OMP BARRIER
+ 
+-      CALL xc_f90_info_name(xc_info, s1)
+-      SELECT CASE (xc_f90_info_kind (xc_info))
++      s1 = xc_f03_func_info_get_name(xc_info)
++      SELECT CASE (xc_f03_func_info_get_kind (xc_info))
+       CASE (XC_EXCHANGE); WRITE (s2, '(a)') "exchange"
+       CASE (XC_CORRELATION); WRITE (s2, '(a)') "correlation"
+       CASE (XC_EXCHANGE_CORRELATION); WRITE (s2, '(a)') "exchange-correlation"
+       CASE (XC_KINETIC); WRITE (s2, '(a)') "kinetic"
+       CASE default
+-         CPABORT(TRIM(func_name(ifunc_name))//": this XC_KIND is currently not supported.")
++         CPABORT(TRIM(func_name)//": this XC_KIND is currently not supported.")
+       END SELECT
+       IF (PRESENT(shortform)) THEN
+          shortform = TRIM(s1)//' ('//TRIM(s2)//')'
+       END IF
+       IF (PRESENT(reference)) THEN
+-         CALL xc_libxc_wrap_info_refs(xc_info, XC_POLARIZED, sc, reference)
++         CALL xc_libxc_wrap_info_refs(xc_info, XC_POLARIZED, func_scale, reference)
+       END IF
+       IF (PRESENT(needs)) THEN
+-         SELECT CASE (xc_f90_info_family (xc_info))
++         SELECT CASE (xc_f03_func_info_get_family (xc_info))
+          CASE (XC_FAMILY_LDA)
+             needs%rho_spin = .TRUE.
+          CASE (XC_FAMILY_GGA, XC_FAMILY_HYB_GGA)
+@@ -283,11 +265,11 @@
+             needs%tau_spin = .TRUE.
+             needs%laplace_rho_spin = xc_libxc_wrap_needs_laplace(func_id)
+          CASE default
+-            CPABORT(TRIM(func_name(ifunc_name))//": this XC_FAMILY is currently not supported.")
++            CPABORT(TRIM(func_name)//": this XC_FAMILY is currently not supported.")
+          END SELECT
+       END IF
+       IF (PRESENT(max_deriv)) THEN
+-         SELECT CASE (xc_f90_info_family (xc_info))
++         SELECT CASE (xc_f03_func_info_get_family (xc_info))
+          CASE (XC_FAMILY_LDA)
+             max_deriv = 3
+          CASE (XC_FAMILY_GGA, XC_FAMILY_HYB_GGA)
+@@ -295,12 +277,17 @@
+          CASE (XC_FAMILY_MGGA)
+             max_deriv = 1
+          CASE default
+-            CPABORT(TRIM(func_name(ifunc_name))//": this XC_FAMILY is currently not supported.")
++            CPABORT(TRIM(func_name)//": this XC_FAMILY is currently not supported.")
+          END SELECT
+       END IF
+ 
+-      CALL xc_f90_func_end(xc_func)
++      CALL xc_f03_func_end(xc_func)
+ #else
++      MARK_USED(libxc_params)
++      MARK_USED(reference)
++      MARK_USED(shortform)
++      MARK_USED(needs)
++      MARK_USED(max_deriv)
+       CPABORT("In order to use libxc you need to download and install it")
+ #endif
+ 
+@@ -335,28 +322,25 @@
+ !>        if positive all the derivatives up to the given degree are evaluated,
+ !>        if negative only the given degree is calculated
+ !> \param libxc_params input parameter (functional name, scaling and parameters)
+-!> \param ifunc_name the index of the functional as given in the input file
+ !> \author F. Tran
+ ! **************************************************************************************************
+-   SUBROUTINE libxc_lda_eval(rho_set, deriv_set, grad_deriv, libxc_params, ifunc_name)
++   SUBROUTINE libxc_lda_eval(rho_set, deriv_set, grad_deriv, libxc_params)
+ 
+       TYPE(xc_rho_set_type), POINTER           :: rho_set
+       TYPE(xc_derivative_set_type), POINTER    :: deriv_set
+       INTEGER, INTENT(in)                      :: grad_deriv
+       TYPE(section_vals_type), POINTER         :: libxc_params
+-      INTEGER, INTENT(in)                      :: ifunc_name
+ 
+       CHARACTER(len=*), PARAMETER :: routineN = 'libxc_lda_eval', &
+                                      routineP = moduleN//':'//routineN
+ 
+ #if defined (__LIBXC)
+-      CHARACTER(LEN=default_string_length), &
+-         DIMENSION(:), POINTER                  :: func_name
++      CHARACTER(LEN=default_string_length)     :: func_name
+       INTEGER                                  :: func_id, handle, npoints
+       INTEGER, DIMENSION(:, :), POINTER        :: bo
+       LOGICAL                                  :: has_laplace
+-      REAL(KIND=dp)                            :: epsilon_rho, epsilon_tau, sc
+-      REAL(KIND=dp), DIMENSION(:), POINTER     :: params, scale
++      REAL(KIND=dp)                            :: epsilon_rho, epsilon_tau, func_scale
++      REAL(KIND=dp), DIMENSION(:), POINTER     :: params
+       REAL(KIND=dp), DIMENSION(:, :, :), POINTER :: dummy, e_0, e_laplace_rho, &
+                                                     e_laplace_rho_laplace_rho, e_laplace_rho_tau, e_ndrho, &
+                                                     e_ndrho_laplace_rho, e_ndrho_ndrho, e_ndrho_rho, e_ndrho_tau, e_rho, &
+@@ -363,7 +347,8 @@
+                                                     e_rho_laplace_rho, e_rho_rho, e_rho_rho_rho, e_rho_tau, e_tau, &
+                                                     e_tau_tau, laplace_rho, norm_drho, rho, tau
+       TYPE(xc_derivative_type), POINTER        :: deriv
+-      TYPE(xc_f90_pointer_t)                   :: xc_func, xc_info
++      TYPE(xc_f03_func_t)                      :: xc_func
++      TYPE(xc_f03_func_info_t)                 :: xc_info
+ 
+       CALL timeset(routineN, handle)
+ 
+@@ -376,20 +361,16 @@
+       CPASSERT(ASSOCIATED(deriv_set))
+       CPASSERT(deriv_set%ref_count > 0)
+ 
+-      CALL section_vals_val_get(libxc_params, "functional", c_vals=func_name)
+-      CALL section_vals_val_get(libxc_params, "scale", r_vals=scale)
++      CALL section_vals_val_get(libxc_params, "functional", c_val=func_name)
++      CALL section_vals_val_get(libxc_params, "scale", r_val=func_scale)
+       CALL section_vals_val_get(libxc_params, "parameters", r_vals=params)
+ 
+-      IF ((SIZE(scale) == 1) .AND. (ABS(SCALE(1)-1.0_dp) < 1.0e-10_dp)) THEN
+-         sc = 1.0_dp
+-      ELSE
+-         sc = SCALE(ifunc_name)
+-      ENDIF
++      IF (ABS(func_scale-1.0_dp) < 1.0e-10_dp) func_scale = 1.0_dp
+ 
+-      func_id = xc_libxc_wrap_functional_get_number(func_name(ifunc_name))
+-      CALL xc_libxc_wrap_functional_buggy(func_id, grad_deriv=grad_deriv)
++      func_id = xc_libxc_wrap_functional_get_number(func_name)
+ !$OMP CRITICAL(libxc_init)
+-      CALL xc_f90_func_init(xc_func, xc_info, func_id, XC_UNPOLARIZED)
++      CALL xc_f03_func_init(xc_func, func_id, XC_UNPOLARIZED)
++      xc_info = xc_f03_func_get_info(xc_func)
+ !$OMP END CRITICAL(libxc_init)
+ !$OMP BARRIER
+ 
+@@ -434,7 +415,7 @@
+          CALL xc_derivative_get(deriv, deriv_data=e_0)
+       END IF
+       IF (grad_deriv >= 1 .OR. grad_deriv == -1) THEN
+-         SELECT CASE (xc_f90_info_family (xc_info))
++         SELECT CASE (xc_f03_func_info_get_family (xc_info))
+          CASE (XC_FAMILY_LDA)
+             deriv => xc_dset_get_derivative(deriv_set, "(rho)", &
+                                             allocate_deriv=.TRUE.)
+@@ -462,11 +443,11 @@
+                CALL xc_derivative_get(deriv, deriv_data=e_laplace_rho)
+             END IF
+          CASE default
+-            CPABORT(TRIM(func_name(ifunc_name))//": this XC_FAMILY is currently not supported.")
++            CPABORT(TRIM(func_name)//": this XC_FAMILY is currently not supported.")
+          END SELECT
+       END IF
+       IF (grad_deriv >= 2 .OR. grad_deriv == -2) THEN
+-         SELECT CASE (xc_f90_info_family (xc_info))
++         SELECT CASE (xc_f03_func_info_get_family (xc_info))
+          CASE (XC_FAMILY_LDA)
+             deriv => xc_dset_get_derivative(deriv_set, "(rho)(rho)", &
+                                             allocate_deriv=.TRUE.)
+@@ -518,11 +499,11 @@
+             !                CALL xc_derivative_get(deriv,deriv_data=e_laplace_rho_tau)
+             !             END IF
+          CASE default
+-            CPABORT(TRIM(func_name(ifunc_name))//": this XC_FAMILY is currently not supported.")
++            CPABORT(TRIM(func_name)//": this XC_FAMILY is currently not supported.")
+          END SELECT
+       END IF
+       IF (grad_deriv >= 3 .OR. grad_deriv == -3) THEN
+-         SELECT CASE (xc_f90_info_family (xc_info))
++         SELECT CASE (xc_f03_func_info_get_family (xc_info))
+          CASE (XC_FAMILY_LDA)
+             deriv => xc_dset_get_derivative(deriv_set, "(rho)(rho)(rho)", &
+                                             allocate_deriv=.TRUE.)
+@@ -530,7 +511,7 @@
+          CASE (XC_FAMILY_GGA, XC_FAMILY_HYB_GGA, XC_FAMILY_MGGA)
+             CPABORT("derivatives larger than 2 not implemented")
+          CASE default
+-            CPABORT(TRIM(func_name(ifunc_name))//": this XC_FAMILY is currently not supported.")
++            CPABORT(TRIM(func_name)//": this XC_FAMILY is currently not supported.")
+          END SELECT
+       END IF
+       IF (grad_deriv >= 4 .OR. grad_deriv <= -4) THEN
+@@ -544,7 +525,7 @@
+ !$OMP SHARED(e_laplace_rho_tau,e_tau_tau,e_rho_rho_rho),&
+ !$OMP SHARED(grad_deriv,npoints),&
+ !$OMP SHARED(epsilon_rho,epsilon_tau),&
+-!$OMP SHARED(func_name,ifunc_name,sc,params)
++!$OMP SHARED(func_name,func_scale,params)
+ 
+       CALL libxc_lda_calc(rho=rho, norm_drho=norm_drho, &
+                           laplace_rho=laplace_rho, tau=tau, &
+@@ -557,17 +538,21 @@
+                           e_rho_rho_rho=e_rho_rho_rho, &
+                           grad_deriv=grad_deriv, npoints=npoints, &
+                           epsilon_rho=epsilon_rho, &
+-                          epsilon_tau=epsilon_tau, func_name=func_name(ifunc_name), &
+-                          sc=sc, params=params)
++                          epsilon_tau=epsilon_tau, func_name=func_name, &
++                          sc=func_scale, params=params)
+ 
+ !$OMP END PARALLEL
+ 
+       NULLIFY (dummy)
+ 
+-      CALL xc_f90_func_end(xc_func)
++      CALL xc_f03_func_end(xc_func)
+ 
+       CALL timestop(handle)
+ #else
++      MARK_USED(rho_set)
++      MARK_USED(deriv_set)
++      MARK_USED(grad_deriv)
++      MARK_USED(libxc_params)
+       CPABORT("In order to use libxc you need to download and install it")
+ #endif
+    END SUBROUTINE libxc_lda_eval
+@@ -581,28 +566,25 @@
+ !>        if positive all the derivatives up to the given degree are evaluated,
+ !>        if negative only the given degree is calculated
+ !> \param libxc_params input parameter (functional name, scaling and parameters)
+-!> \param ifunc_name the index of the functional as given in the input file
+ !> \author F. Tran
+ ! **************************************************************************************************
+-   SUBROUTINE libxc_lsd_eval(rho_set, deriv_set, grad_deriv, libxc_params, ifunc_name)
++   SUBROUTINE libxc_lsd_eval(rho_set, deriv_set, grad_deriv, libxc_params)
+ 
+       TYPE(xc_rho_set_type), POINTER           :: rho_set
+       TYPE(xc_derivative_set_type), POINTER    :: deriv_set
+       INTEGER, INTENT(in)                      :: grad_deriv
+       TYPE(section_vals_type), POINTER         :: libxc_params
+-      INTEGER, INTENT(in)                      :: ifunc_name
+ 
+       CHARACTER(len=*), PARAMETER :: routineN = 'libxc_lsd_eval', &
+                                      routineP = moduleN//':'//routineN
+ 
+ #if defined (__LIBXC)
+-      CHARACTER(LEN=default_string_length), &
+-         DIMENSION(:), POINTER                  :: func_name
++      CHARACTER(LEN=default_string_length)     :: func_name
+       INTEGER                                  :: func_id, handle, npoints
+       INTEGER, DIMENSION(:, :), POINTER        :: bo
+       LOGICAL                                  :: has_laplace
+-      REAL(KIND=dp)                            :: epsilon_rho, epsilon_tau, sc
+-      REAL(KIND=dp), DIMENSION(:), POINTER     :: params, scale
++      REAL(KIND=dp)                            :: epsilon_rho, epsilon_tau, func_scale
++      REAL(KIND=dp), DIMENSION(:), POINTER     :: params
+       REAL(KIND=dp), DIMENSION(:, :, :), POINTER :: dummy, e_0, e_laplace_rhoa, &
+                                                     e_laplace_rhoa_laplace_rhoa, e_laplace_rhoa_laplace_rhob, &
+                                                     e_laplace_rhoa_tau_a, e_laplace_rhoa_tau_b, e_laplace_rhob, &
+@@ -623,7 +605,8 @@
+                                                     e_tau_a_tau_b, e_tau_b, e_tau_b_tau_b, laplace_rhoa, laplace_rhob, &
+                                                     norm_drho, norm_drhoa, norm_drhob, rhoa, rhob, tau_a, tau_b
+       TYPE(xc_derivative_type), POINTER        :: deriv
+-      TYPE(xc_f90_pointer_t)                   :: xc_func, xc_info
++      TYPE(xc_f03_func_t)                      :: xc_func
++      TYPE(xc_f03_func_info_t)                 :: xc_info
+ 
+       CALL timeset(routineN, handle)
+ 
+@@ -637,20 +620,16 @@
+       CPASSERT(ASSOCIATED(deriv_set))
+       CPASSERT(deriv_set%ref_count > 0)
+ 
+-      CALL section_vals_val_get(libxc_params, "functional", c_vals=func_name)
+-      CALL section_vals_val_get(libxc_params, "scale", r_vals=scale)
++      CALL section_vals_val_get(libxc_params, "functional", c_val=func_name)
++      CALL section_vals_val_get(libxc_params, "scale", r_val=func_scale)
+       CALL section_vals_val_get(libxc_params, "parameters", r_vals=params)
+ 
+-      IF ((SIZE(scale) == 1) .AND. (ABS(SCALE(1)-1.0_dp) < 1.0e-10_dp)) THEN
+-         sc = 1.0_dp
+-      ELSE
+-         sc = SCALE(ifunc_name)
+-      ENDIF
++      IF (ABS(func_scale-1.0_dp) < 1.0e-10_dp) func_scale = 1.0_dp
+ 
+-      func_id = xc_libxc_wrap_functional_get_number(func_name(ifunc_name))
+-      CALL xc_libxc_wrap_functional_buggy(func_id, grad_deriv=grad_deriv)
++      func_id = xc_libxc_wrap_functional_get_number(func_name)
+ !$OMP CRITICAL(libxc_init)
+-      CALL xc_f90_func_init(xc_func, xc_info, func_id, XC_POLARIZED)
++      CALL xc_f03_func_init(xc_func, func_id, XC_POLARIZED)
++      xc_info = xc_f03_func_get_info(xc_func)
+ !$OMP END CRITICAL(libxc_init)
+ !$OMP BARRIER
+ 
+@@ -744,7 +723,7 @@
+          CALL xc_derivative_get(deriv, deriv_data=e_0)
+       END IF
+       IF (grad_deriv >= 1 .OR. grad_deriv == -1) THEN
+-         SELECT CASE (xc_f90_info_family (xc_info))
++         SELECT CASE (xc_f03_func_info_get_family (xc_info))
+          CASE (XC_FAMILY_LDA)
+             deriv => xc_dset_get_derivative(deriv_set, "(rhoa)", &
+                                             allocate_deriv=.TRUE.)
+@@ -799,11 +778,11 @@
+                CALL xc_derivative_get(deriv, deriv_data=e_laplace_rhob)
+             END IF
+          CASE default
+-            CPABORT(TRIM(func_name(ifunc_name))//": this XC_FAMILY is currently not supported.")
++            CPABORT(TRIM(func_name)//": this XC_FAMILY is currently not supported.")
+          END SELECT
+       END IF
+       IF (grad_deriv >= 2 .OR. grad_deriv == -2) THEN
+-         SELECT CASE (xc_f90_info_family (xc_info))
++         SELECT CASE (xc_f03_func_info_get_family (xc_info))
+          CASE (XC_FAMILY_LDA)
+             deriv => xc_dset_get_derivative(deriv_set, "(rhoa)(rhoa)", &
+                                             allocate_deriv=.TRUE.)
+@@ -1002,11 +981,11 @@
+             !                CALL xc_derivative_get(deriv,deriv_data=e_laplace_rhob_tau_b)
+             !             END IF
+          CASE default
+-            CPABORT(TRIM(func_name(ifunc_name))//": this XC_FAMILY is currently not supported.")
++            CPABORT(TRIM(func_name)//": this XC_FAMILY is currently not supported.")
+          END SELECT
+       END IF
+       IF (grad_deriv >= 3 .OR. grad_deriv == -3) THEN
+-         SELECT CASE (xc_f90_info_family (xc_info))
++         SELECT CASE (xc_f03_func_info_get_family (xc_info))
+          CASE (XC_FAMILY_LDA)
+             deriv => xc_dset_get_derivative(deriv_set, "(rhoa)(rhoa)(rhoa)", &
+                                             allocate_deriv=.TRUE.)
+@@ -1023,7 +1002,7 @@
+          CASE (XC_FAMILY_GGA, XC_FAMILY_HYB_GGA, XC_FAMILY_MGGA)
+             CPABORT("derivatives larger than 2 not implemented")
+          CASE default
+-            CPABORT(TRIM(func_name(ifunc_name))//": this XC_FAMILY is currently not supported.")
++            CPABORT(TRIM(func_name)//": this XC_FAMILY is currently not supported.")
+          END SELECT
+       END IF
+       IF (grad_deriv >= 4 .OR. grad_deriv <= -4) THEN
+@@ -1052,7 +1031,7 @@
+ !$OMP SHARED(e_rhoa_rhoa_rhoa,e_rhoa_rhoa_rhob,e_rhoa_rhob_rhob,e_rhob_rhob_rhob),&
+ !$OMP SHARED(grad_deriv,npoints),&
+ !$OMP SHARED(epsilon_rho,epsilon_tau),&
+-!$OMP SHARED(func_name,ifunc_name,sc,params)
++!$OMP SHARED(func_name,func_scale,params)
+ 
+       CALL libxc_lsd_calc(rhoa=rhoa, rhob=rhob, norm_drho=norm_drho, &
+                           norm_drhoa=norm_drhoa, norm_drhob=norm_drhob, laplace_rhoa=laplace_rhoa, &
+@@ -1098,17 +1077,21 @@
+                           e_rhob_rhob_rhob=e_rhob_rhob_rhob, &
+                           grad_deriv=grad_deriv, npoints=npoints, &
+                           epsilon_rho=epsilon_rho, &
+-                          epsilon_tau=epsilon_tau, func_name=func_name(ifunc_name), &
+-                          sc=sc, params=params)
++                          epsilon_tau=epsilon_tau, func_name=func_name, &
++                          sc=func_scale, params=params)
+ 
+ !$OMP END PARALLEL
+ 
+       NULLIFY (dummy)
+ 
+-      CALL xc_f90_func_end(xc_func)
++      CALL xc_f03_func_end(xc_func)
+ 
+       CALL timestop(handle)
+ #else
++      MARK_USED(rho_set)
++      MARK_USED(deriv_set)
++      MARK_USED(grad_deriv)
++      MARK_USED(libxc_params)
+       CPABORT("In order to use libxc you need to download and install it")
+ #endif
+    END SUBROUTINE libxc_lsd_eval
+@@ -1146,6 +1129,7 @@
+ !> \param params parameters of the functional
+ !> \author F. Tran
+ ! **************************************************************************************************
++#if defined (__LIBXC)
+    SUBROUTINE libxc_lda_calc(rho, norm_drho, laplace_rho, tau, &
+                              e_0, e_rho, e_ndrho, e_laplace_rho, e_tau, e_rho_rho, e_ndrho_rho, &
+                              e_ndrho_ndrho, e_rho_laplace_rho, e_rho_tau, e_ndrho_laplace_rho, &
+@@ -1154,43 +1138,44 @@
+                              grad_deriv, npoints, epsilon_rho, &
+                              epsilon_tau, func_name, sc, params)
+ 
+-      REAL(KIND=dp), DIMENSION(*), INTENT(IN)  :: rho, norm_drho, laplace_rho, &
+-                                                  tau
+-      REAL(KIND=dp), DIMENSION(*), INTENT(INOUT) :: e_0, e_rho, e_ndrho, &
+-                                                    e_laplace_rho, e_tau, e_rho_rho, e_ndrho_rho, e_ndrho_ndrho, &
+-                                                    e_rho_laplace_rho, e_rho_tau, e_ndrho_laplace_rho, e_ndrho_tau, &
+-                                                    e_laplace_rho_laplace_rho, e_laplace_rho_tau, e_tau_tau, e_rho_rho_rho
+-      INTEGER, INTENT(in)                      :: grad_deriv, npoints
+-      REAL(KIND=dp), INTENT(in)                :: epsilon_rho, epsilon_tau
+-      CHARACTER(LEN=80), INTENT(IN)            :: func_name
+-      REAL(KIND=dp), INTENT(in)                :: sc
+-      REAL(KIND=dp), DIMENSION(*), INTENT(IN)  :: params
++      REAL(KIND=dp), DIMENSION(*), INTENT(IN)            :: rho, norm_drho, laplace_rho, tau
++      REAL(KIND=dp), DIMENSION(*), INTENT(INOUT) :: e_0, e_rho, e_ndrho, e_laplace_rho, e_tau, &
++         e_rho_rho, e_ndrho_rho, e_ndrho_ndrho, e_rho_laplace_rho, e_rho_tau, e_ndrho_laplace_rho, &
++         e_ndrho_tau, e_laplace_rho_laplace_rho, e_laplace_rho_tau, e_tau_tau, e_rho_rho_rho
++      INTEGER, INTENT(in)                                :: grad_deriv, npoints
++      REAL(KIND=dp), INTENT(in)                          :: epsilon_rho, epsilon_tau
++      CHARACTER(LEN=default_string_length), INTENT(IN)   :: func_name
++      REAL(KIND=dp), INTENT(in)                          :: sc
++      REAL(KIND=dp), DIMENSION(:), INTENT(IN), POINTER   :: params
+ 
+-      CHARACTER(len=*), PARAMETER :: routineN = 'libxc_lda_calc', &
+-                                     routineP = moduleN//':'//routineN
++      CHARACTER(len=*), PARAMETER :: routineN = 'libxc_lda_calc', routineP = moduleN//':'//routineN
+ 
+-#if defined (__LIBXC)
+-      INTEGER                                  :: func_id, ii
+-      LOGICAL                                  :: no_exc
+-      REAL(KIND=dp) :: exc, my_tau, v2lapl2, v2lapltau, v2rho2, v2rholapl, &
+-                       v2rhosigma, v2rhotau, v2sigma2, v2sigmalapl, v2sigmatau, v2tau2, &
+-                       v3rho3, vlapl, vrho, vsigma, vtau
+-      TYPE(xc_f90_pointer_t)                   :: xc_func, xc_info
++      INTEGER                                            :: func_id, ii
++      LOGICAL                                            :: no_exc
++      REAL(KIND=dp), DIMENSION(1) :: exc, my_tau, sigma, v2lapl2, v2lapltau, v2rho2, v2rholapl, &
++         v2rhosigma, v2rhotau, v2sigma2, v2sigmalapl, v2sigmatau, v2tau2, v3rho3, vlapl, vrho, &
++         vsigma, vtau
++      TYPE(xc_f03_func_info_t)                           :: xc_info
++      TYPE(xc_f03_func_t)                                :: xc_func
+ 
++      ! init vlapl (prevent libxc-4.0.x bug)
++      vlapl = 0.0_dp
++
+       func_id = xc_libxc_wrap_functional_get_number(func_name)
+ !$OMP CRITICAL(libxc_init)
+-      CALL xc_f90_func_init(xc_func, xc_info, func_id, XC_UNPOLARIZED)
+-      CALL xc_libxc_wrap_functional_set_params(xc_func, xc_info, func_id, params, no_exc)
++      CALL xc_f03_func_init(xc_func, func_id, XC_UNPOLARIZED)
++      xc_info = xc_f03_func_get_info(xc_func)
++      CALL xc_libxc_wrap_functional_set_params(xc_func, xc_info, params, no_exc)
+ !$OMP END CRITICAL(libxc_init)
+ !$OMP BARRIER
+-      SELECT CASE (xc_f90_info_family (xc_info))
++      SELECT CASE (xc_f03_func_info_get_family (xc_info))
+       CASE (XC_FAMILY_LDA)
+          IF (grad_deriv == 0) THEN
+ !$OMP           DO
+             DO ii = 1, npoints
+                IF (rho(ii) > epsilon_rho) THEN
+-                  CALL xc_f90_lda_exc(xc_func, 1, rho(ii), exc)
+-                  e_0(ii) = e_0(ii)+sc*exc*rho(ii)
++                  CALL xc_f03_lda_exc(xc_func, 1, rho(ii), exc)
++                  e_0(ii) = e_0(ii)+sc*exc(1)*rho(ii)
+                END IF
+             END DO
+ !$OMP           END DO
+@@ -1198,8 +1183,8 @@
+ !$OMP           DO
+             DO ii = 1, npoints
+                IF (rho(ii) > epsilon_rho) THEN
+-                  CALL xc_f90_lda_vxc(xc_func, 1, rho(ii), vrho)
+-                  e_rho(ii) = e_rho(ii)+sc*vrho
++                  CALL xc_f03_lda_vxc(xc_func, 1, rho(ii), vrho)
++                  e_rho(ii) = e_rho(ii)+sc*vrho(1)
+                END IF
+             END DO
+ !$OMP           END DO
+@@ -1207,9 +1192,9 @@
+ !$OMP           DO
+             DO ii = 1, npoints
+                IF (rho(ii) > epsilon_rho) THEN
+-                  CALL xc_f90_lda_exc_vxc(xc_func, 1, rho(ii), exc, vrho)
+-                  e_0(ii) = e_0(ii)+sc*exc*rho(ii)
+-                  e_rho(ii) = e_rho(ii)+sc*vrho
++                  CALL xc_f03_lda_exc_vxc(xc_func, 1, rho(ii), exc, vrho)
++                  e_0(ii) = e_0(ii)+sc*exc(1)*rho(ii)
++                  e_rho(ii) = e_rho(ii)+sc*vrho(1)
+                END IF
+             END DO
+ !$OMP           END DO
+@@ -1217,8 +1202,8 @@
+ !$OMP           DO
+             DO ii = 1, npoints
+                IF (rho(ii) > epsilon_rho) THEN
+-                  CALL xc_f90_lda_fxc(xc_func, 1, rho(ii), v2rho2)
+-                  e_rho_rho(ii) = e_rho_rho(ii)+sc*v2rho2
++                  CALL xc_f03_lda_fxc(xc_func, 1, rho(ii), v2rho2)
++                  e_rho_rho(ii) = e_rho_rho(ii)+sc*v2rho2(1)
+                END IF
+             END DO
+ !$OMP           END DO
+@@ -1226,11 +1211,11 @@
+ !$OMP           DO
+             DO ii = 1, npoints
+                IF (rho(ii) > epsilon_rho) THEN
+-                  CALL xc_f90_lda_exc_vxc(xc_func, 1, rho(ii), exc, vrho)
+-                  CALL xc_f90_lda_fxc(xc_func, 1, rho(ii), v2rho2)
+-                  e_0(ii) = e_0(ii)+sc*exc*rho(ii)
+-                  e_rho(ii) = e_rho(ii)+sc*vrho
+-                  e_rho_rho(ii) = e_rho_rho(ii)+sc*v2rho2
++                  CALL xc_f03_lda_exc_vxc(xc_func, 1, rho(ii), exc, vrho)
++                  CALL xc_f03_lda_fxc(xc_func, 1, rho(ii), v2rho2)
++                  e_0(ii) = e_0(ii)+sc*exc(1)*rho(ii)
++                  e_rho(ii) = e_rho(ii)+sc*vrho(1)
++                  e_rho_rho(ii) = e_rho_rho(ii)+sc*v2rho2(1)
+                END IF
+             END DO
+ !$OMP           END DO
+@@ -1238,8 +1223,8 @@
+ !$OMP           DO
+             DO ii = 1, npoints
+                IF (rho(ii) > epsilon_rho) THEN
+-                  CALL xc_f90_lda_kxc(xc_func, 1, rho(ii), v3rho3)
+-                  e_rho_rho_rho(ii) = e_rho_rho_rho(ii)+sc*v3rho3
++                  CALL xc_f03_lda_kxc(xc_func, 1, rho(ii), v3rho3)
++                  e_rho_rho_rho(ii) = e_rho_rho_rho(ii)+sc*v3rho3(1)
+                END IF
+             END DO
+ !$OMP           END DO
+@@ -1247,11 +1232,11 @@
+ !$OMP           DO
+             DO ii = 1, npoints
+                IF (rho(ii) > epsilon_rho) THEN
+-                  CALL xc_f90_lda(xc_func, 1, rho(ii), exc, vrho, v2rho2, v3rho3)
+-                  e_0(ii) = e_0(ii)+sc*exc*rho(ii)
+-                  e_rho(ii) = e_rho(ii)+sc*vrho
+-                  e_rho_rho(ii) = e_rho_rho(ii)+sc*v2rho2
+-                  e_rho_rho_rho(ii) = e_rho_rho_rho(ii)+sc*v3rho3
++                  CALL xc_f03_lda(xc_func, 1, rho(ii), exc, vrho, v2rho2, v3rho3)
++                  e_0(ii) = e_0(ii)+sc*exc(1)*rho(ii)
++                  e_rho(ii) = e_rho(ii)+sc*vrho(1)
++                  e_rho_rho(ii) = e_rho_rho(ii)+sc*v2rho2(1)
++                  e_rho_rho_rho(ii) = e_rho_rho_rho(ii)+sc*v3rho3(1)
+                END IF
+             END DO
+ !$OMP           END DO
+@@ -1261,8 +1246,9 @@
+ !$OMP           DO
+             DO ii = 1, npoints
+                IF (rho(ii) > epsilon_rho) THEN
+-                  CALL xc_f90_gga_exc(xc_func, 1, rho(ii), norm_drho(ii)**2, exc)
+-                  e_0(ii) = e_0(ii)+sc*exc*rho(ii)
++                  sigma = norm_drho(ii)**2
++                  CALL xc_f03_gga_exc(xc_func, 1, rho(ii), sigma, exc)
++                  e_0(ii) = e_0(ii)+sc*exc(1)*rho(ii)
+                END IF
+             END DO
+ !$OMP           END DO
+@@ -1270,9 +1256,10 @@
+ !$OMP           DO
+             DO ii = 1, npoints
+                IF (rho(ii) > epsilon_rho) THEN
+-                  CALL xc_f90_gga_vxc(xc_func, 1, rho(ii), norm_drho(ii)**2, vrho, vsigma)
+-                  e_rho(ii) = e_rho(ii)+sc*vrho
+-                  e_ndrho(ii) = e_ndrho(ii)+sc*2.0_dp*vsigma*norm_drho(ii)
++                  sigma = norm_drho(ii)**2
++                  CALL xc_f03_gga_vxc(xc_func, 1, rho(ii), sigma, vrho, vsigma)
++                  e_rho(ii) = e_rho(ii)+sc*vrho(1)
++                  e_ndrho(ii) = e_ndrho(ii)+sc*2.0_dp*vsigma(1)*norm_drho(ii)
+                END IF
+             END DO
+ !$OMP           END DO
+@@ -1280,16 +1267,17 @@
+ !$OMP           DO
+             DO ii = 1, npoints
+                IF (rho(ii) > epsilon_rho) THEN
++                  sigma = norm_drho(ii)**2
+                   IF (no_exc) THEN
+-                     CALL xc_f90_gga_vxc(xc_func, 1, rho(ii), norm_drho(ii)**2, vrho, vsigma)
++                     CALL xc_f03_gga_vxc(xc_func, 1, rho(ii), sigma, vrho, vsigma)
+                      exc = 0.0_dp
+                   ELSE
+-                     CALL xc_f90_gga_exc_vxc(xc_func, 1, rho(ii), norm_drho(ii)**2, &
++                     CALL xc_f03_gga_exc_vxc(xc_func, 1, rho(ii), sigma, &
+                                              exc, vrho, vsigma)
+                   END IF
+-                  e_0(ii) = e_0(ii)+sc*exc*rho(ii)
+-                  e_rho(ii) = e_rho(ii)+sc*vrho
+-                  e_ndrho(ii) = e_ndrho(ii)+sc*2.0_dp*vsigma*norm_drho(ii)
++                  e_0(ii) = e_0(ii)+sc*exc(1)*rho(ii)
++                  e_rho(ii) = e_rho(ii)+sc*vrho(1)
++                  e_ndrho(ii) = e_ndrho(ii)+sc*2.0_dp*vsigma(1)*norm_drho(ii)
+                END IF
+             END DO
+ !$OMP           END DO
+@@ -1297,20 +1285,21 @@
+ !$OMP           DO
+             DO ii = 1, npoints
+                IF (rho(ii) > epsilon_rho) THEN
++                  sigma = norm_drho(ii)**2
+                   IF (no_exc) THEN
+-                     CALL xc_f90_gga_vxc(xc_func, 1, rho(ii), norm_drho(ii)**2, vrho, vsigma)
+-                     CALL xc_f90_gga_fxc(xc_func, 1, rho(ii), norm_drho(ii)**2, &
++                     CALL xc_f03_gga_vxc(xc_func, 1, rho(ii), sigma, vrho, vsigma)
++                     CALL xc_f03_gga_fxc(xc_func, 1, rho(ii), sigma, &
+                                          v2rho2, v2rhosigma, v2sigma2)
+                   ELSE
+-                     CALL xc_f90_gga_exc_vxc(xc_func, 1, rho(ii), norm_drho(ii)**2, &
++                     CALL xc_f03_gga_exc_vxc(xc_func, 1, rho(ii), sigma, &
+                                              exc, vrho, vsigma)
+-                     CALL xc_f90_gga_fxc(xc_func, 1, rho(ii), norm_drho(ii)**2, &
++                     CALL xc_f03_gga_fxc(xc_func, 1, rho(ii), sigma, &
+                                          v2rho2, v2rhosigma, v2sigma2)
+                   END IF
+-                  e_rho_rho(ii) = e_rho_rho(ii)+sc*v2rho2
+-                  e_ndrho_rho(ii) = e_ndrho_rho(ii)+sc*2.0_dp*v2rhosigma*norm_drho(ii)
++                  e_rho_rho(ii) = e_rho_rho(ii)+sc*v2rho2(1)
++                  e_ndrho_rho(ii) = e_ndrho_rho(ii)+sc*2.0_dp*v2rhosigma(1)*norm_drho(ii)
+                   e_ndrho_ndrho(ii) = e_ndrho_ndrho(ii)+ &
+-                                      sc*2.0_dp*(2.0_dp*norm_drho(ii)**2*v2sigma2+vsigma)
++                                      sc*2.0_dp*(2.0_dp*sigma(1)*v2sigma2(1)+vsigma(1))
+                END IF
+             END DO
+ !$OMP           END DO
+@@ -1318,24 +1307,25 @@
+ !$OMP           DO
+             DO ii = 1, npoints
+                IF (rho(ii) > epsilon_rho) THEN
++                  sigma = norm_drho(ii)**2
+                   IF (no_exc) THEN
+-                     CALL xc_f90_gga_vxc(xc_func, 1, rho(ii), norm_drho(ii)**2, vrho, vsigma)
+-                     CALL xc_f90_gga_fxc(xc_func, 1, rho(ii), norm_drho(ii)**2, &
++                     CALL xc_f03_gga_vxc(xc_func, 1, rho(ii), sigma, vrho, vsigma)
++                     CALL xc_f03_gga_fxc(xc_func, 1, rho(ii), sigma, &
+                                          v2rho2, v2rhosigma, v2sigma2)
+                      exc = 0.0_dp
+                   ELSE
+-                     CALL xc_f90_gga_exc_vxc(xc_func, 1, rho(ii), norm_drho(ii)**2, &
++                     CALL xc_f03_gga_exc_vxc(xc_func, 1, rho(ii), sigma, &
+                                              exc, vrho, vsigma)
+-                     CALL xc_f90_gga_fxc(xc_func, 1, rho(ii), norm_drho(ii)**2, &
++                     CALL xc_f03_gga_fxc(xc_func, 1, rho(ii), sigma, &
+                                          v2rho2, v2rhosigma, v2sigma2)
+                   END IF
+-                  e_0(ii) = e_0(ii)+sc*exc*rho(ii)
+-                  e_rho(ii) = e_rho(ii)+sc*vrho
+-                  e_ndrho(ii) = e_ndrho(ii)+sc*2.0_dp*vsigma*norm_drho(ii)
+-                  e_rho_rho(ii) = e_rho_rho(ii)+sc*v2rho2
+-                  e_ndrho_rho(ii) = e_ndrho_rho(ii)+sc*2.0_dp*v2rhosigma*norm_drho(ii)
++                  e_0(ii) = e_0(ii)+sc*exc(1)*rho(ii)
++                  e_rho(ii) = e_rho(ii)+sc*vrho(1)
++                  e_ndrho(ii) = e_ndrho(ii)+sc*2.0_dp*vsigma(1)*norm_drho(ii)
++                  e_rho_rho(ii) = e_rho_rho(ii)+sc*v2rho2(1)
++                  e_ndrho_rho(ii) = e_ndrho_rho(ii)+sc*2.0_dp*v2rhosigma(1)*norm_drho(ii)
+                   e_ndrho_ndrho(ii) = e_ndrho_ndrho(ii)+ &
+-                                      sc*2.0_dp*(2.0_dp*norm_drho(ii)**2*v2sigma2+vsigma)
++                                      sc*2.0_dp*(2.0_dp*sigma(1)*v2sigma2(1)+vsigma(1))
+                END IF
+             END DO
+ !$OMP           END DO
+@@ -1345,10 +1335,11 @@
+ !$OMP           DO
+             DO ii = 1, npoints
+                IF ((rho(ii) > epsilon_rho) .AND. (tau(ii) > epsilon_tau)) THEN
+-                  my_tau = MAX(tau(ii), norm_drho(ii)**2/(8.0_dp*rho(ii)))
+-                  CALL xc_f90_mgga_exc(xc_func, 1, rho(ii), norm_drho(ii)**2, &
++                  sigma = norm_drho(ii)**2
++                  my_tau = MAX(tau(ii), sigma(1)/(8.0_dp*rho(ii)))
++                  CALL xc_f03_mgga_exc(xc_func, 1, rho(ii), sigma, &
+                                        laplace_rho(ii), my_tau, exc)
+-                  e_0(ii) = e_0(ii)+sc*exc*rho(ii)
++                  e_0(ii) = e_0(ii)+sc*exc(1)*rho(ii)
+                END IF
+             END DO
+ !$OMP           END DO
+@@ -1356,13 +1347,14 @@
+ !$OMP           DO
+             DO ii = 1, npoints
+                IF ((rho(ii) > epsilon_rho) .AND. (tau(ii) > epsilon_tau)) THEN
+-                  my_tau = MAX(tau(ii), norm_drho(ii)**2/(8.0_dp*rho(ii)))
+-                  CALL xc_f90_mgga_vxc(xc_func, 1, rho(ii), norm_drho(ii)**2, &
++                  sigma = norm_drho(ii)**2
++                  my_tau = MAX(tau(ii), sigma(1)/(8.0_dp*rho(ii)))
++                  CALL xc_f03_mgga_vxc(xc_func, 1, rho(ii), sigma, &
+                                        laplace_rho(ii), my_tau, vrho, vsigma, vlapl, vtau)
+-                  e_rho(ii) = e_rho(ii)+sc*vrho
+-                  e_ndrho(ii) = e_ndrho(ii)+sc*2.0_dp*vsigma*norm_drho(ii)
+-                  e_laplace_rho(ii) = e_laplace_rho(ii)+sc*vlapl
+-                  e_tau(ii) = e_tau(ii)+sc*vtau
++                  e_rho(ii) = e_rho(ii)+sc*vrho(1)
++                  e_ndrho(ii) = e_ndrho(ii)+sc*2.0_dp*vsigma(1)*norm_drho(ii)
++                  e_laplace_rho(ii) = e_laplace_rho(ii)+sc*vlapl(1)
++                  e_tau(ii) = e_tau(ii)+sc*vtau(1)
+                END IF
+             END DO
+ !$OMP           END DO
+@@ -1370,20 +1362,21 @@
+ !$OMP           DO
+             DO ii = 1, npoints
+                IF ((rho(ii) > epsilon_rho) .AND. (tau(ii) > epsilon_tau)) THEN
+-                  my_tau = MAX(tau(ii), norm_drho(ii)**2/(8.0_dp*rho(ii)))
++                  sigma = norm_drho(ii)**2
++                  my_tau = MAX(tau(ii), sigma(1)/(8.0_dp*rho(ii)))
+                   IF (no_exc) THEN
+-                     CALL xc_f90_mgga_vxc(xc_func, 1, rho(ii), norm_drho(ii)**2, &
++                     CALL xc_f03_mgga_vxc(xc_func, 1, rho(ii), sigma, &
+                                           laplace_rho(ii), my_tau, vrho, vsigma, vlapl, vtau)
+                      exc = 0.0_dp
+                   ELSE
+-                     CALL xc_f90_mgga_exc_vxc(xc_func, 1, rho(ii), norm_drho(ii)**2, &
++                     CALL xc_f03_mgga_exc_vxc(xc_func, 1, rho(ii), sigma, &
+                                               laplace_rho(ii), my_tau, exc, vrho, vsigma, vlapl, vtau)
+                   END IF
+-                  e_0(ii) = e_0(ii)+sc*exc*rho(ii)
+-                  e_rho(ii) = e_rho(ii)+sc*vrho
+-                  e_ndrho(ii) = e_ndrho(ii)+sc*2.0_dp*vsigma*norm_drho(ii)
+-                  e_laplace_rho(ii) = e_laplace_rho(ii)+sc*vlapl
+-                  e_tau(ii) = e_tau(ii)+sc*vtau
++                  e_0(ii) = e_0(ii)+sc*exc(1)*rho(ii)
++                  e_rho(ii) = e_rho(ii)+sc*vrho(1)
++                  e_ndrho(ii) = e_ndrho(ii)+sc*2.0_dp*vsigma(1)*norm_drho(ii)
++                  e_laplace_rho(ii) = e_laplace_rho(ii)+sc*vlapl(1)
++                  e_tau(ii) = e_tau(ii)+sc*vtau(1)
+                END IF
+             END DO
+ !$OMP           END DO
+@@ -1391,32 +1384,33 @@
+ !$OMP           DO
+             DO ii = 1, npoints
+                IF ((rho(ii) > epsilon_rho) .AND. (tau(ii) > epsilon_tau)) THEN
+-                  my_tau = MAX(tau(ii), norm_drho(ii)**2/(8.0_dp*rho(ii)))
++                  sigma = norm_drho(ii)**2
++                  my_tau = MAX(tau(ii), sigma(1)/(8.0_dp*rho(ii)))
+                   IF (no_exc) THEN
+-                     CALL xc_f90_mgga_vxc(xc_func, 1, rho(ii), norm_drho(ii)**2, &
++                     CALL xc_f03_mgga_vxc(xc_func, 1, rho(ii), sigma, &
+                                           laplace_rho(ii), my_tau, vrho, vsigma, vlapl, vtau)
+-                     CALL xc_f90_mgga_fxc(xc_func, 1, rho(ii), norm_drho(ii)**2, &
++                     CALL xc_f03_mgga_fxc(xc_func, 1, rho(ii), sigma, &
+                                           laplace_rho(ii), my_tau, &
+                                           v2rho2, v2sigma2, v2lapl2, v2tau2, v2rhosigma, v2rholapl, &
+                                           v2rhotau, v2sigmalapl, v2sigmatau, v2lapltau)
+                   ELSE
+-                     CALL xc_f90_mgga(xc_func, 1, rho(ii), norm_drho(ii)**2, &
++                     CALL xc_f03_mgga(xc_func, 1, rho(ii), sigma, &
+                                       laplace_rho(ii), my_tau, exc, vrho, vsigma, vlapl, vtau, &
+                                       v2rho2, v2sigma2, v2lapl2, v2tau2, v2rhosigma, v2rholapl, &
+                                       v2rhotau, v2sigmalapl, v2sigmatau, v2lapltau)
+                   END IF
+-                  e_rho_rho(ii) = e_rho_rho(ii)+sc*v2rho2
+-                  e_ndrho_rho(ii) = e_ndrho_rho(ii)+sc*2.0_dp*v2rhosigma*norm_drho(ii)
++                  e_rho_rho(ii) = e_rho_rho(ii)+sc*v2rho2(1)
++                  e_ndrho_rho(ii) = e_ndrho_rho(ii)+sc*2.0_dp*v2rhosigma(1)*norm_drho(ii)
+                   e_ndrho_ndrho(ii) = e_ndrho_ndrho(ii)+ &
+-                                      sc*2.0_dp*(2.0_dp*norm_drho(ii)**2*v2sigma2+vsigma)
+-                  e_rho_laplace_rho(ii) = e_rho_laplace_rho(ii)+sc*v2rholapl
+-                  e_rho_tau(ii) = e_rho_tau(ii)+sc*v2rhotau
++                                      sc*2.0_dp*(2.0_dp*sigma(1)*v2sigma2(1)+vsigma(1))
++                  e_rho_laplace_rho(ii) = e_rho_laplace_rho(ii)+sc*v2rholapl(1)
++                  e_rho_tau(ii) = e_rho_tau(ii)+sc*v2rhotau(1)
+                   e_ndrho_laplace_rho(ii) = e_ndrho_laplace_rho(ii)+ &
+-                                            sc*2.0_dp*v2sigmalapl*norm_drho(ii)
+-                  e_ndrho_tau(ii) = e_ndrho_tau(ii)+sc*2.0_dp*v2sigmatau*norm_drho(ii)
+-                  e_laplace_rho_laplace_rho(ii) = e_laplace_rho_laplace_rho(ii)+sc*v2lapl2
+-                  e_laplace_rho_tau(ii) = e_laplace_rho_tau(ii)+sc*v2lapltau
+-                  e_tau_tau(ii) = e_tau_tau(ii)+sc*v2tau2
++                                            sc*2.0_dp*v2sigmalapl(1)*norm_drho(ii)
++                  e_ndrho_tau(ii) = e_ndrho_tau(ii)+sc*2.0_dp*v2sigmatau(1)*norm_drho(ii)
++                  e_laplace_rho_laplace_rho(ii) = e_laplace_rho_laplace_rho(ii)+sc*v2lapl2(1)
++                  e_laplace_rho_tau(ii) = e_laplace_rho_tau(ii)+sc*v2lapltau(1)
++                  e_tau_tau(ii) = e_tau_tau(ii)+sc*v2tau2(1)
+                END IF
+             END DO
+ !$OMP           END DO
+@@ -1424,38 +1418,39 @@
+ !$OMP           DO
+             DO ii = 1, npoints
+                IF ((rho(ii) > epsilon_rho) .AND. (tau(ii) > epsilon_tau)) THEN
+-                  my_tau = MAX(tau(ii), norm_drho(ii)**2/(8.0_dp*rho(ii)))
++                  sigma = norm_drho(ii)**2
++                  my_tau = MAX(tau(ii), sigma(1)/(8.0_dp*rho(ii)))
+                   IF (no_exc) THEN
+-                     CALL xc_f90_mgga_vxc(xc_func, 1, rho(ii), norm_drho(ii)**2, &
++                     CALL xc_f03_mgga_vxc(xc_func, 1, rho(ii), sigma, &
+                                           laplace_rho(ii), my_tau, vrho, vsigma, vlapl, vtau)
+-                     CALL xc_f90_mgga_fxc(xc_func, 1, rho(ii), norm_drho(ii)**2, &
++                     CALL xc_f03_mgga_fxc(xc_func, 1, rho(ii), sigma, &
+                                           laplace_rho(ii), my_tau, &
+                                           v2rho2, v2sigma2, v2lapl2, v2tau2, v2rhosigma, v2rholapl, &
+                                           v2rhotau, v2sigmalapl, v2sigmatau, v2lapltau)
+                      exc = 0.0_dp
+                   ELSE
+-                     CALL xc_f90_mgga(xc_func, 1, rho(ii), norm_drho(ii)**2, &
++                     CALL xc_f03_mgga(xc_func, 1, rho(ii), sigma, &
+                                       laplace_rho(ii), my_tau, exc, vrho, vsigma, vlapl, vtau, &
+                                       v2rho2, v2sigma2, v2lapl2, v2tau2, v2rhosigma, v2rholapl, &
+                                       v2rhotau, v2sigmalapl, v2sigmatau, v2lapltau)
+                   END IF
+-                  e_0(ii) = e_0(ii)+sc*exc*rho(ii)
+-                  e_rho(ii) = e_rho(ii)+sc*vrho
+-                  e_ndrho(ii) = e_ndrho(ii)+sc*2.0_dp*vsigma*norm_drho(ii)
+-                  e_laplace_rho(ii) = e_laplace_rho(ii)+sc*vlapl
+-                  e_tau(ii) = e_tau(ii)+sc*vtau
+-                  e_rho_rho(ii) = e_rho_rho(ii)+sc*v2rho2
+-                  e_ndrho_rho(ii) = e_ndrho_rho(ii)+sc*2.0_dp*v2rhosigma*norm_drho(ii)
++                  e_0(ii) = e_0(ii)+sc*exc(1)*rho(ii)
++                  e_rho(ii) = e_rho(ii)+sc*vrho(1)
++                  e_ndrho(ii) = e_ndrho(ii)+sc*2.0_dp*vsigma(1)*norm_drho(ii)
++                  e_laplace_rho(ii) = e_laplace_rho(ii)+sc*vlapl(1)
++                  e_tau(ii) = e_tau(ii)+sc*vtau(1)
++                  e_rho_rho(ii) = e_rho_rho(ii)+sc*v2rho2(1)
++                  e_ndrho_rho(ii) = e_ndrho_rho(ii)+sc*2.0_dp*v2rhosigma(1)*norm_drho(ii)
+                   e_ndrho_ndrho(ii) = e_ndrho_ndrho(ii)+ &
+-                                      sc*2.0_dp*(2.0_dp*norm_drho(ii)**2*v2sigma2+vsigma)
+-                  e_rho_laplace_rho(ii) = e_rho_laplace_rho(ii)+sc*v2rholapl
+-                  e_rho_tau(ii) = e_rho_tau(ii)+sc*v2rhotau
++                                      sc*2.0_dp*(2.0_dp*sigma(1)*v2sigma2(1)+vsigma(1))
++                  e_rho_laplace_rho(ii) = e_rho_laplace_rho(ii)+sc*v2rholapl(1)
++                  e_rho_tau(ii) = e_rho_tau(ii)+sc*v2rhotau(1)
+                   e_ndrho_laplace_rho(ii) = e_ndrho_laplace_rho(ii)+ &
+-                                            sc*2.0_dp*v2sigmalapl*norm_drho(ii)
+-                  e_ndrho_tau(ii) = e_ndrho_tau(ii)+sc*2.0_dp*v2sigmatau*norm_drho(ii)
+-                  e_laplace_rho_laplace_rho(ii) = e_laplace_rho_laplace_rho(ii)+sc*v2lapl2
+-                  e_laplace_rho_tau(ii) = e_laplace_rho_tau(ii)+sc*v2lapltau
+-                  e_tau_tau(ii) = e_tau_tau(ii)+sc*v2tau2
++                                            sc*2.0_dp*v2sigmalapl(1)*norm_drho(ii)
++                  e_ndrho_tau(ii) = e_ndrho_tau(ii)+sc*2.0_dp*v2sigmatau(1)*norm_drho(ii)
++                  e_laplace_rho_laplace_rho(ii) = e_laplace_rho_laplace_rho(ii)+sc*v2lapl2(1)
++                  e_laplace_rho_tau(ii) = e_laplace_rho_tau(ii)+sc*v2lapltau(1)
++                  e_tau_tau(ii) = e_tau_tau(ii)+sc*v2tau2(1)
+                END IF
+             END DO
+ !$OMP           END DO
+@@ -1464,12 +1459,10 @@
+          CPABORT(TRIM(func_name)//": this XC_FAMILY is currently not supported.")
+       END SELECT
+ 
+-      CALL xc_f90_func_end(xc_func)
+-#else
+-      CPABORT("In order to use libxc you need to download and install it")
+-#endif
++      CALL xc_f03_func_end(xc_func)
+ 
+    END SUBROUTINE libxc_lda_calc
++#endif
+ 
+ ! **************************************************************************************************
+ !> \brief libxc exchange-correlation functionals
+@@ -1552,6 +1545,7 @@
+ !> \param params parameters of the functional
+ !> \author F. Tran
+ ! **************************************************************************************************
++#if defined (__LIBXC)
+    SUBROUTINE libxc_lsd_calc(rhoa, rhob, norm_drho, norm_drhoa, &
+                              norm_drhob, laplace_rhoa, laplace_rhob, tau_a, tau_b, &
+                              e_0, e_rhoa, e_rhob, e_ndrho, e_ndrhoa, e_ndrhob, &
+@@ -1581,63 +1575,56 @@
+                              grad_deriv, npoints, epsilon_rho, &
+                              epsilon_tau, func_name, sc, params)
+ 
+-      REAL(KIND=dp), DIMENSION(*), INTENT(IN)  :: rhoa, rhob, norm_drho, &
+-                                                  norm_drhoa, norm_drhob, &
+-                                                  laplace_rhoa, laplace_rhob, &
+-                                                  tau_a, tau_b
+-      REAL(KIND=dp), DIMENSION(*), INTENT(INOUT) :: e_0, e_rhoa, e_rhob, &
+-                                                    e_ndrho, e_ndrhoa, e_ndrhob, e_laplace_rhoa, e_laplace_rhob, e_tau_a, &
+-                                                    e_tau_b, e_rhoa_rhoa, e_rhoa_rhob, e_rhob_rhob, e_ndrho_rhoa, &
+-                                                    e_ndrho_rhob, e_ndrhoa_rhoa, e_ndrhoa_rhob, e_ndrhob_rhoa, &
+-                                                    e_ndrhob_rhob, e_ndrho_ndrho, e_ndrho_ndrhoa, e_ndrho_ndrhob, &
+-                                                    e_ndrhoa_ndrhoa, e_ndrhoa_ndrhob, e_ndrhob_ndrhob, e_rhoa_laplace_rhoa, &
+-                                                    e_rhoa_laplace_rhob, e_rhob_laplace_rhoa, e_rhob_laplace_rhob, &
+-                                                    e_rhoa_tau_a, e_rhoa_tau_b, e_rhob_tau_a, e_rhob_tau_b, &
+-                                                    e_ndrho_laplace_rhoa, e_ndrho_laplace_rhob, e_ndrhoa_laplace_rhoa
+-      REAL(KIND=dp), DIMENSION(*), INTENT(INOUT) :: e_ndrhoa_laplace_rhob, &
+-                                                    e_ndrhob_laplace_rhoa, e_ndrhob_laplace_rhob, e_ndrho_tau_a, &
+-                                                    e_ndrho_tau_b, e_ndrhoa_tau_a, e_ndrhoa_tau_b, e_ndrhob_tau_a, &
+-                                                    e_ndrhob_tau_b, e_laplace_rhoa_laplace_rhoa, &
+-                                                    e_laplace_rhoa_laplace_rhob, e_laplace_rhob_laplace_rhob, &
+-                                                    e_laplace_rhoa_tau_a, e_laplace_rhoa_tau_b, e_laplace_rhob_tau_a, &
+-                                                    e_laplace_rhob_tau_b, e_tau_a_tau_a, e_tau_a_tau_b, e_tau_b_tau_b, &
+-                                                    e_rhoa_rhoa_rhoa, e_rhoa_rhoa_rhob, e_rhoa_rhob_rhob, e_rhob_rhob_rhob
+-      INTEGER, INTENT(in)                      :: grad_deriv, npoints
+-      REAL(KIND=dp), INTENT(in)                :: epsilon_rho, epsilon_tau
+-      CHARACTER(LEN=80), INTENT(IN)            :: func_name
+-      REAL(KIND=dp), INTENT(in)                :: sc
+-      REAL(KIND=dp), DIMENSION(*), INTENT(IN)  :: params
++      REAL(KIND=dp), DIMENSION(*), INTENT(IN)            :: rhoa, rhob, norm_drho, norm_drhoa, &
++                                                            norm_drhob, laplace_rhoa, &
++                                                            laplace_rhob, tau_a, tau_b
++      REAL(KIND=dp), DIMENSION(*), INTENT(INOUT) :: e_0, e_rhoa, e_rhob, e_ndrho, e_ndrhoa, &
++         e_ndrhob, e_laplace_rhoa, e_laplace_rhob, e_tau_a, e_tau_b, e_rhoa_rhoa, e_rhoa_rhob, &
++         e_rhob_rhob, e_ndrho_rhoa, e_ndrho_rhob, e_ndrhoa_rhoa, e_ndrhoa_rhob, e_ndrhob_rhoa, &
++         e_ndrhob_rhob, e_ndrho_ndrho, e_ndrho_ndrhoa, e_ndrho_ndrhob, e_ndrhoa_ndrhoa, &
++         e_ndrhoa_ndrhob, e_ndrhob_ndrhob, e_rhoa_laplace_rhoa, e_rhoa_laplace_rhob, &
++         e_rhob_laplace_rhoa, e_rhob_laplace_rhob, e_rhoa_tau_a, e_rhoa_tau_b, e_rhob_tau_a, &
++         e_rhob_tau_b, e_ndrho_laplace_rhoa, e_ndrho_laplace_rhob, e_ndrhoa_laplace_rhoa
++      REAL(KIND=dp), DIMENSION(*), INTENT(INOUT) :: e_ndrhoa_laplace_rhob, e_ndrhob_laplace_rhoa, &
++         e_ndrhob_laplace_rhob, e_ndrho_tau_a, e_ndrho_tau_b, e_ndrhoa_tau_a, e_ndrhoa_tau_b, &
++         e_ndrhob_tau_a, e_ndrhob_tau_b, e_laplace_rhoa_laplace_rhoa, e_laplace_rhoa_laplace_rhob, &
++         e_laplace_rhob_laplace_rhob, e_laplace_rhoa_tau_a, e_laplace_rhoa_tau_b, &
++         e_laplace_rhob_tau_a, e_laplace_rhob_tau_b, e_tau_a_tau_a, e_tau_a_tau_b, e_tau_b_tau_b, &
++         e_rhoa_rhoa_rhoa, e_rhoa_rhoa_rhob, e_rhoa_rhob_rhob, e_rhob_rhob_rhob
++      INTEGER, INTENT(in)                                :: grad_deriv, npoints
++      REAL(KIND=dp), INTENT(in)                          :: epsilon_rho, epsilon_tau
++      CHARACTER(LEN=default_string_length), INTENT(IN)   :: func_name
++      REAL(KIND=dp), INTENT(in)                          :: sc
++      REAL(KIND=dp), DIMENSION(:), INTENT(IN), POINTER   :: params
+ 
+-      CHARACTER(len=*), PARAMETER :: routineN = 'libxc_lsd_calc', &
+-                                     routineP = moduleN//':'//routineN
++      CHARACTER(len=*), PARAMETER :: routineN = 'libxc_lsd_calc', routineP = moduleN//':'//routineN
+ 
+-#if defined (__LIBXC)
+-      INTEGER                                  :: func_id, ii
+-      LOGICAL                                  :: no_exc
+-      REAL(KIND=dp)                            :: exc, my_norm_drho, &
+-                                                  my_norm_drhoa, my_norm_drhob, &
+-                                                  my_rhoa, my_rhob, my_tau_a, &
+-                                                  my_tau_b
+-      REAL(KIND=dp), DIMENSION(2, 1)           :: laplace_rhov, rhov, tauv, &
+-                                                  vlapl, vrho, vtau
+-      REAL(KIND=dp), DIMENSION(3, 1)           :: sigmav, v2lapl2, v2rho2, &
+-                                                  v2tau2, vsigma
+-      REAL(KIND=dp), DIMENSION(4, 1)           :: v2lapltau, v2rholapl, &
+-                                                  v2rhotau, v3rho3
+-      REAL(KIND=dp), DIMENSION(6, 1)           :: v2rhosigma, v2sigma2, &
+-                                                  v2sigmalapl, v2sigmatau
+-      TYPE(xc_f90_pointer_t)                   :: xc_func, xc_info
++      INTEGER                                            :: func_id, ii
++      LOGICAL                                            :: no_exc
++      REAL(KIND=dp)                                      :: my_norm_drho, my_norm_drhoa, &
++                                                            my_norm_drhob, my_rhoa, my_rhob, &
++                                                            my_tau_a, my_tau_b
++      REAL(KIND=dp), DIMENSION(1)                        :: exc
++      REAL(KIND=dp), DIMENSION(2, 1)                     :: laplace_rhov, rhov, tauv, vlapl, vrho, &
++                                                            vtau
++      REAL(KIND=dp), DIMENSION(3, 1)                     :: sigmav, v2lapl2, v2rho2, v2tau2, vsigma
++      REAL(KIND=dp), DIMENSION(4, 1)                     :: v2lapltau, v2rholapl, v2rhotau, v3rho3
++      REAL(KIND=dp), DIMENSION(6, 1)                     :: v2rhosigma, v2sigma2, v2sigmalapl, &
++                                                            v2sigmatau
++      TYPE(xc_f03_func_info_t)                           :: xc_info
++      TYPE(xc_f03_func_t)                                :: xc_func
+ 
+ ! these are just dummy variables, you need to use the correct size if working
+ 
+       func_id = xc_libxc_wrap_functional_get_number(func_name)
+ !$OMP CRITICAL(libxc_init)
+-      CALL xc_f90_func_init(xc_func, xc_info, func_id, XC_POLARIZED)
+-      CALL xc_libxc_wrap_functional_set_params(xc_func, xc_info, func_id, params, no_exc)
++      CALL xc_f03_func_init(xc_func, func_id, XC_POLARIZED)
++      xc_info = xc_f03_func_get_info(xc_func)
++      CALL xc_libxc_wrap_functional_set_params(xc_func, xc_info, params, no_exc)
+ !$OMP END CRITICAL(libxc_init)
+ !$OMP BARRIER
+ 
+-      SELECT CASE (xc_f90_info_family (xc_info))
++      SELECT CASE (xc_f03_func_info_get_family (xc_info))
+       CASE (XC_FAMILY_LDA)
+          IF (grad_deriv == 0) THEN
+ !$OMP           DO
+@@ -1647,8 +1634,8 @@
+                IF ((my_rhoa+my_rhob) > epsilon_rho) THEN
+                   rhov(1, 1) = MAX(my_rhoa, EPSILON(0.0_dp)*1.e4_dp)
+                   rhov(2, 1) = MAX(my_rhob, EPSILON(0.0_dp)*1.e4_dp)
+-                  CALL xc_f90_lda_exc(xc_func, 1, rhov(1, 1), exc)
+-                  e_0(ii) = e_0(ii)+sc*exc*(rhov(1, 1)+rhov(2, 1))
++                  CALL xc_f03_lda_exc(xc_func, 1, rhov(1, 1), exc)
++                  e_0(ii) = e_0(ii)+sc*exc(1)*(rhov(1, 1)+rhov(2, 1))
+                END IF
+             END DO
+ !$OMP           END DO
+@@ -1660,7 +1647,7 @@
+                IF ((my_rhoa+my_rhob) > epsilon_rho) THEN
+                   rhov(1, 1) = MAX(my_rhoa, EPSILON(0.0_dp)*1.e4_dp)
+                   rhov(2, 1) = MAX(my_rhob, EPSILON(0.0_dp)*1.e4_dp)
+-                  CALL xc_f90_lda_vxc(xc_func, 1, rhov(1, 1), vrho(1, 1))
++                  CALL xc_f03_lda_vxc(xc_func, 1, rhov(1, 1), vrho(1, 1))
+                   e_rhoa(ii) = e_rhoa(ii)+sc*vrho(1, 1)
+                   e_rhob(ii) = e_rhob(ii)+sc*vrho(2, 1)
+                END IF
+@@ -1674,8 +1661,8 @@
+                IF ((my_rhoa+my_rhob) > epsilon_rho) THEN
+                   rhov(1, 1) = MAX(my_rhoa, EPSILON(0.0_dp)*1.e4_dp)
+                   rhov(2, 1) = MAX(my_rhob, EPSILON(0.0_dp)*1.e4_dp)
+-                  CALL xc_f90_lda_exc_vxc(xc_func, 1, rhov(1, 1), exc, vrho(1, 1))
+-                  e_0(ii) = e_0(ii)+sc*exc*(rhov(1, 1)+rhov(2, 1))
++                  CALL xc_f03_lda_exc_vxc(xc_func, 1, rhov(1, 1), exc, vrho(1, 1))
++                  e_0(ii) = e_0(ii)+sc*exc(1)*(rhov(1, 1)+rhov(2, 1))
+                   e_rhoa(ii) = e_rhoa(ii)+sc*vrho(1, 1)
+                   e_rhob(ii) = e_rhob(ii)+sc*vrho(2, 1)
+                END IF
+@@ -1689,7 +1676,7 @@
+                IF ((my_rhoa+my_rhob) > epsilon_rho) THEN
+                   rhov(1, 1) = MAX(my_rhoa, EPSILON(0.0_dp)*1.e4_dp)
+                   rhov(2, 1) = MAX(my_rhob, EPSILON(0.0_dp)*1.e4_dp)
+-                  CALL xc_f90_lda_fxc(xc_func, 1, rhov(1, 1), v2rho2(1, 1))
++                  CALL xc_f03_lda_fxc(xc_func, 1, rhov(1, 1), v2rho2(1, 1))
+                   e_rhoa_rhoa(ii) = e_rhoa_rhoa(ii)+sc*v2rho2(1, 1)
+                   e_rhoa_rhob(ii) = e_rhoa_rhob(ii)+sc*v2rho2(2, 1)
+                   e_rhob_rhob(ii) = e_rhob_rhob(ii)+sc*v2rho2(3, 1)
+@@ -1704,9 +1691,9 @@
+                IF ((my_rhoa+my_rhob) > epsilon_rho) THEN
+                   rhov(1, 1) = MAX(my_rhoa, EPSILON(0.0_dp)*1.e4_dp)
+                   rhov(2, 1) = MAX(my_rhob, EPSILON(0.0_dp)*1.e4_dp)
+-                  CALL xc_f90_lda_exc_vxc(xc_func, 1, rhov(1, 1), exc, vrho(1, 1))
+-                  CALL xc_f90_lda_fxc(xc_func, 1, rhov(1, 1), v2rho2(1, 1))
+-                  e_0(ii) = e_0(ii)+sc*exc*(rhov(1, 1)+rhov(2, 1))
++                  CALL xc_f03_lda_exc_vxc(xc_func, 1, rhov(1, 1), exc, vrho(1, 1))
++                  CALL xc_f03_lda_fxc(xc_func, 1, rhov(1, 1), v2rho2(1, 1))
++                  e_0(ii) = e_0(ii)+sc*exc(1)*(rhov(1, 1)+rhov(2, 1))
+                   e_rhoa(ii) = e_rhoa(ii)+sc*vrho(1, 1)
+                   e_rhob(ii) = e_rhob(ii)+sc*vrho(2, 1)
+                   e_rhoa_rhoa(ii) = e_rhoa_rhoa(ii)+sc*v2rho2(1, 1)
+@@ -1723,7 +1710,7 @@
+                IF ((my_rhoa+my_rhob) > epsilon_rho) THEN
+                   rhov(1, 1) = MAX(my_rhoa, EPSILON(0.0_dp)*1.e4_dp)
+                   rhov(2, 1) = MAX(my_rhob, EPSILON(0.0_dp)*1.e4_dp)
+-                  CALL xc_f90_lda_kxc(xc_func, 1, rhov(1, 1), v3rho3(1, 1))
++                  CALL xc_f03_lda_kxc(xc_func, 1, rhov(1, 1), v3rho3(1, 1))
+                   e_rhoa_rhoa_rhoa(ii) = e_rhoa_rhoa_rhoa(ii)+sc*v3rho3(1, 1)
+                   e_rhoa_rhoa_rhob(ii) = e_rhoa_rhoa_rhob(ii)+sc*v3rho3(2, 1)
+                   e_rhoa_rhob_rhob(ii) = e_rhoa_rhob_rhob(ii)+sc*v3rho3(3, 1)
+@@ -1739,8 +1726,8 @@
+                IF ((my_rhoa+my_rhob) > epsilon_rho) THEN
+                   rhov(1, 1) = MAX(my_rhoa, EPSILON(0.0_dp)*1.e4_dp)
+                   rhov(2, 1) = MAX(my_rhob, EPSILON(0.0_dp)*1.e4_dp)
+-                  CALL xc_f90_lda(xc_func, 1, rhov(1, 1), exc, vrho(1, 1), v2rho2(1, 1), v3rho3(1, 1))
+-                  e_0(ii) = e_0(ii)+sc*exc*(rhov(1, 1)+rhov(2, 1))
++                  CALL xc_f03_lda(xc_func, 1, rhov(1, 1), exc, vrho(1, 1), v2rho2(1, 1), v3rho3(1, 1))
++                  e_0(ii) = e_0(ii)+sc*exc(1)*(rhov(1, 1)+rhov(2, 1))
+                   e_rhoa(ii) = e_rhoa(ii)+sc*vrho(1, 1)
+                   e_rhob(ii) = e_rhob(ii)+sc*vrho(2, 1)
+                   e_rhoa_rhoa(ii) = e_rhoa_rhoa(ii)+sc*v2rho2(1, 1)
+@@ -1769,8 +1756,8 @@
+                   sigmav(1, 1) = my_norm_drhoa**2
+                   sigmav(3, 1) = my_norm_drhob**2
+                   sigmav(2, 1) = 0.5_dp*(my_norm_drho**2-sigmav(1, 1)-sigmav(3, 1))
+-                  CALL xc_f90_gga_exc(xc_func, 1, rhov(1, 1), sigmav(1, 1), exc)
+-                  e_0(ii) = e_0(ii)+sc*exc*(rhov(1, 1)+rhov(2, 1))
++                  CALL xc_f03_gga_exc(xc_func, 1, rhov(1, 1), sigmav(1, 1), exc)
++                  e_0(ii) = e_0(ii)+sc*exc(1)*(rhov(1, 1)+rhov(2, 1))
+                END IF
+             END DO
+ !$OMP           END DO
+@@ -1788,7 +1775,7 @@
+                   sigmav(1, 1) = my_norm_drhoa**2
+                   sigmav(3, 1) = my_norm_drhob**2
+                   sigmav(2, 1) = 0.5_dp*(my_norm_drho**2-sigmav(1, 1)-sigmav(3, 1))
+-                  CALL xc_f90_gga_vxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), vrho(1, 1), vsigma(1, 1))
++                  CALL xc_f03_gga_vxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), vrho(1, 1), vsigma(1, 1))
+                   e_rhoa(ii) = e_rhoa(ii)+sc*vrho(1, 1)
+                   e_rhob(ii) = e_rhob(ii)+sc*vrho(2, 1)
+                   e_ndrho(ii) = e_ndrho(ii)+sc*vsigma(2, 1)*my_norm_drho
+@@ -1814,12 +1801,12 @@
+                   sigmav(3, 1) = my_norm_drhob**2
+                   sigmav(2, 1) = 0.5_dp*(my_norm_drho**2-sigmav(1, 1)-sigmav(3, 1))
+                   IF (no_exc) THEN
+-                     CALL xc_f90_gga_vxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), vrho(1, 1), vsigma(1, 1))
++                     CALL xc_f03_gga_vxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), vrho(1, 1), vsigma(1, 1))
+                      exc = 0.0_dp
+                   ELSE
+-                     CALL xc_f90_gga_exc_vxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), exc, vrho(1, 1), vsigma(1, 1))
++                     CALL xc_f03_gga_exc_vxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), exc, vrho(1, 1), vsigma(1, 1))
+                   END IF
+-                  e_0(ii) = e_0(ii)+sc*exc*(rhov(1, 1)+rhov(2, 1))
++                  e_0(ii) = e_0(ii)+sc*exc(1)*(rhov(1, 1)+rhov(2, 1))
+                   e_rhoa(ii) = e_rhoa(ii)+sc*vrho(1, 1)
+                   e_rhob(ii) = e_rhob(ii)+sc*vrho(2, 1)
+                   e_ndrho(ii) = e_ndrho(ii)+sc*vsigma(2, 1)*my_norm_drho
+@@ -1845,12 +1832,12 @@
+                   sigmav(3, 1) = my_norm_drhob**2
+                   sigmav(2, 1) = 0.5_dp*(my_norm_drho**2-sigmav(1, 1)-sigmav(3, 1))
+                   IF (no_exc) THEN
+-                     CALL xc_f90_gga_vxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), vrho(1, 1), vsigma(1, 1))
+-                     CALL xc_f90_gga_fxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), &
++                     CALL xc_f03_gga_vxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), vrho(1, 1), vsigma(1, 1))
++                     CALL xc_f03_gga_fxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), &
+                                          v2rho2(1, 1), v2rhosigma(1, 1), v2sigma2(1, 1))
+                   ELSE
+-                     CALL xc_f90_gga_exc_vxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), exc, vrho(1, 1), vsigma(1, 1))
+-                     CALL xc_f90_gga_fxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), &
++                     CALL xc_f03_gga_exc_vxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), exc, vrho(1, 1), vsigma(1, 1))
++                     CALL xc_f03_gga_fxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), &
+                                          v2rho2(1, 1), v2rhosigma(1, 1), v2sigma2(1, 1))
+                   END IF
+                   e_rhoa_rhoa(ii) = e_rhoa_rhoa(ii)+sc*v2rho2(1, 1)
+@@ -1899,16 +1886,16 @@
+                   sigmav(3, 1) = my_norm_drhob**2
+                   sigmav(2, 1) = 0.5_dp*(my_norm_drho**2-sigmav(1, 1)-sigmav(3, 1))
+                   IF (no_exc) THEN
+-                     CALL xc_f90_gga_vxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), vrho(1, 1), vsigma(1, 1))
+-                     CALL xc_f90_gga_fxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), &
++                     CALL xc_f03_gga_vxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), vrho(1, 1), vsigma(1, 1))
++                     CALL xc_f03_gga_fxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), &
+                                          v2rho2(1, 1), v2rhosigma(1, 1), v2sigma2(1, 1))
+                      exc = 0.0_dp
+                   ELSE
+-                     CALL xc_f90_gga_exc_vxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), exc, vrho(1, 1), vsigma(1, 1))
+-                     CALL xc_f90_gga_fxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), &
++                     CALL xc_f03_gga_exc_vxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), exc, vrho(1, 1), vsigma(1, 1))
++                     CALL xc_f03_gga_fxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), &
+                                          v2rho2(1, 1), v2rhosigma(1, 1), v2sigma2(1, 1))
+                   END IF
+-                  e_0(ii) = e_0(ii)+sc*exc*(rhov(1, 1)+rhov(2, 1))
++                  e_0(ii) = e_0(ii)+sc*exc(1)*(rhov(1, 1)+rhov(2, 1))
+                   e_rhoa(ii) = e_rhoa(ii)+sc*vrho(1, 1)
+                   e_rhob(ii) = e_rhob(ii)+sc*vrho(2, 1)
+                   e_ndrho(ii) = e_ndrho(ii)+sc*vsigma(2, 1)*my_norm_drho
+@@ -1971,9 +1958,9 @@
+                   tauv(2, 1) = MAX(my_tau_b, EPSILON(0.0_dp)*1.e4_dp)
+                   tauv(1, 1) = MAX(tauv(1, 1), sigmav(1, 1)/(8.0_dp*rhov(1, 1)))
+                   tauv(2, 1) = MAX(tauv(2, 1), sigmav(3, 1)/(8.0_dp*rhov(2, 1)))
+-                  CALL xc_f90_mgga_exc(xc_func, 1, rhov(1, 1), sigmav(1, 1), &
++                  CALL xc_f03_mgga_exc(xc_func, 1, rhov(1, 1), sigmav(1, 1), &
+                                        laplace_rhov(1, 1), tauv(1, 1), exc)
+-                  e_0(ii) = e_0(ii)+sc*exc*(rhov(1, 1)+rhov(2, 1))
++                  e_0(ii) = e_0(ii)+sc*exc(1)*(rhov(1, 1)+rhov(2, 1))
+                END IF
+             END DO
+ !$OMP           END DO
+@@ -1999,7 +1986,7 @@
+                   tauv(2, 1) = MAX(my_tau_b, EPSILON(0.0_dp)*1.e4_dp)
+                   tauv(1, 1) = MAX(tauv(1, 1), sigmav(1, 1)/(8.0_dp*rhov(1, 1)))
+                   tauv(2, 1) = MAX(tauv(2, 1), sigmav(3, 1)/(8.0_dp*rhov(2, 1)))
+-                  CALL xc_f90_mgga_vxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), &
++                  CALL xc_f03_mgga_vxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), &
+                                        laplace_rhov(1, 1), tauv(1, 1), vrho(1, 1), vsigma(1, 1), vlapl(1, 1), vtau(1, 1))
+                   e_rhoa(ii) = e_rhoa(ii)+sc*vrho(1, 1)
+                   e_rhob(ii) = e_rhob(ii)+sc*vrho(2, 1)
+@@ -2038,16 +2025,16 @@
+                   tauv(1, 1) = MAX(tauv(1, 1), sigmav(1, 1)/(8.0_dp*rhov(1, 1)))
+                   tauv(2, 1) = MAX(tauv(2, 1), sigmav(3, 1)/(8.0_dp*rhov(2, 1)))
+                   IF (no_exc) THEN
+-                     CALL xc_f90_mgga_vxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), &
++                     CALL xc_f03_mgga_vxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), &
+                                           laplace_rhov(1, 1), tauv(1, 1), vrho(1, 1), vsigma(1, 1), &
+                                           vlapl(1, 1), vtau(1, 1))
+                      exc = 0.0_dp
+                   ELSE
+-                     CALL xc_f90_mgga_exc_vxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), &
++                     CALL xc_f03_mgga_exc_vxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), &
+                                               laplace_rhov(1, 1), tauv(1, 1), exc, &
+                                               vrho(1, 1), vsigma(1, 1), vlapl(1, 1), vtau(1, 1))
+                   END IF
+-                  e_0(ii) = e_0(ii)+sc*exc*(rhov(1, 1)+rhov(2, 1))
++                  e_0(ii) = e_0(ii)+sc*exc(1)*(rhov(1, 1)+rhov(2, 1))
+                   e_rhoa(ii) = e_rhoa(ii)+sc*vrho(1, 1)
+                   e_rhob(ii) = e_rhob(ii)+sc*vrho(2, 1)
+                   e_ndrho(ii) = e_ndrho(ii)+sc*vsigma(2, 1)*my_norm_drho
+@@ -2085,16 +2072,16 @@
+                   tauv(1, 1) = MAX(tauv(1, 1), sigmav(1, 1)/(8.0_dp*rhov(1, 1)))
+                   tauv(2, 1) = MAX(tauv(2, 1), sigmav(3, 1)/(8.0_dp*rhov(2, 1)))
+                   IF (no_exc) THEN
+-                     CALL xc_f90_mgga_vxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), &
++                     CALL xc_f03_mgga_vxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), &
+                                           laplace_rhov(1, 1), tauv(1, 1), vrho(1, 1), vsigma(1, 1), &
+                                           vlapl(1, 1), vtau(1, 1))
+-                     CALL xc_f90_mgga_fxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), &
++                     CALL xc_f03_mgga_fxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), &
+                                           laplace_rhov(1, 1), tauv(1, 1), &
+                                           v2rho2(1, 1), v2sigma2(1, 1), v2lapl2(1, 1), v2tau2(1, 1), &
+                                           v2rhosigma(1, 1), v2rholapl(1, 1), v2rhotau(1, 1), &
+                                           v2sigmalapl(1, 1), v2sigmatau(1, 1), v2lapltau(1, 1))
+                   ELSE
+-                     CALL xc_f90_mgga(xc_func, 1, rhov(1, 1), sigmav(1, 1), &
++                     CALL xc_f03_mgga(xc_func, 1, rhov(1, 1), sigmav(1, 1), &
+                                       laplace_rhov(1, 1), tauv(1, 1), exc, vrho(1, 1), vsigma(1, 1), &
+                                       vlapl(1, 1), vtau(1, 1), v2rho2(1, 1), v2sigma2(1, 1), &
+                                       v2lapl2(1, 1), v2tau2(1, 1), v2rhosigma(1, 1), v2rholapl(1, 1), &
+@@ -2192,10 +2179,10 @@
+                   tauv(1, 1) = MAX(tauv(1, 1), sigmav(1, 1)/(8.0_dp*rhov(1, 1)))
+                   tauv(2, 1) = MAX(tauv(2, 1), sigmav(3, 1)/(8.0_dp*rhov(2, 1)))
+                   IF (no_exc) THEN
+-                     CALL xc_f90_mgga_vxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), &
++                     CALL xc_f03_mgga_vxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), &
+                                           laplace_rhov(1, 1), tauv(1, 1), vrho(1, 1), vsigma(1, 1), &
+                                           vlapl(1, 1), vtau(1, 1))
+-                     CALL xc_f90_mgga_fxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), &
++                     CALL xc_f03_mgga_fxc(xc_func, 1, rhov(1, 1), sigmav(1, 1), &
+                                           laplace_rhov(1, 1), tauv(1, 1), &
+                                           v2rho2(1, 1), v2sigma2(1, 1), v2lapl2(1, 1), v2tau2(1, 1), &
+                                           v2rhosigma(1, 1), v2rholapl(1, 1), v2rhotau(1, 1), &
+@@ -2202,13 +2189,13 @@
+                                           v2sigmalapl(1, 1), v2sigmatau(1, 1), v2lapltau(1, 1))
+                      exc = 0.0_dp
+                   ELSE
+-                     CALL xc_f90_mgga(xc_func, 1, rhov(1, 1), sigmav(1, 1), &
++                     CALL xc_f03_mgga(xc_func, 1, rhov(1, 1), sigmav(1, 1), &
+                                       laplace_rhov(1, 1), tauv(1, 1), exc, vrho(1, 1), vsigma(1, 1), &
+                                       vlapl(1, 1), vtau(1, 1), v2rho2(1, 1), v2sigma2(1, 1), &
+                                       v2lapl2(1, 1), v2tau2(1, 1), v2rhosigma(1, 1), v2rholapl(1, 1), &
+                                       v2rhotau(1, 1), v2sigmalapl(1, 1), v2sigmatau(1, 1), v2lapltau(1, 1))
+                   END IF
+-                  e_0(ii) = e_0(ii)+sc*exc*(rhov(1, 1)+rhov(2, 1))
++                  e_0(ii) = e_0(ii)+sc*exc(1)*(rhov(1, 1)+rhov(2, 1))
+                   e_rhoa(ii) = e_rhoa(ii)+sc*vrho(1, 1)
+                   e_rhob(ii) = e_rhob(ii)+sc*vrho(2, 1)
+                   e_ndrho(ii) = e_ndrho(ii)+sc*vsigma(2, 1)*my_norm_drho
+@@ -2294,11 +2281,9 @@
+          CPABORT(TRIM(func_name)//": this XC_FAMILY is currently not supported.")
+       END SELECT
+ 
+-      CALL xc_f90_func_end(xc_func)
+-#else
+-      CPABORT("In order to use libxc you need to download and install it")
+-#endif
++      CALL xc_f03_func_end(xc_func)
+ 
+    END SUBROUTINE libxc_lsd_calc
++#endif
+ 
+ END MODULE xc_libxc
+Index: src/xc/xc_libxc_wrap.F
+===================================================================
+--- src/xc/xc_libxc_wrap.F	(revision 18252)
++++ src/xc/xc_libxc_wrap.F	(working copy)
+@@ -1,167 +1,87 @@
+ !--------------------------------------------------------------------------------------------------!
+ !   CP2K: A general program to perform molecular dynamics simulations                              !
+-!   Copyright (C) 2000 - 2017  CP2K developers group                                               !
++!   Copyright (C) 2000 - 2018  CP2K developers group                                               !
+ !--------------------------------------------------------------------------------------------------!
+ 
+ ! **************************************************************************************************
+ !> \brief Includes all necessary routines, functions and parameters from
+ !>        libxc. Provides CP2K routines/functions where the LibXC calling list
+-!>        is version dependent. The naming convention for such
+-!>        routines/functions is xc_f90_XXX --> 'xc_libxc_wrap_XXX'. All version
++!>        is version dependent (>=4.0.3). The naming convention for such
++!>        routines/functions is xc_f03_XXX --> 'xc_libxc_wrap_XXX'. All version
+ !>        independent routines/functions are just bypassed to higher level
+ !>        module file 'xc_libxc'.
+ !>
+-!> \note For LibXC versions 2.2.2 and above.
+-!>       Once the LibXC-API is stable, remove all 'xc_libxc_wrap_XXX'
+-!>       routines/functions and use 'xc_f90_lib_m' directly in 'xc_libxc'.
+-!>       Marques, Oliveira, Burnus, CPC 183, 2272 (2012)).
+-!>
+ !> \par History
+-!>      08.2015 created [A. Gloess]
+-!> \author A. Gloessa (agloess)
++!>      08.2015 created [A. Gloess (agloess)]
++!>      01.2018 refactoring [A. Gloess (agloess)]
++!> \author A. Gloess (agloess)
+ ! **************************************************************************************************
+ MODULE xc_libxc_wrap
+-#if defined(__LIBXC2) || defined(__LIBXC3)
+-#define __LIBXC
+-#endif
+ #if defined (__LIBXC)
+ #include <xc_version.h>
+ ! check for LibXC version
+-#if (XC_MAJOR_VERSION < 2) || ((XC_MAJOR_VERSION == 2) && (XC_MINOR_VERSION < 2))
+-   This version of CP2K ONLY works with libxc versions 2.2.2 and above.
++#if (XC_MAJOR_VERSION < 4)
++   This version of CP2K ONLY works with libxc versions 4.0.3 and above.
+    Furthermore, -I[LIBXC_DIR]/INCLUDE needs to be added to FCFLAGS.
+ #else
+ 
+-#if (XC_MAJOR_VERSION == 2)
+-   ! Functionals which either have known bugs, or require parameters
+-  USE libxc_funcs_m,                   ONLY: XC_GGA_C_N12,&
+-                                             XC_GGA_C_N12_SX,&
+-                                             XC_GGA_K_FR_B88,&
+-                                             XC_GGA_K_LLP,&
+-                                             XC_GGA_K_THAKKAR,&
+-                                             XC_GGA_X_B88,&
+-                                             XC_GGA_X_HJS_B88,&
+-                                             XC_GGA_X_HJS_B97X,&
+-                                             XC_GGA_X_HJS_PBE,&
+-                                             XC_GGA_X_HJS_PBE_SOL,&
+-                                             XC_GGA_X_LB,&
+-                                             XC_GGA_X_MB88,&
+-                                             XC_GGA_X_N12,&
+-                                             XC_GGA_X_OPTB88_VDW,&
+-                                             XC_GGA_X_WPBEH,&
+-                                             XC_HYB_GGA_XC_HJS_B88,&
+-                                             XC_HYB_GGA_XC_HJS_B97X,&
+-                                             XC_HYB_GGA_XC_HJS_PBE,&
+-                                             XC_HYB_GGA_XC_HJS_PBE_SOL,&
+-                                             XC_HYB_GGA_XC_HSE03,&
+-                                             XC_HYB_GGA_XC_HSE06,&
+-                                             XC_HYB_GGA_XC_O3LYP,&
+-                                             XC_HYB_GGA_XC_X3LYP,&
+-                                             XC_HYB_GGA_X_N12_SX,&
+-                                             XC_HYB_MGGA_X_M11,&
+-                                             XC_LDA_C_1D_CSC,&
+-                                             XC_LDA_C_2D_PRM,&
+-                                             XC_LDA_C_XALPHA,&
+-                                             XC_LDA_X,&
+-                                             XC_LDA_X_1D,&
+-                                             XC_MGGA_X_M11_L,&
+-                                             XC_MGGA_X_MS2H,&
+-                                             XC_MGGA_X_TB09
+-#else
+    ! Functionals which require parameters
+-  USE libxc_funcs_m,                   ONLY: XC_LDA_X,&
+-                                             XC_LDA_X_1D,&
+-                                             XC_LDA_C_XALPHA,&
+-                                             XC_LDA_C_2D_PRM,&
+-                                             XC_LDA_C_1D_CSC,&
+-                                             XC_MGGA_X_TB09,&
+-                                             XC_HYB_GGA_XC_HSE03,&
+-                                             XC_HYB_GGA_XC_HSE06,&
+-                                             XC_HYB_GGA_XC_HJS_PBE,&
+-                                             XC_HYB_GGA_XC_HJS_PBE_SOL,&
+-                                             XC_HYB_GGA_XC_HJS_B88,&
+-                                             XC_HYB_GGA_XC_HJS_B97X,&
+-                                             XC_GGA_X_LB,&
+-                                             XC_GGA_X_HJS_PBE,&
+-                                             XC_GGA_X_HJS_PBE_SOL,&
+-                                             XC_GGA_X_HJS_B88,&
+-                                             XC_GGA_X_HJS_B97X,&
+-                                             XC_GGA_X_WPBEH
+-#endif
++  USE cp_log_handling,                 ONLY: cp_to_string
+   USE kinds,                           ONLY: dp
+-  USE xc_f90_lib_m,                    ONLY: xc_f90_func_end,&
+-                                             xc_f90_func_init,&
+-                                             xc_f90_functional_get_number,&
++  USE xc_f03_lib_m,                    ONLY: xc_f03_func_end,&
++                                             xc_f03_func_init,&
++                                             xc_f03_func_set_ext_params,&
++                                             xc_f03_functional_get_number,&
+ !
+-                                             xc_f90_gga_exc,&
+-                                             xc_f90_gga_exc_vxc,&
+-                                             xc_f90_gga_fxc,&
+-                                             xc_f90_gga_lb_set_par,&
+-                                             xc_f90_gga_vxc,&
+-                                             xc_f90_gga_x_hjs_set_par,&
+-                                             xc_f90_gga_x_wpbeh_set_par,&
++                                             xc_f03_gga_exc,&
++                                             xc_f03_gga_exc_vxc,&
++                                             xc_f03_gga_fxc,&
++                                             xc_f03_gga_vxc,&
+ !
+-                                             xc_f90_hyb_gga_xc_hse_set_par,&
++                                             xc_f03_func_get_info,&
++                                             xc_f03_func_info_get_family,&
++                                             xc_f03_func_info_get_kind,&
++                                             xc_f03_func_info_get_name,&
++                                             xc_f03_func_info_get_references,&
++                                             xc_f03_func_info_get_flags,&
++                                             xc_f03_func_info_get_n_ext_params,&
++                                             xc_f03_func_info_get_ext_params_description,&
+ !
+-                                             xc_f90_info_family,&
+-                                             xc_f90_info_kind,&
+-                                             xc_f90_info_name,&
+-                                             xc_f90_info_refs,&
+-                                             xc_f90_info_flags,&
++                                             xc_f03_func_reference_get_ref, &
++                                             xc_f03_func_reference_get_doi, &
+ !
+-                                             xc_f90_lda,&
+-                                             xc_f90_lda_c_1d_csc_set_par,&
+-                                             xc_f90_lda_c_2d_prm_set_par,&
+-                                             xc_f90_lda_c_xalpha_set_par,&
+-                                             xc_f90_lda_exc,&
+-                                             xc_f90_lda_exc_vxc,&
+-                                             xc_f90_lda_fxc,&
+-                                             xc_f90_lda_kxc,&
+-                                             xc_f90_lda_vxc,&
+-                                             xc_f90_lda_x_1d_set_par,&
+-                                             xc_f90_lda_x_set_par,&
++                                             xc_f03_lda, &
++                                             xc_f03_lda_exc, &
++                                             xc_f03_lda_exc_vxc, &
++                                             xc_f03_lda_fxc, &
++                                             xc_f03_lda_kxc, &
++                                             xc_f03_lda_vxc, &
+ !
+-                                             xc_f90_mgga,&
+-                                             xc_f90_mgga_exc,&
+-                                             xc_f90_mgga_exc_vxc,&
+-                                             xc_f90_mgga_fxc,&
+-                                             xc_f90_mgga_vxc,&
+-                                             xc_f90_mgga_x_tb09_set_par,&
++                                             xc_f03_mgga, &
++                                             xc_f03_mgga_exc, &
++                                             xc_f03_mgga_exc_vxc, &
++                                             xc_f03_mgga_fxc, &
++                                             xc_f03_mgga_vxc, &
+ !
+-                                             xc_f90_pointer_t,&
++                                             xc_f03_func_t, &
++                                             xc_f03_func_info_t, &
++                                             xc_f03_func_reference_t, &
+ !
+-                                             XC_FAMILY_UNKNOWN,&
+-                                             XC_FAMILY_NONE,&
+-                                             XC_FAMILY_LDA,&
+-                                             XC_FAMILY_GGA,&
+-                                             XC_FAMILY_MGGA,&
+-                                             XC_FAMILY_LCA,&
+-                                             XC_FAMILY_OEP,&
+-                                             XC_FAMILY_HYB_GGA,&
+-                                             XC_FAMILY_HYB_MGGA,&
++                                             XC_FAMILY_LDA, &
++                                             XC_FAMILY_GGA, &
++                                             XC_FAMILY_MGGA, &
++                                             XC_FAMILY_HYB_GGA, &
+ !
+-                                             XC_UNPOLARIZED,&
+-                                             XC_POLARIZED,&
+-                                             XC_NON_RELATIVISTIC,&
+-                                             XC_RELATIVISTIC,&
++                                             XC_UNPOLARIZED, &
++                                             XC_POLARIZED, &
+ !
+-                                             XC_EXCHANGE,&
+-                                             XC_CORRELATION,&
+-                                             XC_EXCHANGE_CORRELATION,&
+-                                             XC_KINETIC,&
++                                             XC_EXCHANGE, &
++                                             XC_CORRELATION, &
++                                             XC_EXCHANGE_CORRELATION, &
++                                             XC_KINETIC, &
+ !
+-                                             XC_FLAGS_HAVE_EXC,&
+-                                             XC_FLAGS_HAVE_VXC,&
+-                                             XC_FLAGS_HAVE_FXC,&
+-                                             XC_FLAGS_HAVE_KXC,&
+-                                             XC_FLAGS_HAVE_LXC,&
+-                                             XC_FLAGS_1D,&
+-                                             XC_FLAGS_2D,&
+-                                             XC_FLAGS_3D,&
+-                                             XC_FLAGS_STABLE,&
+-                                             XC_FLAGS_DEVELOPMENT,&
+-                                             XC_GGA_XC_LB,&
+-                                             XC_GGA_K_ABSR1
++                                             XC_FLAGS_NEEDS_LAPLACIAN, &
++                                             XC_FLAGS_HAVE_EXC
+ 
+ #include "../base/base_uses.f90"
+ 
+@@ -172,16 +92,17 @@
+ 
+    CHARACTER(LEN=*), PARAMETER, PUBLIC :: libxc_version = XC_VERSION
+ 
+-   PUBLIC :: xc_f90_pointer_t
+-   PUBLIC :: xc_f90_func_init, xc_f90_func_end
+-   PUBLIC :: xc_f90_info_family, xc_f90_info_kind, xc_f90_info_name
+-   PUBLIC :: xc_f90_gga_exc, xc_f90_gga_exc_vxc, xc_f90_gga_fxc, &
+-             xc_f90_gga_vxc
+-   PUBLIC :: xc_f90_lda, &
+-             xc_f90_lda_exc, xc_f90_lda_exc_vxc, &
+-             xc_f90_lda_fxc, xc_f90_lda_kxc, xc_f90_lda_vxc
+-   PUBLIC :: xc_f90_mgga, xc_f90_mgga_exc, xc_f90_mgga_exc_vxc, xc_f90_mgga_fxc, &
+-             xc_f90_mgga_vxc
++   PUBLIC :: xc_f03_func_t, xc_f03_func_info_t
++   PUBLIC :: xc_f03_func_init, xc_f03_func_end
++   PUBLIC :: xc_f03_func_get_info, xc_f03_func_info_get_family, xc_f03_func_info_get_kind, &
++             xc_f03_func_info_get_name
++   PUBLIC :: xc_f03_gga_exc, xc_f03_gga_exc_vxc, xc_f03_gga_fxc, &
++             xc_f03_gga_vxc
++   PUBLIC :: xc_f03_lda, &
++             xc_f03_lda_exc, xc_f03_lda_exc_vxc, &
++             xc_f03_lda_fxc, xc_f03_lda_kxc, xc_f03_lda_vxc
++   PUBLIC :: xc_f03_mgga, xc_f03_mgga_exc, xc_f03_mgga_exc_vxc, xc_f03_mgga_fxc, &
++             xc_f03_mgga_vxc
+ 
+    PUBLIC :: XC_FAMILY_LDA, XC_FAMILY_GGA, XC_FAMILY_MGGA, &
+              XC_FAMILY_HYB_GGA
+@@ -190,16 +111,13 @@
+ 
+    PUBLIC :: XC_EXCHANGE, XC_CORRELATION, XC_EXCHANGE_CORRELATION, XC_KINETIC
+ 
+-! wrappers for routines where interface has changed between versions
++! wrappers for routines
+    PUBLIC :: xc_libxc_wrap_info_refs, &
+              xc_libxc_wrap_version, &
+              xc_libxc_wrap_functional_get_number, &
+              xc_libxc_wrap_needs_laplace, &
+-             xc_libxc_wrap_functional_set_params, &
+-             xc_libxc_wrap_functional_buggy
++             xc_libxc_wrap_functional_set_params
+ 
+-   LOGICAL, SAVE :: first_time = .TRUE.
+-
+ CONTAINS
+ 
+ ! **************************************************************************************************
+@@ -209,50 +127,64 @@
+ !> \param sc ...
+ !> \param reference ...
+ !>
+-!> \author A. Gloessa (agloess)
++!> \author A. Gloess (agloess)
+ ! **************************************************************************************************
+    SUBROUTINE xc_libxc_wrap_info_refs(xc_info, polarized, sc, reference)
+-      TYPE(xc_f90_pointer_t), INTENT(IN) :: xc_info
+-      INTEGER, INTENT(IN)                :: polarized
+-      REAL(KIND=dp), INTENT(IN)          :: sc
+-      CHARACTER(LEN=*), INTENT(OUT)      :: reference
++      TYPE(xc_f03_func_info_t), INTENT(IN)               :: xc_info
++      INTEGER, INTENT(IN)                                :: polarized
++      REAL(KIND=dp), INTENT(IN)                          :: sc
++      CHARACTER(LEN=*), INTENT(OUT)                      :: reference
+ 
+       CHARACTER(LEN=*), PARAMETER :: routineN = 'xc_libxc_wrap_info_refs', &
+-                                     routineP = moduleN//':'//routineN
++         routineP = moduleN//':'//routineN
++      INTEGER, PARAMETER                                 :: maxlen = 67
+ 
+-      INTEGER, PARAMETER                 :: maxlen = 67 ! max line length in output
+-      INTEGER                            :: handle, i_ref, first, last, empty
+-      CHARACTER(LEN=400)                 :: ref_string ! string for one reference
+-      CHARACTER(LEN=400)                 :: tmp_string ! modified string for one reference
+-#if (XC_MAJOR_VERSION == 2)
+-      TYPE(xc_f90_pointer_t)             :: str ! this will hold a (char **) pointer
+-#endif
++      CHARACTER(LEN=128)                                 :: descr_string
++      CHARACTER(LEN=400)                                 :: doi_string, ref_string, tmp_string
++      INTEGER                                            :: empty, first, handle, i, i_ref, idx, &
++                                                            last, n_params
++      TYPE(xc_f03_func_reference_t)                      :: xc_ref
+ 
+       CALL timeset(routineN, handle)
+ 
+       i_ref = 0
+-#if (XC_MAJOR_VERSION == 2)
+-      CALL xc_f90_info_refs(xc_info, i_ref, str, ref_string)
+-#else
+-      CALL xc_f90_info_refs(xc_info, i_ref, ref_string)
+-#endif
++      idx = 1
+       first = 1
+       DO WHILE (i_ref >= 0)
+-         WRITE (tmp_string, '(a1,i1,a2,a)') '[', i_ref, '] ', TRIM(ref_string)
++         ! information about functional references
++         xc_ref = xc_f03_func_info_get_references(xc_info, i_ref)
++         ref_string = xc_f03_func_reference_get_ref(xc_ref)
++         doi_string = xc_f03_func_reference_get_doi(xc_ref)
++         WRITE (tmp_string, '(a1,i1,a2,a,a7,a)') '[', idx, '] ', &
++            TRIM(ref_string), ', doi: ', TRIM(doi_string)
+          last = first+LEN_TRIM(tmp_string)-1
+          reference(first:last) = TRIM(tmp_string)
+          first = last+1
+-         empty = last-MOD(last, maxlen)+maxlen
++         empty = last+(maxlen-1)-MOD(last-1, maxlen)
++         ! fill up line with 'spaces'
+          IF (empty /= last) THEN
+-            ! fill with 'spaces'
+             reference(first:empty) = ' '
+             first = empty+1
+          END IF
+-#if (XC_MAJOR_VERSION == 2)
+-         CALL xc_f90_info_refs(xc_info, i_ref, str, ref_string)
+-#else
+-         CALL xc_f90_info_refs(xc_info, i_ref, ref_string)
+-#endif
++         ! information about (optional) external parameters
++         n_params = xc_f03_func_info_get_n_ext_params(xc_info)
++         IF (n_params > 0) THEN
++            reference(first:first+maxlen-1) = 'Optional external parameters:'//REPEAT(' ', maxlen-28)
++            first = first+maxlen
++         END IF
++         DO i = 1, n_params
++            descr_string = xc_f03_func_info_get_ext_params_description(xc_info, i-1)
++            last = first+LEN_TRIM(descr_string)-1+3
++            reference(first:last) = ' * '//TRIM(descr_string)
++            first = last+1
++            empty = last+(maxlen-1)-MOD(last-1, maxlen)
++            ! fill up line with 'spaces'
++            IF (empty /= last) THEN
++               reference(first:empty) = ' '
++               first = empty+1
++            END IF
++         END DO
++         idx = idx+1
+       END DO
+       SELECT CASE (polarized)
+       CASE (XC_UNPOLARIZED)
+@@ -275,9 +207,7 @@
+ ! **************************************************************************************************
+ !> \brief Provides a version string.
+ !> \param version ...
+-!> \author A. Gloessa (agloess)
+-!> \note Minor and micro version could be defined as character for SVN trunk
+-!>       version (e.g. 3.x.x)!
++!> \author A. Gloess (agloess)
+ !>
+ ! **************************************************************************************************
+    SUBROUTINE xc_libxc_wrap_version(version)
+@@ -288,20 +218,8 @@
+ 
+       INTEGER                                            :: handle
+ 
+-! the string that is output
+-!#if (XC_MAJOR_VERSION >= 3)
+-!    INTEGER                            :: vmajor, vminor, vmicro
+-!#endif
+-
+       CALL timeset(routineN, handle)
+ 
+-!#if (XC_MAJOR_VERSION >= 3)
+-!    CALL xc_f90_version(vmajor, vminor, vmicro)
+-!    write(version(1:5),'(i1,a,i1,a,i1)') vmajor, '.', vminor, '.', vmicro
+-!#else
+-!    CALL xc_f90_version(vmajor, vminor)
+-!    write(version(1:5),'(i1,a,i1,a)') vmajor, '.', vminor, '.?'
+-!#endif
+       version = TRIM(libxc_version)
+ 
+       CALL timestop(handle)
+@@ -312,7 +230,7 @@
+ !> \brief Provides the functional ID.
+ !> \param func_string ...
+ !> \retval func_id ...
+-!> \author A. Gloessa (agloess)
++!> \author A. Gloess (agloess)
+ !> \note Remove prefix to keep compatibility, functionals can be specified (in
+ !>       LIBXC section) as:
+ !>       GGA_X_...  or  XC_GGA_X_...
+@@ -331,9 +249,9 @@
+       CALL timeset(routineN, handle)
+ 
+       IF (func_string(1:3) == "XC_") THEN
+-         func_id = xc_f90_functional_get_number(func_string(4:LEN_TRIM(func_string)))
++         func_id = xc_f03_functional_get_number(func_string(4:LEN_TRIM(func_string)))
+       ELSE
+-         func_id = xc_f90_functional_get_number(func_string(1:LEN_TRIM(func_string)))
++         func_id = xc_f03_functional_get_number(func_string(1:LEN_TRIM(func_string)))
+       END IF
+       IF (func_id == -1) THEN
+          CPABORT(TRIM(func_string)//": wrong functional name")
+@@ -349,53 +267,10 @@
+ !> \param func_id ...
+ !>
+ !> \retval xc_libxc_wrap_needs_laplace ...
+-!> \author A. Gloessa (agloess)
++!> \author A. Gloess (agloess)
+ ! **************************************************************************************************
+    LOGICAL FUNCTION xc_libxc_wrap_needs_laplace(func_id)
+-      ! Only some MGGA functionals need 'r->u' and 'r->us', which are calculated
+-      ! by default in 'src/work_mgga_x.c' and 'src/work_mgga_c.c' as 'r.u' and
+-      ! 'r.us'.
+-      ! All other MGGA functionals one could use a dummy (of the right size) for
+-      ! 'lapl'.
+-      !
+-      ! It would be best, if LibXC would provide the information:
+-      !   need%lapl
+-      !   need%tau
+-      !   nedd%...
+-      ! as FLAGS.
+-      ! As a work-around we call the corresponding routine twice with different
+-      ! values for 'lapl' and check if the results are changing.
+-      !
+-      ! [last checked version: 3.x.x (18.08.2015)]
+-      !
+-      ! 'r->u':
+-      ! -------
+-      ! # src/mgga_x_br89.c
+-      ! XC_MGGA_X_BR89              206 /* Becke-Roussel 89  */
+-      ! XC_MGGA_X_BJ06              207 /* Becke & Johnson correction to Becke-Roussel 89  */
+-      ! XC_MGGA_X_TB09              208 /* Tran & Blaha correction to Becke & Johnson  */
+-      ! XC_MGGA_X_RPP09             209 /* Rasanen, Pittalis, and Proetto correction to Becke & Johnson  */
+-      !
+-      ! # src/mgga_x_2d_prhg07.c
+-      ! XC_MGGA_X_2D_PRHG07         210   /* Pittalis, Rasanen, Helbig, Gross Exchange Functional */
+-      ! XC_MGGA_X_2D_PRHG07_PRP10   211   /* PRGH07 with PRP10 correction */
+-      !
+-      ! # src/mgga_x_mk00.c
+-      ! XC_MGGA_X_MK00              230 /* Exchange for accurate virtual orbital energies */
+-      ! XC_MGGA_X_MK00B             243 /* Exchange for accurate virtual orbital energies (v. B) */
+-      !
+-      !
+-      ! 'r->us':
+-      ! -------
+-      ! # src/mgga_xc_zlp.c
+-      ! XC_MGGA_XC_ZLP               42 /* Zhao, Levy & Parr, Eq. (21) */
+-      !
+-      ! # src/mgga_c_cs.c
+-      ! XC_MGGA_C_CS                 72 /* Colle and Salvetti */
+-      !
+-      ! # src/mgga_c_cc06.c
+-      ! XC_MGGA_C_CC06              229 /* Cancio and Chou 2006 */
+-      !
++      ! Only some MGGA functionals needs the laplacian
+       INTEGER, INTENT(IN)                        :: func_id
+ 
+       CHARACTER(LEN=*), PARAMETER :: routineN = 'xc_libxc_wrap_needs_laplace', &
+@@ -402,23 +277,15 @@
+                                      routineP = moduleN//':'//routineN
+ 
+       INTEGER                                  :: handle
+-      REAL(KIND=dp)                            :: rho, norm_drho, laplace_rho, &
+-                                                  my_tau
+-      REAL(KIND=dp), DIMENSION(:), &
+-         ALLOCATABLE                            :: dummy
+-      REAL(KIND=dp), DIMENSION(:, :), &
+-         ALLOCATABLE                            :: val
+-      TYPE(xc_f90_pointer_t)                   :: xc_func, xc_info
++      TYPE(xc_f03_func_t)                      :: xc_func
++      TYPE(xc_f03_func_info_t)                 :: xc_info
+ 
+       CALL timeset(routineN, handle)
+ 
+-      xc_libxc_wrap_needs_laplace = .FALSE.
+-
+       ! Some MGGa need the laplace explicit and some just need an arbitrary array
+-      ! of the correct size. Here we call the calculation routine twice for two
+-      ! different values of 'laplace_rho' and check if the result has changed.
++      ! of the correct size.
+       !
+-      ! Assumption (.true. in v2.1.0 - v3.x.x):
++      ! Assumption (.true. in v2.1.0 - v4.0.x):
+       !             if
+       !                functional is Laplace-dependent for XC_UNPOLARIZED
+       !             then
+@@ -425,68 +292,17 @@
+       !                functional will be Laplace-dependent for XC_POLARIZED too.
+       !
+ !$OMP CRITICAL(libxc_init)
+-      CALL xc_f90_func_init(xc_func, xc_info, func_id, XC_UNPOLARIZED)
++      CALL xc_f03_func_init(xc_func, func_id, XC_UNPOLARIZED)
++      xc_info = xc_f03_func_get_info(xc_func)
+ !$OMP END CRITICAL(libxc_init)
+ !$OMP BARRIER
+-      IF (xc_f90_info_family(xc_info) == XC_FAMILY_MGGA) THEN
+-         IF (IAND(xc_f90_info_flags(xc_info), XC_FLAGS_HAVE_EXC) == XC_FLAGS_HAVE_EXC) THEN
+-            ALLOCATE (val(1, 2))
+-            rho = 2.0e-3_dp; norm_drho = 2.0e-3_dp; my_tau = 5.0e-1_dp
+-            laplace_rho = -1.0e-1_dp
+-            CALL xc_f90_mgga_exc(xc_func, 1, rho, norm_drho, &
+-                                 laplace_rho, my_tau, val(1, 1))
+-            laplace_rho = -3.0e-1_dp
+-            CALL xc_f90_mgga_exc(xc_func, 1, rho, norm_drho, &
+-                                 laplace_rho, my_tau, val(1, 2))
+-            IF (val(1, 1) /= val(1, 2)) xc_libxc_wrap_needs_laplace = .TRUE.
+-            DEALLOCATE (val)
+-         END IF
+-         IF (IAND(xc_f90_info_flags(xc_info), XC_FLAGS_HAVE_VXC) == XC_FLAGS_HAVE_VXC) THEN
+-            ALLOCATE (val(1, 2), dummy(3))
+-            rho = 2.0e-3_dp; norm_drho = 2.0e-3_dp; my_tau = 5.0e-1_dp
+-            laplace_rho = -1.0e-1_dp
+-            CALL xc_f90_mgga_vxc(xc_func, 1, rho, norm_drho, &
+-                                 laplace_rho, my_tau, dummy(1), dummy(2), val(1, 1), dummy(3))
+-            laplace_rho = -3.0e-1_dp
+-            CALL xc_f90_mgga_vxc(xc_func, 1, rho, norm_drho, &
+-                                 laplace_rho, my_tau, dummy(1), dummy(2), val(1, 2), dummy(3))
+-            IF (val(1, 1) /= val(1, 2)) xc_libxc_wrap_needs_laplace = .TRUE.
+-            DEALLOCATE (val, dummy)
+-         END IF
+-         IF (IAND(xc_f90_info_flags(xc_info), XC_FLAGS_HAVE_FXC) == XC_FLAGS_HAVE_FXC) THEN
+-            ALLOCATE (val(4, 2), dummy(6))
+-            rho = 2.0e-3_dp; norm_drho = 2.0e-3_dp; my_tau = 5.0e-1_dp
+-            laplace_rho = -1.0e-1_dp
+-            CALL xc_f90_mgga_fxc(xc_func, 1, rho, norm_drho, &
+-                                 laplace_rho, my_tau, &
+-                                 dummy(1), dummy(2), val(1, 1), dummy(3), dummy(4), val(2, 1), &
+-                                 dummy(5), val(3, 1), dummy(6), val(4, 1))
+-            laplace_rho = -3.0e-1_dp
+-            CALL xc_f90_mgga_fxc(xc_func, 1, rho, norm_drho, &
+-                                 laplace_rho, my_tau, &
+-                                 dummy(1), dummy(2), val(1, 2), dummy(3), dummy(4), val(2, 2), &
+-                                 dummy(5), val(3, 2), dummy(6), val(4, 2))
+-            IF (val(1, 1) /= val(1, 2) .OR. val(2, 1) /= val(2, 2) .OR. &
+-                val(3, 1) /= val(3, 2) .OR. val(4, 1) /= val(4, 2)) &
+-               xc_libxc_wrap_needs_laplace = .TRUE.
+-            DEALLOCATE (val, dummy)
+-         END IF
++      IF (IAND(xc_f03_func_info_get_flags(xc_info), XC_FLAGS_NEEDS_LAPLACIAN) == XC_FLAGS_NEEDS_LAPLACIAN) THEN
++         xc_libxc_wrap_needs_laplace = .TRUE.
++      ELSE
++         xc_libxc_wrap_needs_laplace = .FALSE.
+       END IF
+-      CALL xc_f90_func_end(xc_func)
+ 
+-!    IF (func_id == XC_MGGA_X_BR89)            xc_libxc_wrap_needs_laplace = .TRUE.
+-!    IF (func_id == XC_MGGA_X_BJ06)            xc_libxc_wrap_needs_laplace = .TRUE.
+-!    IF (func_id == XC_MGGA_X_TB09)            xc_libxc_wrap_needs_laplace = .TRUE.
+-!    IF (func_id == XC_MGGA_X_RPP09)           xc_libxc_wrap_needs_laplace = .TRUE.
+-!    IF (func_id == XC_MGGA_X_2D_PRHG07)       xc_libxc_wrap_needs_laplace = .TRUE.
+-!    IF (func_id == XC_MGGA_X_2D_PRHG07_PRP10) xc_libxc_wrap_needs_laplace = .TRUE.
+-!    IF (func_id == XC_MGGA_X_MK00)            xc_libxc_wrap_needs_laplace = .TRUE.
+-!    IF (func_id == XC_MGGA_X_MK00B)           xc_libxc_wrap_needs_laplace = .TRUE.
+-!#if (XC_MAJOR_VERSION == 3)
+-!    IF (func_id == XC_MGGA_XC_ZLP)            xc_libxc_wrap_needs_laplace = .TRUE.
+-!#endif
+-!    IF (func_id == XC_MGGA_C_CS)              xc_libxc_wrap_needs_laplace = .TRUE.
+-!    IF (func_id == XC_MGGA_C_CC06)            xc_libxc_wrap_needs_laplace = .TRUE.
++      CALL xc_f03_func_end(xc_func)
+ 
+       CALL timestop(handle)
+ 
+@@ -496,58 +312,64 @@
+ !> \brief Wrapper for functionals that need special parameters.
+ !> \param xc_func ...
+ !> \param xc_info ...
+-!> \param func_id ...
+ !> \param params ...
+ !> \param no_exc ...
+ !>
+-!> \author A. Gloessa (agloess)
++!> \author A. Gloess (agloess)
+ ! **************************************************************************************************
+-   SUBROUTINE xc_libxc_wrap_functional_set_params(xc_func, xc_info, func_id, params, no_exc)
+-      TYPE(xc_f90_pointer_t), INTENT(INOUT)              :: xc_func
+-      TYPE(xc_f90_pointer_t), INTENT(IN)                 :: xc_info
+-      INTEGER, INTENT(IN)                                :: func_id
+-      REAL(KIND=dp), DIMENSION(*), INTENT(IN)            :: params
++   SUBROUTINE xc_libxc_wrap_functional_set_params(xc_func, xc_info, params, no_exc)
++      TYPE(xc_f03_func_t), INTENT(INOUT)                 :: xc_func
++      TYPE(xc_f03_func_info_t), INTENT(IN)               :: xc_info
++      REAL(KIND=dp), DIMENSION(:), INTENT(IN), POINTER   :: params
+       LOGICAL, INTENT(INOUT)                             :: no_exc
+ 
+       CHARACTER(LEN=*), PARAMETER :: routineN = 'xc_libxc_wrap_functional_set_params', &
+          routineP = moduleN//':'//routineN
+ 
+-      INTEGER                                            :: handle
++      INTEGER                                            :: handle, i_params, n_params
+ 
+       CALL timeset(routineN, handle)
+ 
+-!ToDo: This is dangerous, since wrong parameter ordering or missing ones
+-!      result in wrong numbers or a crash.
+-!      --> LibXC needs to provide more informations via a function.
+-      IF (params(1) < 0.99e20_dp) THEN
+-         SELECT CASE (func_id)
+-         CASE (XC_LDA_X)
+-            CALL xc_f90_lda_x_set_par(xc_func, params(1), NINT(params(2)), params(3))
+-         CASE (XC_LDA_C_XALPHA)
+-            CALL xc_f90_lda_c_xalpha_set_par(xc_func, params(1))
+-         CASE (XC_LDA_C_2D_PRM)
+-            CALL xc_f90_lda_c_2d_prm_set_par(xc_func, params(1))
+-         CASE (XC_LDA_C_1D_CSC)
+-            CALL xc_f90_lda_c_1d_csc_set_par(xc_func, NINT(params(1)), params(2))
+-         CASE (XC_LDA_X_1D)
+-            CALL xc_f90_lda_x_1d_set_par(xc_func, NINT(params(1)), params(2))
+-         CASE (XC_GGA_X_LB)
+-            CALL xc_f90_gga_lb_set_par(xc_func, NINT(params(1)), params(2), params(3), params(4))
+-         CASE (XC_MGGA_X_TB09)
+-            CALL xc_f90_mgga_x_tb09_set_par(xc_func, params(1))
+-         CASE (XC_HYB_GGA_XC_HSE03, XC_HYB_GGA_XC_HSE06)
+-            CALL xc_f90_hyb_gga_xc_hse_set_par(xc_func, params(1), params(2))
+-         CASE (XC_HYB_GGA_XC_HJS_PBE, XC_HYB_GGA_XC_HJS_PBE_SOL, &
+-               XC_HYB_GGA_XC_HJS_B88, XC_HYB_GGA_XC_HJS_B97X, &
+-               XC_GGA_X_HJS_PBE, XC_GGA_X_HJS_PBE_SOL, &
+-               XC_GGA_X_HJS_B88, XC_GGA_X_HJS_B97X)
+-            CALL xc_f90_gga_x_hjs_set_par(xc_func, params(1))
+-         CASE (XC_GGA_X_WPBEH)
+-            CALL xc_f90_gga_x_wpbeh_set_par(xc_func, params(1))
+-         END SELECT
++      n_params = xc_f03_func_info_get_n_ext_params(xc_info)
++      i_params = SIZE(params)
++
++      IF ((n_params > 0) .AND. (i_params > 0) .AND. (params(1) < HUGE(0.0_dp))) THEN
++         IF (i_params == n_params) THEN
++            CALL xc_f03_func_set_ext_params(xc_func, params) ! this is wrong, but XC's F90-interface is missing the '*'
++         ELSE
++            CALL cp_abort(__LOCATION__, &
++               "LIBXC: Inconsistent number of optional external parameters. (required: "&
++               &//cp_to_string(n_params)//", given: "//cp_to_string(i_params)//")")
++         END IF
+       END IF
+ 
+-      IF (IAND(xc_f90_info_flags(xc_info), XC_FLAGS_HAVE_EXC) == XC_FLAGS_HAVE_EXC) THEN
++!         SELECT CASE (func_id)
++!         CASE (XC_LDA_X)
++!            CALL xc_f03_lda_x_set_par(xc_func, params(1), NINT(params(2)), params(3))
++!         CASE (XC_LDA_C_XALPHA)
++!            CALL xc_f03_lda_c_xalpha_set_par(xc_func, params(1))
++!         CASE (XC_LDA_C_2D_PRM)
++!            CALL xc_f03_lda_c_2d_prm_set_par(xc_func, params(1))
++!         CASE (XC_LDA_C_1D_CSC)
++!            CALL xc_f03_lda_c_1d_csc_set_par(xc_func, NINT(params(1)), params(2))
++!         CASE (XC_LDA_X_1D)
++!            CALL xc_f03_lda_x_1d_set_par(xc_func, NINT(params(1)), params(2))
++!         CASE (XC_GGA_X_LB)
++!            CALL xc_f03_gga_lb_set_par(xc_func, NINT(params(1)), params(2), params(3), params(4))
++!         CASE (XC_MGGA_X_TB09)
++!            CALL xc_f03_mgga_x_tb09_set_par(xc_func, params(1))
++!         CASE (XC_HYB_GGA_XC_HSE03, XC_HYB_GGA_XC_HSE06)
++!            CALL xc_f03_hyb_gga_xc_hse_set_par(xc_func, params(1), params(2))
++!         CASE (XC_HYB_GGA_XC_HJS_PBE, XC_HYB_GGA_XC_HJS_PBE_SOL, &
++!               XC_HYB_GGA_XC_HJS_B88, XC_HYB_GGA_XC_HJS_B97X, &
++!               XC_GGA_X_HJS_PBE, XC_GGA_X_HJS_PBE_SOL, &
++!               XC_GGA_X_HJS_B88, XC_GGA_X_HJS_B97X)
++!            CALL xc_f03_gga_x_hjs_set_par(xc_func, params(1))
++!         CASE (XC_GGA_X_WPBEH)
++!            CALL xc_f03_gga_x_wpbeh_set_par(xc_func, params(1))
++!         END SELECT
++
++      IF (IAND(xc_f03_func_info_get_flags(xc_info), XC_FLAGS_HAVE_EXC) == XC_FLAGS_HAVE_EXC) THEN
+          no_exc = .FALSE.
+       ELSE
+          no_exc = .TRUE.
+@@ -557,113 +379,6 @@
+ 
+    END SUBROUTINE xc_libxc_wrap_functional_set_params
+ 
+-! **************************************************************************************************
+-!> \brief Wrapper for known buggy functionals.
+-!> \param func_id ...
+-!> \param grad_deriv ...
+-!> \author A. Gloessa (agloess)
+-! **************************************************************************************************
+-   SUBROUTINE xc_libxc_wrap_functional_buggy(func_id, grad_deriv)
+-!
+-! BugFix information was taken from:
+-!
+-! http://www.tddft.org/programs/octopus/wiki/index.php/Libxc_changes
+-!
+-!
+-! corrected with: 2.1.3 and 2.2.3
+-!    XC_GGA_X_N12, XC_GGA_C_N12, XC_GGA_C_N12_SX, XC_HYB_GGA_X_N12_SX,
+-!    XC_HYB_GGA_XC_O3LYP, XC_HYB_GGA_XC_X3LYP, XC_GGA_X_B88,
+-!    XC_GGA_X_OPTB88_VDW, XC_GGA_X_MB88, XC_GGA_K_LLP, XC_GGA_K_FR_B88,
+-!    XC_GGA_K_THAKKAR
+-! + all XC_GGA_X_HJS_*
+-! + all XC_HYB_GGA_XC_HJS_*
+-!    second order derivatives (XC_GGA_X_B88, XC_GGA_X_OPTB88_VDW,
+-!     XC_GGA_X_MB88, XC_GGA_K_LLP, XC_GGA_K_FR_B88, XC_GGA_K_THAKKAR)
+-!
+-! corrected with: 3.x.x
+-!    XC_MGGA_X_M11, XC_MGGA_X_M11_L, XC_HYB_MGGA_X_MS2H
+-!
+-!
+-! Note, some variables were redefined between version 2.1.x and 3.x.x!
+-!
+-! XC_HYB_MGGA_X_M11 --> XC_MGGA_X_M11
+-! XC_MGGA_X_MS2H    --> XC_HYB_MGGA_X_MS2H
+-!
+-      INTEGER, INTENT(IN)                                :: func_id
+-      INTEGER, INTENT(IN), OPTIONAL                      :: grad_deriv
+-
+-      CHARACTER(LEN=*), PARAMETER :: routineN = 'xc_libxc_wrap_functional_buggy', &
+-         routineP = moduleN//':'//routineN
+-
+-      CHARACTER(LEN=256)                                 :: func_name
+-      INTEGER                                            :: handle, i, my_grad_deriv, nbuggy
+-      INTEGER, ALLOCATABLE, DIMENSION(:)                 :: buggy
+-      LOGICAL                                            :: bug
+-
+-      CALL timeset(routineN, handle)
+-
+-      bug = .FALSE.
+-      my_grad_deriv = 0
+-      IF (PRESENT(grad_deriv)) my_grad_deriv = ABS(grad_deriv)
+-      SELECT CASE (libxc_version)
+-#if ( XC_MAJOR_VERSION == 2)
+-      CASE ("2.1.2", "2.2.2")
+-         IF (my_grad_deriv == 2) THEN
+-            nbuggy = 23; ALLOCATE (buggy(nbuggy))
+-            buggy(:) = (/XC_GGA_X_N12, XC_GGA_C_N12, &
+-                         XC_GGA_C_N12_SX, XC_HYB_GGA_X_N12_SX, XC_HYB_GGA_XC_O3LYP, &
+-                         XC_HYB_GGA_XC_X3LYP, XC_GGA_X_B88, XC_GGA_X_OPTB88_VDW, &
+-                         XC_GGA_X_MB88, XC_GGA_K_LLP, XC_GGA_K_FR_B88, XC_GGA_K_THAKKAR, &
+-                         XC_HYB_MGGA_X_M11, XC_MGGA_X_M11_L, XC_MGGA_X_MS2H, &
+-                         XC_GGA_X_HJS_PBE, XC_GGA_X_HJS_PBE_SOL, &
+-                         XC_GGA_X_HJS_B88, XC_GGA_X_HJS_B97X, XC_HYB_GGA_XC_HJS_PBE, &
+-                         XC_HYB_GGA_XC_HJS_PBE_SOL, XC_HYB_GGA_XC_HJS_B88, XC_HYB_GGA_XC_HJS_B97X/)
+-         ELSE
+-            nbuggy = 17; ALLOCATE (buggy(nbuggy))
+-            buggy(:) = (/XC_GGA_X_N12, XC_GGA_C_N12, &
+-                         XC_GGA_C_N12_SX, XC_HYB_GGA_X_N12_SX, XC_HYB_GGA_XC_O3LYP, &
+-                         XC_HYB_GGA_XC_X3LYP, &
+-                         XC_HYB_MGGA_X_M11, XC_MGGA_X_M11_L, XC_MGGA_X_MS2H, &
+-                         XC_GGA_X_HJS_PBE, XC_GGA_X_HJS_PBE_SOL, &
+-                         XC_GGA_X_HJS_B88, XC_GGA_X_HJS_B97X, XC_HYB_GGA_XC_HJS_PBE, &
+-                         XC_HYB_GGA_XC_HJS_PBE_SOL, XC_HYB_GGA_XC_HJS_B88, XC_HYB_GGA_XC_HJS_B97X/)
+-         END IF
+-      CASE ("2.1.3", "2.2.3")
+-         nbuggy = 3; ALLOCATE (buggy(nbuggy))
+-         buggy(:) = (/XC_HYB_MGGA_X_M11, XC_MGGA_X_M11_L, XC_MGGA_X_MS2H/)
+ #endif
+-      CASE ("3.x.x")
+-         nbuggy = 0
+-      CASE default
+-         nbuggy = 0
+-         IF (first_time) THEN
+-            CALL cp_warn(__LOCATION__, &
+-                         " This version ("//TRIM(libxc_version)//") of LibXC is new or unknown."// &
+-                         " ======== Please check the results carefully. ========    "// &
+-                         " More informations on bugfixes can be found at: "// &
+-                         " http://www.tddft.org/programs/octopus/wiki/index.php/Libxc_changes"// &
+-                         " Calculation continues using unsupported LibXC version. ")
+-            first_time = .FALSE.
+-         END IF
+-      END SELECT
+-
+-      DO i = 1, nbuggy
+-         IF (func_id == buggy(i)) THEN
+-            bug = .TRUE.
+-         END IF
+-      END DO
+-
+-      IF (bug) THEN
+-         CALL xc_f90_functional_get_name(func_id, func_name)
+-         CALL cp_abort(__LOCATION__, TRIM(func_name)//": deactivated since buggy in version "// &
+-                       TRIM(libxc_version)//" of LibXC.")
+-      END IF
+-
+-      IF (ALLOCATED(buggy)) DEALLOCATE (buggy)
+-
+-      CALL timestop(handle)
+-
+-   END SUBROUTINE xc_libxc_wrap_functional_buggy
+ #endif
+-#endif
+ END MODULE xc_libxc_wrap
+Index: src/xc/xc_rho_set_types.F
+===================================================================
+--- src/xc/xc_rho_set_types.F	(revision 18252)
++++ src/xc/xc_rho_set_types.F	(working copy)
+@@ -1,6 +1,6 @@
+ !--------------------------------------------------------------------------------------------------!
+ !   CP2K: A general program to perform molecular dynamics simulations                              !
+-!   Copyright (C) 2000 - 2017  CP2K developers group                                               !
++!   Copyright (C) 2000 - 2018  CP2K developers group                                               !
+ !--------------------------------------------------------------------------------------------------!
+ 
+ ! **************************************************************************************************
+@@ -767,7 +767,7 @@
+                   END DO
+                   CPABORT("Drho collocation not implemented")
+                CASE default
+-                  CPABORT("")
++                  CPABORT("Derivatives using PW are not implemented for this 'XC_DERIV'")
+                END SELECT
+                CALL pw_pool_give_back_pw(pw_pool, tmp_g)
+                IF (my_rho_g_local) THEN
+Index: src/xc_write_output.F
+===================================================================
+--- src/xc_write_output.F	(revision 18252)
++++ src/xc_write_output.F	(working copy)
+@@ -1,6 +1,6 @@
+ !--------------------------------------------------------------------------------------------------!
+ !   CP2K: A general program to perform molecular dynamics simulations                              !
+-!   Copyright (C) 2000 - 2017  CP2K developers group                                               !
++!   Copyright (C) 2000 - 2018  CP2K developers group                                               !
+ !--------------------------------------------------------------------------------------------------!
+ 
+ ! **************************************************************************************************
+@@ -10,8 +10,11 @@
+ 
+    USE input_constants,                 ONLY: xc_none
+    USE input_cp2k_check,                ONLY: xc_functionals_expand
+-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
++   USE input_section_types,             ONLY: section_vals_duplicate,&
++                                              section_vals_get,&
++                                              section_vals_get_subs_vals,&
+                                               section_vals_get_subs_vals2,&
++                                              section_vals_release,&
+                                               section_vals_type,&
+                                               section_vals_val_get
+    USE kinds,                           ONLY: default_string_length
+@@ -45,10 +48,8 @@
+       CHARACTER(LEN=10*default_string_length)            :: reference
+       CHARACTER(LEN=2*default_string_length)             :: shortform
+       CHARACTER(LEN=20)                                  :: tmpStr
+-      CHARACTER(LEN=default_string_length), &
+-         DIMENSION(:), POINTER                           :: func_name
+-      INTEGER                                            :: ifun, ifunc_name, il, myfun
+-      TYPE(section_vals_type), POINTER                   :: xc_fun, xc_fun_section
++      INTEGER                                            :: i_rep, ifun, il, myfun, n_rep
++      TYPE(section_vals_type), POINTER                   :: libxc_fun, xc_fun, xc_fun_section
+ 
+       IF (output_unit > 0) THEN
+ 
+@@ -66,26 +67,24 @@
+                ifun = ifun+1
+                xc_fun => section_vals_get_subs_vals2(xc_fun_section, i_section=ifun)
+                IF (.NOT. ASSOCIATED(xc_fun)) EXIT
+-               CALL xc_functional_get_info(xc_fun, &
+-                                           lsd=lsd, &
+-                                           reference=reference, &
+-                                           shortform=shortform, &
+-                                           ifunc_name=1)
+-               IF (TRIM(xc_fun%section%name) == "LIBXC") THEN
+-                  CALL libxc_version_info(tmpStr)
+-                  WRITE (output_unit, fmt="(A,A,A)") ' FUNCTIONAL| LIBXC Vers. ', TRIM(tmpStr(1:5)), &
+-                     ' (Marques, Oliveira, Burnus, CPC 183, 2272 (2012))'
+-                  WRITE (output_unit, fmt="(' FUNCTIONAL| ',a,':')") TRIM(shortform)
++               IF (TRIM(xc_fun%section%name) /= "LIBXC") THEN
++                  CALL xc_functional_get_info(xc_fun, lsd=lsd, reference=reference, shortform=shortform)
++                  WRITE (output_unit, fmt="(' FUNCTIONAL| ',a,':')") &
++                     TRIM(xc_fun%section%name)
+                   DO il = 1, LEN_TRIM(reference), 67
+                      WRITE (output_unit, fmt="(' FUNCTIONAL| ',a67)") reference(il:)
+                   END DO
+-                  CALL section_vals_val_get(xc_fun, "functional", c_vals=func_name)
+-                  DO ifunc_name = 2, SIZE(func_name)
+-                     CALL xc_functional_get_info(xc_fun, &
+-                                                 lsd=lsd, &
+-                                                 reference=reference, &
+-                                                 shortform=shortform, &
+-                                                 ifunc_name=ifunc_name)
++               ELSE
++                  ! LIBXC is the only repeatable functional section - for each we need
++                  ! NOT the single values, but the whole section_vals_type independently
++                  CALL section_vals_get(xc_fun, n_repetition=n_rep)
++                  DO i_rep = 1, n_rep
++                     NULLIFY (libxc_fun)
++                     CALL section_vals_duplicate(xc_fun, libxc_fun, i_rep_start=i_rep, i_rep_end=i_rep)
++                     IF (.NOT. ASSOCIATED(libxc_fun)) EXIT
++                     CALL xc_functional_get_info(libxc_fun, lsd=lsd, reference=reference, shortform=shortform)
++                     CALL section_vals_release(libxc_fun)
++                     CALL libxc_version_info(tmpStr)
+                      WRITE (output_unit, fmt="(A,A,A)") ' FUNCTIONAL| LIBXC Vers. ', TRIM(tmpStr(1:5)), &
+                         ' (Marques, Oliveira, Burnus, CPC 183, 2272 (2012))'
+                      WRITE (output_unit, fmt="(' FUNCTIONAL| ',a,':')") TRIM(shortform)
+@@ -93,12 +92,6 @@
+                         WRITE (output_unit, fmt="(' FUNCTIONAL| ',a67)") reference(il:)
+                      END DO
+                   END DO
+-               ELSE
+-                  WRITE (output_unit, fmt="(' FUNCTIONAL| ',a,':')") &
+-                     TRIM(xc_fun%section%name)
+-                  DO il = 1, LEN_TRIM(reference), 67
+-                     WRITE (output_unit, fmt="(' FUNCTIONAL| ',a67)") reference(il:)
+-                  END DO
+                END IF
+             END DO
+          ELSE
+Index: tests/QS/regtest-dft-vdw-corr-3/argon11.inp
+===================================================================
+--- tests/QS/regtest-dft-vdw-corr-3/argon11.inp	(revision 18252)
++++ tests/QS/regtest-dft-vdw-corr-3/argon11.inp	(working copy)
+@@ -23,8 +23,11 @@
+     &XC
+       &XC_FUNCTIONAL
+         &LIBXC
+-          FUNCTIONAL XC_GGA_X_RPW86 XC_GGA_C_PBE
++          FUNCTIONAL XC_GGA_X_RPW86
+         &END LIBXC
++        &LIBXC
++          FUNCTIONAL XC_GGA_C_PBE
++        &END LIBXC
+       &END XC_FUNCTIONAL
+       &vdW_POTENTIAL
+          DISPERSION_FUNCTIONAL NON_LOCAL
+Index: tests/QS/regtest-dft-vdw-corr-3/argon12.inp
+===================================================================
+--- tests/QS/regtest-dft-vdw-corr-3/argon12.inp	(revision 18252)
++++ tests/QS/regtest-dft-vdw-corr-3/argon12.inp	(working copy)
+@@ -23,8 +23,11 @@
+     &XC
+       &XC_FUNCTIONAL
+         &LIBXC
+-          FUNCTIONAL XC_GGA_X_RPW86 XC_GGA_C_PBE
++          FUNCTIONAL XC_GGA_X_RPW86
+         &END LIBXC
++        &LIBXC
++          FUNCTIONAL XC_GGA_C_PBE
++        &END LIBXC
+       &END XC_FUNCTIONAL
+       &vdW_POTENTIAL
+          DISPERSION_FUNCTIONAL NON_LOCAL
+Index: tests/QS/regtest-dft-vdw-corr-3/argon14.inp
+===================================================================
+--- tests/QS/regtest-dft-vdw-corr-3/argon14.inp	(revision 18252)
++++ tests/QS/regtest-dft-vdw-corr-3/argon14.inp	(working copy)
+@@ -26,8 +26,11 @@
+       &END XC_GRID
+       &XC_FUNCTIONAL
+         &LIBXC
+-          FUNCTIONAL XC_GGA_X_RPW86 XC_GGA_C_PBE
++          FUNCTIONAL XC_GGA_X_RPW86
+         &END LIBXC
++        &LIBXC
++          FUNCTIONAL XC_GGA_C_PBE
++        &END LIBXC
+       &END XC_FUNCTIONAL
+       &vdW_POTENTIAL
+          DISPERSION_FUNCTIONAL NON_LOCAL
+Index: tests/QS/regtest-libxc/H2O_lda_libxc_tddfpt-s.inp
+===================================================================
+--- tests/QS/regtest-libxc/H2O_lda_libxc_tddfpt-s.inp	(revision 18252)
++++ tests/QS/regtest-libxc/H2O_lda_libxc_tddfpt-s.inp	(working copy)
+@@ -29,8 +29,11 @@
+       &XC
+         &XC_FUNCTIONAL
+           &LIBXC
+-            FUNCTIONAL XC_LDA_X XC_LDA_C_VWN
++            FUNCTIONAL XC_LDA_X
+           &END LIBXC
++          &LIBXC
++            FUNCTIONAL XC_LDA_C_VWN
++          &END LIBXC
+         &END XC_FUNCTIONAL
+         &XC_GRID
+          XC_DERIV SPLINE2_SMOOTH
+@@ -40,8 +43,11 @@
+     &XC
+       &XC_FUNCTIONAL
+         &LIBXC
+-          FUNCTIONAL XC_LDA_X XC_LDA_C_VWN
++          FUNCTIONAL XC_LDA_X
+         &END LIBXC
++        &LIBXC
++          FUNCTIONAL XC_LDA_C_VWN
++        &END LIBXC
+       &END XC_FUNCTIONAL
+     &END XC
+   &END DFT
+Index: tests/QS/regtest-libxc/H2O_lda_libxc_tddfpt-t_uks.inp
+===================================================================
+--- tests/QS/regtest-libxc/H2O_lda_libxc_tddfpt-t_uks.inp	(revision 18252)
++++ tests/QS/regtest-libxc/H2O_lda_libxc_tddfpt-t_uks.inp	(working copy)
+@@ -30,8 +30,11 @@
+       &XC
+         &XC_FUNCTIONAL
+           &LIBXC
+-            FUNCTIONAL XC_LDA_X XC_LDA_C_VWN
++            FUNCTIONAL XC_LDA_X
+           &END LIBXC
++          &LIBXC
++            FUNCTIONAL XC_LDA_C_VWN
++          &END LIBXC
+         &END XC_FUNCTIONAL
+         &XC_GRID
+          XC_DERIV SPLINE2_SMOOTH
+@@ -41,8 +44,11 @@
+     &XC
+       &XC_FUNCTIONAL
+         &LIBXC
+-          FUNCTIONAL XC_LDA_X XC_LDA_C_VWN
++          FUNCTIONAL XC_LDA_X
+         &END LIBXC
++        &LIBXC
++          FUNCTIONAL XC_LDA_C_VWN
++        &END LIBXC
+       &END XC_FUNCTIONAL
+     &END XC
+   &END DFT
+Index: tests/QS/regtest-libxc/H2O_pbe_libxc_tddfpt-s.inp
+===================================================================
+--- tests/QS/regtest-libxc/H2O_pbe_libxc_tddfpt-s.inp	(revision 18252)
++++ tests/QS/regtest-libxc/H2O_pbe_libxc_tddfpt-s.inp	(working copy)
+@@ -29,8 +29,11 @@
+       &XC
+         &XC_FUNCTIONAL
+           &LIBXC
+-            FUNCTIONAL XC_GGA_X_PBE XC_GGA_C_PBE
++            FUNCTIONAL XC_GGA_X_PBE
+           &END LIBXC
++          &LIBXC
++            FUNCTIONAL XC_GGA_C_PBE
++          &END LIBXC
+         &END XC_FUNCTIONAL
+         &XC_GRID
+          XC_DERIV SPLINE2_SMOOTH
+@@ -40,8 +43,11 @@
+     &XC
+       &XC_FUNCTIONAL
+         &LIBXC
+-          FUNCTIONAL XC_GGA_X_PBE XC_GGA_C_PBE
++          FUNCTIONAL XC_GGA_X_PBE
+         &END LIBXC
++        &LIBXC
++          FUNCTIONAL XC_GGA_C_PBE
++        &END LIBXC
+       &END XC_FUNCTIONAL
+     &END XC
+   &END DFT
+Index: tests/QS/regtest-libxc/H2O_pbe_libxc_tddfpt-t_uks.inp
+===================================================================
+--- tests/QS/regtest-libxc/H2O_pbe_libxc_tddfpt-t_uks.inp	(revision 18252)
++++ tests/QS/regtest-libxc/H2O_pbe_libxc_tddfpt-t_uks.inp	(working copy)
+@@ -30,8 +30,11 @@
+       &XC
+         &XC_FUNCTIONAL
+           &LIBXC
+-            FUNCTIONAL XC_GGA_X_PBE XC_GGA_C_PBE
++            FUNCTIONAL XC_GGA_X_PBE
+           &END LIBXC
++          &LIBXC
++            FUNCTIONAL XC_GGA_C_PBE
++          &END LIBXC
+         &END XC_FUNCTIONAL
+         &XC_GRID
+          XC_DERIV SPLINE2_SMOOTH
+@@ -41,8 +44,11 @@
+     &XC
+       &XC_FUNCTIONAL
+         &LIBXC
+-          FUNCTIONAL XC_GGA_X_PBE XC_GGA_C_PBE
++          FUNCTIONAL XC_GGA_X_PBE
+         &END LIBXC
++        &LIBXC
++          FUNCTIONAL XC_GGA_C_PBE
++        &END LIBXC
+       &END XC_FUNCTIONAL
+     &END XC
+   &END DFT

@@ -15,7 +15,7 @@
 
 Name: cp2k
 Version: 5.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
 URL: http://cp2k.org/
@@ -26,16 +26,19 @@ Source0: cp2k-%{version}-%{snapshot}.tar.xz
 Source0: https://downloads.sourceforge.net/project/cp2k/cp2k-%{version}.tar.bz2
 %endif
 Source4: cp2k-snapshot.sh
+# Upstream patches
+# Support libxc 4
+# https://groups.google.com/forum/#!topic/cp2k/yJP-HRqx4Y0
+Patch0: https://www.cp2k.org/static/downloads/patches/patch_cp2k-5.1_libxc-4.0.4-support.diff
+# Fedora patches
 # patch to:
 # use rpm optflags
 # link with openblas or atlas instead of vanilla blas/lapack
 # build with libint and libxc
 # build shared libraries
-Patch0: %{name}-rpm.patch
+Patch10: %{name}-rpm.patch
 # fix build failure on 32bit arches
-Patch1: %{name}-32bit.patch
-# Support libxc 4
-Patch2: cp2k-4.1-libxc4.patch
+Patch11: %{name}-32bit.patch
 %if %{with atlas}
 BuildRequires: atlas-devel
 %else
@@ -46,7 +49,7 @@ BuildRequires: bc
 BuildRequires: fftw-devel
 BuildRequires: gcc-gfortran
 BuildRequires: libint-devel
-BuildRequires: libxc-devel
+BuildRequires: libxc-devel >= 4.0
 %ifarch x86_64
 # See https://bugzilla.redhat.com/show_bug.cgi?id=1515404
 BuildRequires: libxsmm-devel >= 1.8.1-3
@@ -116,9 +119,9 @@ This package contains the documentation and the manual.
 
 %prep
 %setup -q
-%patch0 -p1 -b .r
-%patch1 -p1 -b .32bit
-%patch2 -p1 -b .libxc4
+%patch0 -p0
+%patch10 -p1 -b .r
+%patch11 -p1 -b .32bit
 sed -i 's|@libdir@|%{_libdir}|' makefiles/Makefile
 
 # Generate necessary symlinks
@@ -268,6 +271,10 @@ done
 %{_libdir}/mpich/lib/cp2k/lib*.psmp.so
 
 %changelog
+* Wed Feb 07 2018 Dominik Mierzejewski <rpm@greysector.net> - 5.1-3
+- use upstream patch for libxc-4.x support
+- reorder and adjust patches
+
 * Wed Feb 07 2018 Fedora Release Engineering <releng@fedoraproject.org> - 5.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
 

@@ -14,8 +14,8 @@ diff -up cp2k-5.1/arch/Linux-x86-64-gfortran.popt.r cp2k-5.1/arch/Linux-x86-64-g
  FFTW_INC   = $(GCC_DIR)/fftw/3.3-gnu/include
  FFTW_LIB   = $(GCC_DIR)/fftw/3.3-gnu/lib64
 @@ -11,19 +12,25 @@ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LAR
- LIBXC_INC  = $(GCC_DIR)/libxc/3.0.0-gnu/include
- LIBXC_LIB  = $(GCC_DIR)/libxc/3.0.0-gnu/lib64
+ LIBXC_INC  = $(GCC_DIR)/libxc/4.0.4-gnu/include
+ LIBXC_LIB  = $(GCC_DIR)/libxc/4.0.4-gnu/lib64
  DFLAGS     = -D__FFTW3 -D__LIBINT -D__LIBXC -D__MPI_VERSION=3\
 -             -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6 -D__MAX_CONTR=4\
 +             -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@ -D__MAX_CONTR=4\
@@ -32,7 +32,7 @@ diff -up cp2k-5.1/arch/Linux-x86-64-gfortran.popt.r cp2k-5.1/arch/Linux-x86-64-g
 -             $(LIBPATH)/liblapack-gnu.a\
 -             $(LIBPATH)/libblas-gnu.a\
 -             $(FFTW_LIB)/libfftw3.a\
--             $(LIBXC_LIB)/libxcf90.a\
+-             $(LIBXC_LIB)/libxcf03.a\
 -             $(LIBXC_LIB)/libxc.a\
 -             $(LIBINT_LIB)/libderiv.a\
 -             $(LIBINT_LIB)/libint.a
@@ -45,7 +45,7 @@ diff -up cp2k-5.1/arch/Linux-x86-64-gfortran.popt.r cp2k-5.1/arch/Linux-x86-64-g
 +             -lscalapack -lmpiblacs -lstdc++\
 +             -l@BLAS@\
 +             -lfftw3\
-+             -lxcf90\
++             -lxcf03\
 +             -lxc\
 +             -lderiv\
 +             -lint
@@ -66,8 +66,8 @@ diff -up cp2k-5.1/arch/Linux-x86-64-gfortran.psmp.r cp2k-5.1/arch/Linux-x86-64-g
  FFTW_INC   = $(GCC_DIR)/fftw/3.3-gnu/include
  FFTW_LIB   = $(GCC_DIR)/fftw/3.3-gnu/lib64
 @@ -11,20 +12,26 @@ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LAR
- LIBXC_INC  = $(GCC_DIR)/libxc/3.0.0-gnu/include
- LIBXC_LIB  = $(GCC_DIR)/libxc/3.0.0-gnu/lib64
+ LIBXC_INC  = $(GCC_DIR)/libxc/4.0.4-gnu/include
+ LIBXC_LIB  = $(GCC_DIR)/libxc/4.0.4-gnu/lib64
  DFLAGS     = -D__FFTW3 -D__LIBINT -D__LIBXC -D__MPI_VERSION=3\
 -             -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6 -D__MAX_CONTR=4\
 +             -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@ -D__MAX_CONTR=4\
@@ -85,7 +85,7 @@ diff -up cp2k-5.1/arch/Linux-x86-64-gfortran.psmp.r cp2k-5.1/arch/Linux-x86-64-g
 -             $(LIBPATH)/libblas-gnu.a\
 -             $(FFTW_LIB)/libfftw3.a\
 -             $(FFTW_LIB)/libfftw3_threads.a\
--             $(LIBXC_LIB)/libxcf90.a\
+-             $(LIBXC_LIB)/libxcf03.a\
 -             $(LIBXC_LIB)/libxc.a\
 -             $(LIBINT_LIB)/libderiv.a\
 -             $(LIBINT_LIB)/libint.a
@@ -99,7 +99,7 @@ diff -up cp2k-5.1/arch/Linux-x86-64-gfortran.psmp.r cp2k-5.1/arch/Linux-x86-64-g
 +             -l@BLAS@\
 +             -lfftw3\
 +             -lfftw3_omp\
-+             -lxcf90\
++             -lxcf03\
 +             -lxc\
 +             -lderiv\
 +             -lint
@@ -116,8 +116,8 @@ diff -up cp2k-5.1/arch/Linux-x86-64-gfortran.sopt.r cp2k-5.1/arch/Linux-x86-64-g
  FFTW_INC   = $(GCC_DIR)/fftw/3.3-gnu/include
  FFTW_LIB   = $(GCC_DIR)/fftw/3.3-gnu/lib64
 @@ -11,18 +12,22 @@ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LAR
- LIBXC_INC  = $(GCC_DIR)/libxc/3.0.0-gnu/include
- LIBXC_LIB  = $(GCC_DIR)/libxc/3.0.0-gnu/lib64
+ LIBXC_INC  = $(GCC_DIR)/libxc/4.0.4-gnu/include
+ LIBXC_LIB  = $(GCC_DIR)/libxc/4.0.4-gnu/lib64
  DFLAGS     = -D__FFTW3 -D__LIBINT -D__LIBXC\
 -             -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6 -D__MAX_CONTR=4
 +             -D__HAS_IEEE_EXCEPTIONS @LIBSMM_DEFS@\
@@ -132,7 +132,7 @@ diff -up cp2k-5.1/arch/Linux-x86-64-gfortran.sopt.r cp2k-5.1/arch/Linux-x86-64-g
 -LIBS       = $(LIBPATH)/liblapack-gnu.a\
 -             $(LIBPATH)/libblas-gnu.a\
 -             $(FFTW_LIB)/libfftw3.a\
--             $(LIBXC_LIB)/libxcf90.a\
+-             $(LIBXC_LIB)/libxcf03.a\
 -             $(LIBXC_LIB)/libxc.a\
 -             $(LIBINT_LIB)/libderiv.a\
 -             $(LIBINT_LIB)/libint.a\
@@ -144,7 +144,7 @@ diff -up cp2k-5.1/arch/Linux-x86-64-gfortran.sopt.r cp2k-5.1/arch/Linux-x86-64-g
 +LIBS       = -l@BLAS@\
 +             @LIBSMM_LIBS@\
 +             -lfftw3\
-+             -lxcf90\
++             -lxcf03\
 +             -lxc\
 +             -lderiv\
 +             -lint
@@ -161,8 +161,8 @@ diff -up cp2k-5.1/arch/Linux-x86-64-gfortran.ssmp.r cp2k-5.1/arch/Linux-x86-64-g
  FFTW_INC   = $(GCC_DIR)/fftw/3.3-gnu/include
  FFTW_LIB   = $(GCC_DIR)/fftw/3.3-gnu/lib64
 @@ -11,18 +12,23 @@ LIBINT_LIB = $(GCC_DIR)/libint/1.1.4-LAR
- LIBXC_INC  = $(GCC_DIR)/libxc/3.0.0-gnu/include
- LIBXC_LIB  = $(GCC_DIR)/libxc/3.0.0-gnu/lib64
+ LIBXC_INC  = $(GCC_DIR)/libxc/4.0.4-gnu/include
+ LIBXC_LIB  = $(GCC_DIR)/libxc/4.0.4-gnu/lib64
  DFLAGS     = -D__FFTW3 -D__LIBINT -D__LIBXC\
 -             -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6 -D__MAX_CONTR=4
 +             -D__HAS_IEEE_EXCEPTIONS @LIBSMM_DEFS@\
@@ -178,7 +178,7 @@ diff -up cp2k-5.1/arch/Linux-x86-64-gfortran.ssmp.r cp2k-5.1/arch/Linux-x86-64-g
 -             $(LIBPATH)/libblas-gnu.a\
 -             $(FFTW_LIB)/libfftw3.a\
 -             $(FFTW_LIB)/libfftw3_threads.a\
--             $(LIBXC_LIB)/libxcf90.a\
+-             $(LIBXC_LIB)/libxcf03.a\
 -             $(LIBXC_LIB)/libxc.a\
 -             $(LIBINT_LIB)/libderiv.a\
 -             $(LIBINT_LIB)/libint.a
@@ -190,7 +190,7 @@ diff -up cp2k-5.1/arch/Linux-x86-64-gfortran.ssmp.r cp2k-5.1/arch/Linux-x86-64-g
 +             @LIBSMM_LIBS@\
 +             -lfftw3\
 +             -lfftw3_omp\
-+             -lxcf90\
++             -lxcf03\
 +             -lxc\
 +             -lderiv\
 +             -lint
