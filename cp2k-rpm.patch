@@ -1,6 +1,6 @@
 diff -up cp2k-5.1/arch/Linux-x86-64-gfortran.popt.r cp2k-5.1/arch/Linux-x86-64-gfortran.popt
---- cp2k-5.1/arch/Linux-x86-64-gfortran.popt.r	2017-09-27 15:13:11.000000000 +0200
-+++ cp2k-5.1/arch/Linux-x86-64-gfortran.popt	2017-11-07 00:49:00.319242156 +0100
+--- cp2k-5.1/arch/Linux-x86-64-gfortran.popt.r	2018-02-07 16:34:29.420648820 +0100
++++ cp2k-5.1/arch/Linux-x86-64-gfortran.popt	2018-02-07 16:34:29.445648819 +0100
 @@ -1,8 +1,9 @@
  # Tested with: GFortran 6.4, MPICH 3.2, LAPACK 3.5.0, ScaLAPACK 2.0.2
  CC         = gcc
@@ -51,8 +51,8 @@ diff -up cp2k-5.1/arch/Linux-x86-64-gfortran.popt.r cp2k-5.1/arch/Linux-x86-64-g
 +             -lint
 +DATA_DIR   = /usr/share/cp2k
 diff -up cp2k-5.1/arch/Linux-x86-64-gfortran.psmp.r cp2k-5.1/arch/Linux-x86-64-gfortran.psmp
---- cp2k-5.1/arch/Linux-x86-64-gfortran.psmp.r	2017-09-27 15:13:11.000000000 +0200
-+++ cp2k-5.1/arch/Linux-x86-64-gfortran.psmp	2017-11-07 00:49:05.379294401 +0100
+--- cp2k-5.1/arch/Linux-x86-64-gfortran.psmp.r	2018-02-07 16:34:29.420648820 +0100
++++ cp2k-5.1/arch/Linux-x86-64-gfortran.psmp	2018-02-07 16:34:29.448648818 +0100
 @@ -1,8 +1,9 @@
  # Tested with: GFortran 6.4, MPICH 3.2, LAPACK 3.5.0, ScaLAPACK 2.0.2
  CC         = gcc
@@ -105,8 +105,8 @@ diff -up cp2k-5.1/arch/Linux-x86-64-gfortran.psmp.r cp2k-5.1/arch/Linux-x86-64-g
 +             -lint
 +DATA_DIR   = /usr/share/cp2k
 diff -up cp2k-5.1/arch/Linux-x86-64-gfortran.sopt.r cp2k-5.1/arch/Linux-x86-64-gfortran.sopt
---- cp2k-5.1/arch/Linux-x86-64-gfortran.sopt.r	2017-09-28 12:20:29.000000000 +0200
-+++ cp2k-5.1/arch/Linux-x86-64-gfortran.sopt	2017-11-07 00:50:37.024240641 +0100
+--- cp2k-5.1/arch/Linux-x86-64-gfortran.sopt.r	2018-02-07 16:34:29.420648820 +0100
++++ cp2k-5.1/arch/Linux-x86-64-gfortran.sopt	2018-02-07 16:34:29.454648818 +0100
 @@ -3,6 +3,7 @@ CC         = gcc
  CPP        =
  FC         = gfortran
@@ -150,8 +150,8 @@ diff -up cp2k-5.1/arch/Linux-x86-64-gfortran.sopt.r cp2k-5.1/arch/Linux-x86-64-g
 +             -lint
 +DATA_DIR   = /usr/share/cp2k
 diff -up cp2k-5.1/arch/Linux-x86-64-gfortran.ssmp.r cp2k-5.1/arch/Linux-x86-64-gfortran.ssmp
---- cp2k-5.1/arch/Linux-x86-64-gfortran.ssmp.r	2017-09-28 12:20:29.000000000 +0200
-+++ cp2k-5.1/arch/Linux-x86-64-gfortran.ssmp	2017-11-07 00:50:54.047416406 +0100
+--- cp2k-5.1/arch/Linux-x86-64-gfortran.ssmp.r	2018-02-07 16:34:29.420648820 +0100
++++ cp2k-5.1/arch/Linux-x86-64-gfortran.ssmp	2018-02-07 16:34:29.458648818 +0100
 @@ -3,6 +3,7 @@ CC         = gcc
  CPP        =
  FC         = gfortran
@@ -195,9 +195,62 @@ diff -up cp2k-5.1/arch/Linux-x86-64-gfortran.ssmp.r cp2k-5.1/arch/Linux-x86-64-g
 +             -lderiv\
 +             -lint
 +DATA_DIR   = /usr/share/cp2k
+diff -up cp2k-5.1/makefiles/Makefile.r cp2k-5.1/makefiles/Makefile
+--- cp2k-5.1/makefiles/Makefile.r	2017-03-15 11:12:21.000000000 +0100
++++ cp2k-5.1/makefiles/Makefile	2018-02-08 09:52:49.801358542 +0100
+@@ -162,7 +162,7 @@ endif
+ 	$(MAKE) --version
+ 	@echo ""
+ 	@echo "========= Python ($(ONEVERSION)) ========="
+-	/usr/bin/env python --version
++	/usr/bin/python3 --version
+ 
+ else
+ 
+@@ -420,11 +420,11 @@ FYPPFLAGS ?= -n
+ 
+ %.o: %.F
+ ifneq ($(CPP),)
+-	$(TOOLSRC)/build_utils/fypp $(FYPPFLAGS) $< $*.fypped
++	fypp $(FYPPFLAGS) $< $*.fypped
+ 	$(CPP) $(CPPFLAGS) -D__SHORT_FILE__="\"$(subst $(SRCDIR)/,,$<)\"" -I'$(dir $<)' $*.fypped > $*.f90
+ 	$(FC) -c $(FCFLAGS) $*.f90 $(FCLOGPIPE)
+ else
+-	$(TOOLSRC)/build_utils/fypp $(FYPPFLAGS) $< $*.F90
++	fypp $(FYPPFLAGS) $< $*.F90
+ 	$(FC) -c $(FCFLAGS) -D__SHORT_FILE__="\"$(subst $(SRCDIR)/,,$<)\"" -I'$(dir $<)' $*.F90 $(FCLOGPIPE)
+ endif
+ 
+diff -up cp2k-5.1/tools/build_utils/check_archives.py.r cp2k-5.1/tools/build_utils/check_archives.py
+--- cp2k-5.1/tools/build_utils/check_archives.py.r	2016-06-06 17:37:19.000000000 +0200
++++ cp2k-5.1/tools/build_utils/check_archives.py	2018-02-08 09:53:39.035101211 +0100
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/python3
+ # -*- coding: utf-8 -*-
+ 
+ # author: Ole Schuett
+diff -up cp2k-5.1/tools/build_utils/discover_programs.py.r cp2k-5.1/tools/build_utils/discover_programs.py
+--- cp2k-5.1/tools/build_utils/discover_programs.py.r	2016-03-09 15:07:55.000000000 +0100
++++ cp2k-5.1/tools/build_utils/discover_programs.py	2018-02-08 09:53:48.068159972 +0100
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/python3
+ # -*- coding: utf-8 -*-
+ 
+ import re, sys, os
+diff -up cp2k-5.1/tools/build_utils/makedep.py.r cp2k-5.1/tools/build_utils/makedep.py
+--- cp2k-5.1/tools/build_utils/makedep.py.r	2017-01-07 15:55:51.000000000 +0100
++++ cp2k-5.1/tools/build_utils/makedep.py	2018-02-08 09:53:57.428220860 +0100
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/python3
+ # -*- coding: utf-8 -*-
+ 
+ import re, sys
 diff -up cp2k-5.1/tools/regtesting/do_regtest.r cp2k-5.1/tools/regtesting/do_regtest
 --- cp2k-5.1/tools/regtesting/do_regtest.r	2017-01-20 11:58:56.000000000 +0100
-+++ cp2k-5.1/tools/regtesting/do_regtest	2017-11-07 00:24:03.884859916 +0100
++++ cp2k-5.1/tools/regtesting/do_regtest	2018-02-07 16:34:29.428648819 +0100
 @@ -247,8 +247,8 @@ cp2k_postfix=${cp2k_postfix:-"${cp2k_run
  #
  ###################################################################################

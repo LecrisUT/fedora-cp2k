@@ -49,12 +49,12 @@ BuildRequires: bc
 BuildRequires: fftw-devel
 BuildRequires: gcc-gfortran
 BuildRequires: libint-devel
-BuildRequires: libxc-devel >= 4.0
+BuildRequires: libxc-devel >= 4.0.3
 %ifarch x86_64
 # See https://bugzilla.redhat.com/show_bug.cgi?id=1515404
 BuildRequires: libxsmm-devel >= 1.8.1-3
 %endif
-BuildRequires: python2
+BuildRequires: python3-fypp
 BuildRequires: /usr/bin/hostname
 
 # Libint can break the API between releases
@@ -123,6 +123,7 @@ This package contains the documentation and the manual.
 %patch10 -p1 -b .r
 %patch11 -p1 -b .32bit
 sed -i 's|@libdir@|%{_libdir}|' makefiles/Makefile
+rm tools/build_utils/fypp
 
 # Generate necessary symlinks
 TARGET=Linux-%{_target_cpu}-gfortran
@@ -274,6 +275,8 @@ done
 * Wed Feb 07 2018 Dominik Mierzejewski <rpm@greysector.net> - 5.1-3
 - use upstream patch for libxc-4.x support
 - reorder and adjust patches
+- unbundle fypp
+- use python3 in build scripts
 
 * Wed Feb 07 2018 Fedora Release Engineering <releng@fedoraproject.org> - 5.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
