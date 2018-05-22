@@ -15,7 +15,7 @@
 
 Name: cp2k
 Version: 5.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
 URL: http://cp2k.org/
@@ -272,6 +272,9 @@ done
 %{_libdir}/mpich/lib/cp2k/lib*.psmp.so
 
 %changelog
+* Tue May 22 2018 Dominik Mierzejewski <rpm@greysector.net> - 5.1-4
+- rebuild against libxsmm-1.8.3-1 which changed SONAME (#1577497)
+
 * Wed Feb 07 2018 Dominik Mierzejewski <rpm@greysector.net> - 5.1-3
 - use upstream patch for libxc-4.x support
 - reorder and adjust patches
