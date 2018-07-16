@@ -5,17 +5,11 @@
 %global __provides_exclude_from ^%{_libdir}/(cp2k/lib|(mpich|openmpi)/lib/cp2k).*\\.so$
 %global __requires_exclude ^lib(cp2k|clsmm|dbcsr|micsmm).*\\.so.*$
 
-%{!?openblas_arches:%global openblas_arches x86_64 %{ix86} armv7hl %{power64} aarch64}
-%ifnarch %{openblas_arches}
-# matches openblas ExclusiveArch
-%bcond_without atlas
-%endif
-
 %bcond_with check
 
 Name: cp2k
-Version: 5.1
-Release: 5%{?dist}
+Version: 6.1
+Release: 1%{?dist}
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
 URL: http://cp2k.org/
@@ -26,27 +20,20 @@ Source0: cp2k-%{version}-%{snapshot}.tar.xz
 Source0: https://downloads.sourceforge.net/project/cp2k/cp2k-%{version}.tar.bz2
 %endif
 Source4: cp2k-snapshot.sh
-# Upstream patches
-# Support libxc 4
-# https://groups.google.com/forum/#!topic/cp2k/yJP-HRqx4Y0
-Patch0: https://www.cp2k.org/static/downloads/patches/patch_cp2k-5.1_libxc-4.0.4-support.diff
 # Fedora patches
 # patch to:
 # use rpm optflags
-# link with openblas or atlas instead of vanilla blas/lapack
+# link with openblas instead of vanilla blas/lapack
 # build with libint and libxc
 # build shared libraries
 Patch10: %{name}-rpm.patch
 # fix build failure on 32bit arches
 Patch11: %{name}-32bit.patch
-%if %{with atlas}
-BuildRequires: atlas-devel
-%else
 BuildRequires: openblas-devel
-%endif
 # for regtests
 BuildRequires: bc
 BuildRequires: fftw-devel
+BuildRequires: gcc-c++
 BuildRequires: gcc-gfortran
 BuildRequires: libint-devel
 BuildRequires: libxc-devel >= 4.0.3
@@ -119,7 +106,6 @@ This package contains the documentation and the manual.
 
 %prep
 %setup -q
-%patch0 -p0
 %patch10 -p1 -b .r
 %patch11 -p1 -b .32bit
 sed -i 's|@libdir@|%{_libdir}|' makefiles/Makefile
@@ -146,11 +132,6 @@ maxderiv=`awk '/LIBDERIV_MAX_AM1 / {print $3}' %{_includedir}/libderiv/libderiv.
 # Plug them in the configuration
 for f in arch/Linux-x86-64-gfortran.{popt,psmp,sopt,ssmp}; do
  sed -i "s|@LIBINT_MAX_AM@|$maxam|g;s|@LIBDERIV_MAX_AM@|$maxderiv|g" $f
-%if %{with atlas}
- sed -i 's|@BLAS@|satlas|' $f
-%else
- sed -i 's|@BLAS@|openblas|' $f
-%endif
 %ifarch x86_64
  sed -i 's|@LIBSMM_DEFS@|-D__LIBXSMM|;s|@LIBSMM_LIBS@|-lxsmmf -lxsmm -ldl|' $f
 %else
@@ -162,9 +143,6 @@ done
 TARGET=Linux-%{_target_cpu}-gfortran
 OPTFLAGS_COMMON="%{optflags} -fPIC -I%{_fmoddir}"
 LDFLAGS_COMMON="${OPTFLAGS_COMMON} %{__global_ldflags}"
-%if %{with atlas}
-LDFLAGS_COMMON="${LDFLAGS_COMMON} -L%{_libdir}/atlas"
-%endif
 pushd makefiles
     make OPTFLAGS="${OPTFLAGS_COMMON}" LDFLAGS="${LDFLAGS_COMMON} -Wl,-rpath,%{_libdir}/cp2k" %{?_smp_mflags} ARCH="${TARGET}" VERSION="sopt ssmp"
     %{_openmpi_load}
@@ -272,6 +250,11 @@ done
 %{_libdir}/mpich/lib/cp2k/lib*.psmp.so
 
 %changelog
+* Mon Jul 16 2018 Dominik Mierzejewski <rpm@greysector.net> - 6.1-1
+- update to 6.1
+- drop obsolete patches
+- openblas is available on all supported arches, drop conditional atlas support
+
 * Thu Jul 12 2018 Fedora Release Engineering <releng@fedoraproject.org> - 5.1-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
 
