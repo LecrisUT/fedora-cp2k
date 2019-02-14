@@ -9,7 +9,7 @@
 
 Name: cp2k
 Version: 6.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
 URL: http://cp2k.org/
@@ -250,6 +250,9 @@ done
 %{_libdir}/mpich/lib/cp2k/lib*.psmp.so
 
 %changelog
+* Thu Feb 14 2019 Orion Poplawski <orion@nwra.com> - 6.1-3
+- Rebuild for openmpi 3.1.3
+
 * Thu Jan 31 2019 Fedora Release Engineering <releng@fedoraproject.org> - 6.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
 
