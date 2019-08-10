@@ -9,7 +9,7 @@
 
 Name: cp2k
 Version: 6.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
 URL: http://cp2k.org/
@@ -142,14 +142,13 @@ done
 %build
 TARGET=Linux-%{_target_cpu}-gfortran
 OPTFLAGS_COMMON="%{optflags} -fPIC -I%{_fmoddir}"
-LDFLAGS_COMMON="${OPTFLAGS_COMMON} %{__global_ldflags}"
 pushd makefiles
-    make OPTFLAGS="${OPTFLAGS_COMMON}" LDFLAGS="${LDFLAGS_COMMON} -Wl,-rpath,%{_libdir}/cp2k" %{?_smp_mflags} ARCH="${TARGET}" VERSION="sopt ssmp"
+    make OPTFLAGS="${OPTFLAGS_COMMON}" DISTLDFLAGS="%{__global_ldflags} -Wl,-rpath,%{_libdir}/cp2k" %{?_smp_mflags} ARCH="${TARGET}" VERSION="sopt ssmp"
     %{_openmpi_load}
-        make OPTFLAGS="${OPTFLAGS_COMMON} -I%{_fmoddir}/openmpi" LDFLAGS="${LDFLAGS_COMMON} -Wl,-rpath,${MPI_LIB}/cp2k" %{?_smp_mflags} ARCH="${TARGET}-openmpi" VERSION="popt psmp"
+        make OPTFLAGS="${OPTFLAGS_COMMON} -I%{_fmoddir}/openmpi" DISTLDFLAGS="%{__global_ldflags} -Wl,-rpath,${MPI_LIB}/cp2k" %{?_smp_mflags} ARCH="${TARGET}-openmpi" VERSION="popt psmp"
     %{_openmpi_unload}
     %{_mpich_load}
-        make OPTFLAGS="${OPTFLAGS_COMMON} -I%{_fmoddir}/mpich" LDFLAGS="${LDFLAGS_COMMON} -Wl,-rpath,${MPI_LIB}/cp2k" %{?_smp_mflags} ARCH="${TARGET}-mpich" VERSION="popt psmp"
+        make OPTFLAGS="${OPTFLAGS_COMMON} -I%{_fmoddir}/mpich" DISTLDFLAGS="%{__global_ldflags} -Wl,-rpath,${MPI_LIB}/cp2k" %{?_smp_mflags} ARCH="${TARGET}-mpich" VERSION="popt psmp"
     %{_mpich_unload}
 popd
 
@@ -250,6 +249,9 @@ done
 %{_libdir}/mpich/lib/cp2k/lib*.psmp.so
 
 %changelog
+* Sat Aug 10 2019 Dominik Mierzejewski <rpm@greysector.net> - 6.1-4
+- fix FTBFS due to wrong LDFLAGS override (#1735053)
+
 * Thu Feb 14 2019 Orion Poplawski <orion@nwra.com> - 6.1-3
 - Rebuild for openmpi 3.1.3
 

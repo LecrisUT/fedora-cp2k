@@ -43,7 +43,7 @@ diff -up cp2k-6.1/arch/Linux-x86-64-gfortran.popt.r cp2k-6.1/arch/Linux-x86-64-g
 +CFLAGS      = $(DFLAGS) $(OPTFLAGS)
 +CXXFLAGS    = $(DFLAGS) $(OPTFLAGS)
 +FCFLAGS     = $(DFLAGS) $(OPTFLAGS) -ffree-form -ffree-line-length-none -std=f2008
-+LDFLAGS     = $(FCFLAGS)
++LDFLAGS     = $(FCFLAGS) $(DISTLDFLAGS)
 +LIBS        = -lelpa\
 +              -lscalapack -lmpiblacs -lstdc++\
 +              -lopenblas\
@@ -101,7 +101,7 @@ diff -up cp2k-6.1/arch/Linux-x86-64-gfortran.psmp.r cp2k-6.1/arch/Linux-x86-64-g
 +CFLAGS      = $(DFLAGS) $(OPTFLAGS)
 +CXXFLAGS    = $(DFLAGS) $(OPTFLAGS)
 +FCFLAGS     = $(DFLAGS) $(OPTFLAGS) -fopenmp -ffree-form -ffree-line-length-none -std=f2008
-+LDFLAGS     = $(FCFLAGS)
++LDFLAGS     = $(FCFLAGS) $(DISTLDFLAGS)
 +LIBS        = -lelpa\
 +              -lscalapack -lmpiblacs -lstdc++\
 +              -lopenblas\
@@ -152,7 +152,7 @@ diff -up cp2k-6.1/arch/Linux-x86-64-gfortran.sopt.r cp2k-6.1/arch/Linux-x86-64-g
 +CFLAGS      = $(DFLAGS) $(OPTFLAGS)
 +CXXFLAGS    = $(DFLAGS) $(OPTFLAGS)
 +FCFLAGS     = $(DFLAGS) $(OPTFLAGS) -ffree-form -ffree-line-length-none -std=f2008
-+LDFLAGS     = $(FCFLAGS)
++LDFLAGS     = $(FCFLAGS) $(DISTLDFLAGS)
 +LIBS        = -lopenblas\
 +              -lfftw3\
 +              -lxcf03\
@@ -202,7 +202,7 @@ diff -up cp2k-6.1/arch/Linux-x86-64-gfortran.ssmp.r cp2k-6.1/arch/Linux-x86-64-g
 +CFLAGS      = $(DFLAGS) $(OPTFLAGS)
 +CXXFLAGS    = $(DFLAGS) $(OPTFLAGS)
 +FCFLAGS     = $(DFLAGS) $(OPTFLAGS) -fopenmp -ffree-form -ffree-line-length-none -std=f2008
-+LDFLAGS     = $(FCFLAGS)
++LDFLAGS     = $(FCFLAGS) $(DISTLDFLAGS)
 +LIBS        = -lopenblas\
 +              -lfftw3\
 +              -lfftw3_omp\
