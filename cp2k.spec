@@ -41,7 +41,8 @@ BuildRequires: libxc-devel >= 4.0.3
 # See https://bugzilla.redhat.com/show_bug.cgi?id=1515404
 BuildRequires: libxsmm-devel >= 1.8.1-3
 %endif
-BuildRequires: python3-fypp
+# https://bugzilla.redhat.com/show_bug.cgi?id=1739776
+BuildRequires: python3-fypp > 2.1.1-6
 BuildRequires: /usr/bin/hostname
 
 # Libint can break the API between releases
@@ -251,6 +252,7 @@ done
 %changelog
 * Sat Aug 10 2019 Dominik Mierzejewski <rpm@greysector.net> - 6.1-4
 - fix FTBFS due to wrong LDFLAGS override (#1735053)
+- require the fypp build with fixed dependencies (#1739776)
 
 * Thu Feb 14 2019 Orion Poplawski <orion@nwra.com> - 6.1-3
 - Rebuild for openmpi 3.1.3
