@@ -9,7 +9,7 @@
 
 Name: cp2k
 Version: 6.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
 URL: http://cp2k.org/
@@ -249,6 +249,9 @@ done
 %{_libdir}/mpich/lib/cp2k/lib*.psmp.so
 
 %changelog
+* Sun Nov 17 2019 Tom Callaway <spot@fedoraproject.org> - 6.1-6
+- build against scalapack (no more libmpiblacs)
+
 * Sat Aug 10 2019 Dominik Mierzejewski <rpm@greysector.net> - 6.1-5
 - fix FTBFS due to wrong LDFLAGS override (#1735053)
 
