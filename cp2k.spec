@@ -9,7 +9,7 @@
 
 Name: cp2k
 Version: 6.1
-Release: 9%{?dist}
+Release: 10%{?dist}
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
 URL: http://cp2k.org/
@@ -23,13 +23,13 @@ Source4: cp2k-snapshot.sh
 # Fedora patches
 # patch to:
 # use rpm optflags
-# link with openblas instead of vanilla blas/lapack
+# link with flexiblas instead of vanilla blas/lapack
 # build with libint and libxc
 # build shared libraries
 Patch10: %{name}-rpm.patch
 # fix build failure on 32bit arches
 Patch11: %{name}-32bit.patch
-BuildRequires: openblas-devel
+BuildRequires: flexiblas-devel
 # for regtests
 BuildRequires: bc
 BuildRequires: fftw-devel
@@ -249,6 +249,9 @@ done
 %{_libdir}/mpich/lib/cp2k/lib*.psmp.so
 
 %changelog
+* Mon Aug 10 2020 Iñaki Úcar <iucar@fedoraproject.org> - 6.1-10
+- https://fedoraproject.org/wiki/Changes/FlexiBLAS_as_BLAS/LAPACK_manager
+
 * Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 6.1-9
 - Second attempt - Rebuilt for
   https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
