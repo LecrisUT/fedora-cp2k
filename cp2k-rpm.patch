@@ -1,291 +1,204 @@
-diff -up cp2k-6.1/arch/Linux-x86-64-gfortran.popt.r cp2k-6.1/arch/Linux-x86-64-gfortran.popt
---- cp2k-6.1/arch/Linux-x86-64-gfortran.popt.r	2018-06-12 14:07:45.000000000 +0200
-+++ cp2k-6.1/arch/Linux-x86-64-gfortran.popt	2018-07-16 15:44:30.013193276 +0200
-@@ -2,8 +2,9 @@
- # Author: Matthias Krack (matthias.krack@psi.ch, PSI, June 2018)
- CC          = gcc
- CPP         =
--FC          = mpif90
--LD          = mpif90
-+FC          = mpifort
-+LD          = mpifort
-+LD_SHARED   = mpifort -shared
+diff -up cp2k-dbf7a770d1541ba72a4652ee218de80c0484db2d/arch/Linux-x86-64-gfortran.psmp.r cp2k-dbf7a770d1541ba72a4652ee218de80c0484db2d/arch/Linux-x86-64-gfortran.psmp
+--- cp2k-dbf7a770d1541ba72a4652ee218de80c0484db2d/arch/Linux-x86-64-gfortran.psmp.r	2020-09-25 17:01:47.000000000 +0200
++++ cp2k-dbf7a770d1541ba72a4652ee218de80c0484db2d/arch/Linux-x86-64-gfortran.psmp	2020-09-29 15:18:55.464317641 +0200
+@@ -5,64 +5,37 @@
+ CC          = mpicc
+ FC          = mpif90
+ LD          = mpif90
++LD_SHARED   = mpif90 -shared
  AR          = ar -r
- FFTW_INC    = $(GCC_DIR)/fftw/3.3/include
- FFTW_LIB    = $(GCC_DIR)/fftw/3.3/lib
-@@ -13,22 +14,26 @@ LIBXC_INC   = $(GCC_DIR)/libxc/4.0.4/inc
- LIBXC_LIB   = $(GCC_DIR)/libxc/4.0.4/lib
- LIBXSMM_INC = $(GCC_DIR)/libxsmm/1.9/include
- LIBXSMM_LIB = $(GCC_DIR)/libxsmm/1.9/lib
--DFLAGS      = -D__F2008 -D__FFTW3 -D__LIBINT -D__LIBXC -D__LIBXSMM -D__MPI_VERSION=3\
--              -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6 -D__MAX_CONTR=4\
-+DFLAGS      = -D__F2008 -D__FFTW3 -D__LIBINT -D__LIBXC @LIBSMM_DEFS@ -D__MPI_VERSION=3\
-+              -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@ -D__MAX_CONTR=4\
-+              -D__SCALAPACK2 -D__ELPA=201705 -D__HAS_IEEE_EXCEPTIONS\
-               -D__parallel -D__SCALAPACK
- CPPFLAGS    =
--FCFLAGS     = $(DFLAGS) -O2 -ffast-math -ffree-form -ffree-line-length-none\
--              -ftree-vectorize -funroll-loops -mtune=native -std=f2008\
-+OPTFLAGS    = -O2 -ffast-math\
-+              -ftree-vectorize -funroll-loops -mtune=native\
-               -I$(FFTW_INC) -I$(LIBINT_INC) -I$(LIBXC_INC) -I$(LIBXSMM_INC)
--LDFLAGS     = $(FCFLAGS) -static
--LIBS        = $(MPI_LIBRARY_PATH)/libscalapack-gnu.a\
--              $(LIBPATH)/liblapack-gnu.a\
--              $(LIBPATH)/libblas-gnu.a\
--              $(FFTW_LIB)/libfftw3.a\
--              $(LIBXC_LIB)/libxcf03.a\
--              $(LIBXC_LIB)/libxc.a\
--              $(LIBINT_LIB)/libderiv.a\
--              $(LIBINT_LIB)/libint.a\
--              $(LIBXSMM_LIB)/libxsmmf.a\
--              $(LIBXSMM_LIB)/libxsmm.a\
-+CFLAGS      = $(DFLAGS) $(OPTFLAGS)
-+CXXFLAGS    = $(DFLAGS) $(OPTFLAGS)
-+FCFLAGS     = $(DFLAGS) $(OPTFLAGS) -ffree-form -ffree-line-length-none -std=f2008
+ 
+-include       $(MPI_PATH)/plumed/2.5.2/lib/plumed/src/lib/Plumed.inc.static
+-
+-ELPA_VER    = 2019.05.001
+-ELPA_INC    = $(MPI_PATH)/elpa/$(ELPA_VER)-openmp/include/elpa_openmp-$(ELPA_VER)
+-ELPA_LIB    = $(MPI_PATH)/elpa/$(ELPA_VER)-openmp/lib
+-
+-FFTW_INC    = $(GNU_PATH)/fftw/3.3/include
+-FFTW_LIB    = $(GNU_PATH)/fftw/3.3/lib
+-
+-LIBINT_INC  = $(GNU_PATH)/libint/2.6.0-lmax-6/include
+-LIBINT_LIB  = $(GNU_PATH)/libint/2.6.0-lmax-6/lib
+-
+-LIBXC_INC   = $(GNU_PATH)/libxc/4.3.4/include
+-LIBXC_LIB   = $(GNU_PATH)/libxc/4.3.4/lib
+-
+-LIBXSMM_INC = $(GNU_PATH)/libxsmm/1.15/include
+-LIBXSMM_LIB = $(GNU_PATH)/libxsmm/1.15/lib
+-
+-SPGLIB_INC  = $(GNU_PATH)/spglib/1.12.2/include
+-SPGLIB_LIB  = $(GNU_PATH)/spglib/1.12.2/lib
+-
+-CFLAGS      = -O2 -fopenmp -g -mtune=native
++OPTFLAGS    = -O2 -g -mtune=native
++CFLAGS      = $(OPTFLAGS) -fopenmp
+ 
+ DFLAGS      = -D__ELPA
+ DFLAGS     += -D__FFTW3
+ DFLAGS     += -D__LIBINT
+ DFLAGS     += -D__LIBXC
+-DFLAGS     += -D__LIBXSMM
++DFLAGS     += @LIBSMM_DEFS@
+ DFLAGS     += -D__MPI_VERSION=3
+-DFLAGS     += -D__PLUMED2
+-DFLAGS     += -D__SPGLIB
++DFLAGS     += -D__MAX_CONTR=4
++DFLAGS     += -D__HAS_IEEE_EXCEPTIONS
+ DFLAGS     += -D__parallel
+ DFLAGS     += -D__SCALAPACK
+ 
+ FCFLAGS     = $(CFLAGS) $(DFLAGS)
+ FCFLAGS    += -ffree-form
+ FCFLAGS    += -ffree-line-length-none
+-FCFLAGS    += -ftree-vectorize
+-FCFLAGS    += -funroll-loops
+ FCFLAGS    += -std=f2008
+-FCFLAGS    += -I$(ELPA_INC)/elpa -I$(ELPA_INC)/modules
+-FCFLAGS    += -I$(FFTW_INC) -I$(LIBINT_INC) -I$(LIBXC_INC) -I$(LIBXSMM_INC)
+ 
+-LDFLAGS     = $(FCFLAGS) -static-libgfortran
 +LDFLAGS     = $(FCFLAGS) $(DISTLDFLAGS)
-+LIBS        = -lelpa\
-+              -lscalapack -lstdc++\
-+              -lflexiblas\
-+              -lfftw3\
-+              -lxcf03\
-+              -lxc\
-+              -lderiv\
-+              -lint\
-+              @LIBSMM_LIBS@\
-               -ldl
-+DATA_DIR    = /usr/share/cp2k
-diff -up cp2k-6.1/arch/Linux-x86-64-gfortran.psmp.r cp2k-6.1/arch/Linux-x86-64-gfortran.psmp
---- cp2k-6.1/arch/Linux-x86-64-gfortran.psmp.r	2018-06-12 14:07:45.000000000 +0200
-+++ cp2k-6.1/arch/Linux-x86-64-gfortran.psmp	2018-07-16 15:44:20.853109669 +0200
-@@ -2,8 +2,9 @@
- # Author: Matthias Krack (matthias.krack@psi.ch, PSI, June 2018)
+ 
+-LIBS        = $(PLUMED_DEPENDENCIES) -lgsl -lgslcblas -lz
+-LIBS       += $(ELPA_LIB)/libelpa_openmp.a
+-LIBS       += $(LIBXC_LIB)/libxcf03.a
+-LIBS       += $(LIBXC_LIB)/libxc.a
+-LIBS       += $(LIBINT_LIB)/libint2.a
+-LIBS       += $(SPGLIB_LIB)/libsymspg.a
+-LIBS       += $(FFTW_LIB)/libfftw3.a
+-LIBS       += $(FFTW_LIB)/libfftw3_threads.a
+-LIBS       += $(LIBXSMM_LIB)/libxsmmf.a
+-LIBS       += $(LIBXSMM_LIB)/libxsmm.a
+-LIBS       += $(MPI_LIBRARY_PATH)/libscalapack.a
+-LIBS       += $(LIBPATH)/liblapack.a
+-LIBS       += $(LIBPATH)/libblas.a
++LIBS        = -lelpa_openmp
++LIBS       += -lxcf90
++LIBS       += -lxc
++LIBS       += -lint2
++LIBS       += -lfftw3
++LIBS       += -lfftw3_omp
++LIBS       += @LIBSMM_LIBS@
++LIBS       += -lscalapack
++LIBS       += -lflexiblas
+ LIBS       += -ldl -lpthread -lstdc++
+diff -up cp2k-dbf7a770d1541ba72a4652ee218de80c0484db2d/arch/Linux-x86-64-gfortran.ssmp.r cp2k-dbf7a770d1541ba72a4652ee218de80c0484db2d/arch/Linux-x86-64-gfortran.ssmp
+--- cp2k-dbf7a770d1541ba72a4652ee218de80c0484db2d/arch/Linux-x86-64-gfortran.ssmp.r	2020-09-25 17:01:47.000000000 +0200
++++ cp2k-dbf7a770d1541ba72a4652ee218de80c0484db2d/arch/Linux-x86-64-gfortran.ssmp	2020-09-29 15:19:10.681243626 +0200
+@@ -4,49 +4,31 @@
  CC          = gcc
- CPP         =
--FC          = mpif90
--LD          = mpif90
-+FC          = mpifort
-+LD          = mpifort
-+LD_SHARED   = mpifort -shared
- AR          = ar -r
- FFTW_INC    = $(GCC_DIR)/fftw/3.3/include
- FFTW_LIB    = $(GCC_DIR)/fftw/3.3/lib
-@@ -13,22 +14,26 @@ LIBXC_INC   = $(GCC_DIR)/libxc/4.0.4/inc
- LIBXC_LIB   = $(GCC_DIR)/libxc/4.0.4/lib
- LIBXSMM_INC = $(GCC_DIR)/libxsmm/1.9/include
- LIBXSMM_LIB = $(GCC_DIR)/libxsmm/1.9/lib
--DFLAGS      = -D__F2008 -D__FFTW3 -D__LIBINT -D__LIBXC -D__LIBXSMM -D__MPI_VERSION=3\
--              -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6 -D__MAX_CONTR=4\
-+DFLAGS      = -D__F2008 -D__FFTW3 -D__LIBINT -D__LIBXC  @LIBSMM_DEFS@ -D__MPI_VERSION=3\
-+              -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@ -D__MAX_CONTR=4\
-+              -D__SCALAPACK2 -D__ELPA=201705 -D__HAS_IEEE_EXCEPTIONS\
-               -D__parallel -D__SCALAPACK
- CPPFLAGS    =
--FCFLAGS     = $(DFLAGS) -O2 -ffast-math -ffree-form -ffree-line-length-none\
--              -fopenmp -ftree-vectorize -funroll-loops -mtune=native -std=f2008\
-+OPTFLAGS    = -O2 -ffast-math -ftree-vectorize -funroll-loops\
-+              -fopenmp -ftree-vectorize -funroll-loops -mtune=native\
-               -I$(FFTW_INC) -I$(LIBINT_INC) -I$(LIBXC_INC) -I$(LIBXSMM_INC)
--LDFLAGS     = $(FCFLAGS) -static
--LIBS        = $(MPI_LIBRARY_PATH)/libscalapack-gnu.a\
--              $(LIBPATH)/liblapack-gnu.a\
--              $(LIBPATH)/libblas-gnu.a\
--              $(FFTW_LIB)/libfftw3.a\
--              $(FFTW_LIB)/libfftw3_threads.a\
--              $(LIBXC_LIB)/libxcf03.a\
--              $(LIBXC_LIB)/libxc.a\
--              $(LIBINT_LIB)/libderiv.a\
--              $(LIBINT_LIB)/libint.a\
--              $(LIBXSMM_LIB)/libxsmmf.a\
--              $(LIBXSMM_LIB)/libxsmm.a
-+CFLAGS      = $(DFLAGS) $(OPTFLAGS)
-+CXXFLAGS    = $(DFLAGS) $(OPTFLAGS)
-+FCFLAGS     = $(DFLAGS) $(OPTFLAGS) -fopenmp -ffree-form -ffree-line-length-none -std=f2008
-+LDFLAGS     = $(FCFLAGS) $(DISTLDFLAGS)
-+LIBS        = -lelpa\
-+              -lscalapack -lstdc++\
-+              -lflexiblas\
-+              -lfftw3\
-+              -lfftw3_omp\
-+              -lxcf03\
-+              -lxc\
-+              -lderiv\
-+              -lint\
-+              @LIBSMM_LIBS@
-+DATA_DIR    = /usr/share/cp2k
-diff -up cp2k-6.1/arch/Linux-x86-64-gfortran.sopt.r cp2k-6.1/arch/Linux-x86-64-gfortran.sopt
---- cp2k-6.1/arch/Linux-x86-64-gfortran.sopt.r	2018-06-12 14:07:45.000000000 +0200
-+++ cp2k-6.1/arch/Linux-x86-64-gfortran.sopt	2018-07-16 15:44:45.620335729 +0200
-@@ -4,6 +4,7 @@ CC          = gcc
- CPP         =
  FC          = gfortran
  LD          = gfortran
 +LD_SHARED   = gfortran -shared
  AR          = ar -r
- FFTW_INC    = $(GCC_DIR)/fftw/3.3/include
- FFTW_LIB    = $(GCC_DIR)/fftw/3.3/lib
-@@ -13,20 +14,24 @@ LIBXC_INC   = $(GCC_DIR)/libxc/4.0.4/inc
- LIBXC_LIB   = $(GCC_DIR)/libxc/4.0.4/lib
- LIBXSMM_INC = $(GCC_DIR)/libxsmm/1.9/include
- LIBXSMM_LIB = $(GCC_DIR)/libxsmm/1.9/lib
--DFLAGS      = -D__F2008 -D__FFTW3 -D__LIBINT -D__LIBXC -D__LIBXSMM\
--              -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6 -D__MAX_CONTR=4
-+DFLAGS      = -D__F2008 -D__FFTW3 -D__LIBINT -D__LIBXC @LIBSMM_DEFS@\
-+              -D__HAS_IEEE_EXCEPTIONS\
-+              -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@ -D__MAX_CONTR=4
- CPPFLAGS    =
- FCFLAGS     = $(DFLAGS) -O2 -ffast-math -ffree-form -ffree-line-length-none\
--              -ftree-vectorize -funroll-loops -mtune=native -std=f2008\
-+OPTFLAGS    = -O2 -ffast-math\
-+              -ftree-vectorize -funroll-loops -mtune=native\
-               -I$(FFTW_INC) -I$(LIBINT_INC) -I$(LIBXC_INC) -I$(LIBXSMM_INC)
--LDFLAGS     = $(FCFLAGS) -static
--LIBS        = $(LIBPATH)/liblapack-gnu.a\
--              $(LIBPATH)/libblas-gnu.a\
--              $(FFTW_LIB)/libfftw3.a\
--              $(LIBXC_LIB)/libxcf03.a\
--              $(LIBXC_LIB)/libxc.a\
--              $(LIBINT_LIB)/libderiv.a\
--              $(LIBINT_LIB)/libint.a\
--              $(LIBXSMM_LIB)/libxsmmf.a\
--              $(LIBXSMM_LIB)/libxsmm.a\
-+CFLAGS      = $(DFLAGS) $(OPTFLAGS)
-+CXXFLAGS    = $(DFLAGS) $(OPTFLAGS)
-+FCFLAGS     = $(DFLAGS) $(OPTFLAGS) -ffree-form -ffree-line-length-none -std=f2008
-+LDFLAGS     = $(FCFLAGS) $(DISTLDFLAGS)
-+LIBS        = -lflexiblas\
-+              -lfftw3\
-+              -lxcf03\
-+              -lxc\
-+              -lderiv\
-+              -lint\
-+              @LIBSMM_LIBS@\
-               -ldl -lpthread
-+DATA_DIR    = /usr/share/cp2k
-diff -up cp2k-6.1/arch/Linux-x86-64-gfortran.ssmp.r cp2k-6.1/arch/Linux-x86-64-gfortran.ssmp
---- cp2k-6.1/arch/Linux-x86-64-gfortran.ssmp.r	2018-06-12 14:07:45.000000000 +0200
-+++ cp2k-6.1/arch/Linux-x86-64-gfortran.ssmp	2018-07-16 15:44:55.628427076 +0200
-@@ -4,6 +4,7 @@ CC          = gcc
- CPP         =
- FC          = gfortran
- LD          = gfortran
-+LD_SHARED   = gfortran -shared
- AR          = ar -r
- FFTW_INC    = $(GCC_DIR)/fftw/3.3/include
- FFTW_LIB    = $(GCC_DIR)/fftw/3.3/lib
-@@ -13,21 +14,24 @@ LIBXC_INC   = $(GCC_DIR)/libxc/4.0.4/inc
- LIBXC_LIB   = $(GCC_DIR)/libxc/4.0.4/lib
- LIBXSMM_INC = $(GCC_DIR)/libxsmm/1.9/include
- LIBXSMM_LIB = $(GCC_DIR)/libxsmm/1.9/lib
--DFLAGS      = -D__F2008 -D__FFTW3 -D__LIBINT -D__LIBXC -D__LIBXSMM\
--              -D__LIBINT_MAX_AM=7 -D__LIBDERIV_MAX_AM1=6 -D__MAX_CONTR=4
-+DFLAGS      = -D__F2008 -D__FFTW3 -D__LIBINT -D__LIBXC @LIBSMM_DEFS@\
-+              -D__HAS_IEEE_EXCEPTIONS\
-+              -D__LIBINT_MAX_AM=@LIBINT_MAX_AM@ -D__LIBDERIV_MAX_AM1=@LIBDERIV_MAX_AM@ -D__MAX_CONTR=4
- CPPFLAGS    =
--FCFLAGS     = $(DFLAGS) -O2 -ffast-math -ffree-form -ffree-line-length-none\
--              -fopenmp -ftree-vectorize -funroll-loops -mtune=native -std=f2008\
-+OPTFLAGS    = -O2 -ffast-math -ftree-vectorize\
-+              -fopenmp -ftree-vectorize -funroll-loops -mtune=native\
-               -I$(FFTW_INC) -I$(LIBINT_INC) -I$(LIBXC_INC) -I$(LIBXSMM_INC)
--LDFLAGS     = $(FCFLAGS) -static
--LIBS        = $(LIBPATH)/liblapack-gnu.a\
--              $(LIBPATH)/libblas-gnu.a\
--              $(FFTW_LIB)/libfftw3.a\
--              $(FFTW_LIB)/libfftw3_threads.a\
--              $(LIBXC_LIB)/libxcf03.a\
--              $(LIBXC_LIB)/libxc.a\
--              $(LIBINT_LIB)/libderiv.a\
--              $(LIBINT_LIB)/libint.a\
--              $(LIBXSMM_LIB)/libxsmmf.a\
--              $(LIBXSMM_LIB)/libxsmm.a\
-+CFLAGS      = $(DFLAGS) $(OPTFLAGS)
-+CXXFLAGS    = $(DFLAGS) $(OPTFLAGS)
-+FCFLAGS     = $(DFLAGS) $(OPTFLAGS) -fopenmp -ffree-form -ffree-line-length-none -std=f2008
-+LDFLAGS     = $(FCFLAGS) $(DISTLDFLAGS)
-+LIBS        = -lflexiblas\
-+              -lfftw3\
-+              -lfftw3_omp\
-+              -lxcf03\
-+              -lxc\
-+              -lderiv\
-+              -lint\
-+              @LIBSMM_LIBS@\
-               -ldl -lpthread
-+DATA_DIR    = /usr/share/cp2k
-diff -up cp2k-6.1/makefiles/Makefile.r cp2k-6.1/makefiles/Makefile
---- cp2k-6.1/makefiles/Makefile.r	2018-05-24 19:16:02.000000000 +0200
-+++ cp2k-6.1/makefiles/Makefile	2018-07-16 15:43:39.888735771 +0200
-@@ -181,7 +181,7 @@ endif
- 	$(MAKE) --version
- 	@echo ""
- 	@echo "========= Python ($(ONEVERSION)) ========="
--	/usr/bin/env python --version
-+	/usr/bin/python3 --version
  
- else
+-FFTW_INC    = $(GNU_PATH)/fftw/3.3/include
+-FFTW_LIB    = $(GNU_PATH)/fftw/3.3/lib
+-
+-LIBINT_INC  = $(GNU_PATH)/libint/2.6.0-lmax-6/include
+-LIBINT_LIB  = $(GNU_PATH)/libint/2.6.0-lmax-6/lib
+-
+-LIBXC_INC   = $(GNU_PATH)/libxc/4.3.4/include
+-LIBXC_LIB   = $(GNU_PATH)/libxc/4.3.4/lib
+-
+-LIBXSMM_INC = $(GNU_PATH)/libxsmm/1.15/include
+-LIBXSMM_LIB = $(GNU_PATH)/libxsmm/1.15/lib
+-
+-SPGLIB_INC  = $(GNU_PATH)/spglib/1.12.2/include
+-SPGLIB_LIB  = $(GNU_PATH)/spglib/1.12.2/lib
+-
+-CFLAGS      = -O2 -fopenmp -g -mtune=native
++OPTFLAGS    = -O2 -g -mtune=native
++CFLAGS      = $(OPTFLAGS) -fopenmp
  
-@@ -451,11 +451,11 @@ FYPPFLAGS ?= -n
+ DFLAGS      = -D__FFTW3
+ DFLAGS     += -D__LIBINT
+ DFLAGS     += -D__LIBXC
+-DFLAGS     += -D__LIBXSMM
+-DFLAGS     += -D__SPGLIB
++DFLAGS     += @LIBSMM_DEFS@
++DFLAGS     += -D__HAS_IEEE_EXCEPTIONS
++DFLAGS     += -D__MAX_CONTR=4
+ 
+ FCFLAGS     = $(CFLAGS) $(DFLAGS)
+ FCFLAGS    += -ffree-form
+ FCFLAGS    += -ffree-line-length-none
+-FCFLAGS    += -ftree-vectorize
+-FCFLAGS    += -funroll-loops
+ FCFLAGS    += -std=f2008
+-FCFLAGS    += -I$(FFTW_INC) -I$(LIBINT_INC) -I$(LIBXC_INC) -I$(LIBXSMM_INC)
+ 
+-LDFLAGS     = $(FCFLAGS) -static
++LDFLAGS     = $(FCFLAGS) $(DISTLDFLAGS)
+ 
+-LIBS        = $(LIBXC_LIB)/libxcf03.a
+-LIBS       += $(LIBXC_LIB)/libxc.a
+-LIBS       += $(LIBINT_LIB)/libint2.a
+-LIBS       += $(SPGLIB_LIB)/libsymspg.a
+-LIBS       += $(FFTW_LIB)/libfftw3.a
+-LIBS       += $(FFTW_LIB)/libfftw3_threads.a
+-LIBS       += $(LIBXSMM_LIB)/libxsmmf.a
+-LIBS       += $(LIBXSMM_LIB)/libxsmm.a
+-LIBS       += $(LIBPATH)/liblapack.a
+-LIBS       += $(LIBPATH)/libblas.a
++LIBS        = -lxcf90
++LIBS       += -lxc
++LIBS       += -lint2
++LIBS       += -lfftw3
++LIBS       += -lfftw3_omp
++LIBS       += @LIBSMM_LIBS@
++LIBS       += -lflexiblas
+ LIBS       += -ldl -lpthread -lstdc++
+diff -up cp2k-dbf7a770d1541ba72a4652ee218de80c0484db2d/exts/dbcsr/.cp2k/Makefile.r cp2k-dbf7a770d1541ba72a4652ee218de80c0484db2d/exts/dbcsr/.cp2k/Makefile
+--- cp2k-dbf7a770d1541ba72a4652ee218de80c0484db2d/exts/dbcsr/.cp2k/Makefile.r	2020-09-13 19:31:19.000000000 +0200
++++ cp2k-dbf7a770d1541ba72a4652ee218de80c0484db2d/exts/dbcsr/.cp2k/Makefile	2020-09-29 11:58:26.238474915 +0200
+@@ -54,7 +54,7 @@ MAKEFILE     := $(DBCSRCP2K)/Makefile
+ LIBDIR       := $(DBCSRHOME)/lib
+ OBJDIR       := $(DBCSRHOME)/obj
+ TOOLSDIR     := $(DBCSRHOME)/tools
+-FYPPEXE      := $(TOOLSDIR)/build_utils/fypp/bin/fypp
++FYPPEXE      := fypp
+ SRCDIR       := $(DBCSRHOME)/src
+ TESTSDIR     := $(DBCSRHOME)/tests
+ INCLUDEMAKE  :=
+diff -up cp2k-dbf7a770d1541ba72a4652ee218de80c0484db2d/Makefile.r cp2k-dbf7a770d1541ba72a4652ee218de80c0484db2d/Makefile
+--- cp2k-dbf7a770d1541ba72a4652ee218de80c0484db2d/Makefile.r	2020-09-25 17:01:47.000000000 +0200
++++ cp2k-dbf7a770d1541ba72a4652ee218de80c0484db2d/Makefile	2020-09-29 11:58:26.243474891 +0200
+@@ -16,7 +16,7 @@ export VERSION=ssmp
+ 
+ MAKEFILE     := $(CP2KHOME)/Makefile
+ ARCHDIR      := $(CP2KHOME)/arch
+-DATA_DIR     := $(CP2KHOME)/data
++DATA_DIR     := /usr/share/cp2k/data
+ MAINEXEDIR   := $(CP2KHOME)/exe
+ MAINLIBDIR   := $(CP2KHOME)/lib
+ MAINOBJDIR   := $(CP2KHOME)/obj
+@@ -501,7 +501,7 @@ FCFLAGS += -D__COMPILE_ARCH="\"$(ARCH)\"
+ FYPPFLAGS ?= -n
  
  %.o: %.F
- ifneq ($(CPP),)
--	$(TOOLSRC)/build_utils/fypp $(FYPPFLAGS) $< $*.fypped
-+	fypp $(FYPPFLAGS) $< $*.fypped
- 	$(CPP) $(CPPFLAGS) -D__SHORT_FILE__="\"$(subst $(SRCDIR)/,,$<)\"" -I'$(dir $<)' $*.fypped > $*.f90
- 	$(FC) -c $(FCFLAGS) $*.f90 $(FCLOGPIPE)
- else
 -	$(TOOLSRC)/build_utils/fypp $(FYPPFLAGS) $< $*.F90
 +	fypp $(FYPPFLAGS) $< $*.F90
- 	$(FC) -c $(FCFLAGS) -D__SHORT_FILE__="\"$(subst $(SRCDIR)/,,$<)\"" -I'$(dir $<)' $*.F90 $(FCLOGPIPE)
- endif
+ 	$(FC) -c $(FCFLAGS) -D__SHORT_FILE__="\"$(subst $(SRCDIR)/,,$<)\"" -I'$(dir $<)' $(OBJEXTSINCL) $*.F90 $(FCLOGPIPE)
  
-diff -up cp2k-6.1/tools/build_utils/check_archives.py.r cp2k-6.1/tools/build_utils/check_archives.py
---- cp2k-6.1/tools/build_utils/check_archives.py.r	2016-06-06 17:37:19.000000000 +0200
-+++ cp2k-6.1/tools/build_utils/check_archives.py	2018-07-16 15:43:39.872735625 +0200
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/python3
- # -*- coding: utf-8 -*-
- 
- # author: Ole Schuett
-diff -up cp2k-6.1/tools/build_utils/discover_programs.py.r cp2k-6.1/tools/build_utils/discover_programs.py
---- cp2k-6.1/tools/build_utils/discover_programs.py.r	2016-03-09 15:07:55.000000000 +0100
-+++ cp2k-6.1/tools/build_utils/discover_programs.py	2018-07-16 15:43:39.872735625 +0200
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/python3
- # -*- coding: utf-8 -*-
- 
- import re, sys, os
-diff -up cp2k-6.1/tools/build_utils/makedep.py.r cp2k-6.1/tools/build_utils/makedep.py
---- cp2k-6.1/tools/build_utils/makedep.py.r	2018-04-05 12:22:05.000000000 +0200
-+++ cp2k-6.1/tools/build_utils/makedep.py	2018-07-16 15:43:39.873735634 +0200
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/python3
- # -*- coding: utf-8 -*-
- 
- import re, sys
-diff -up cp2k-6.1/tools/regtesting/do_regtest.r cp2k-6.1/tools/regtesting/do_regtest
---- cp2k-6.1/tools/regtesting/do_regtest.r	2018-05-29 20:12:38.000000000 +0200
-+++ cp2k-6.1/tools/regtesting/do_regtest	2018-07-16 15:43:39.874735643 +0200
-@@ -263,9 +263,9 @@ cp2k_postfix=${cp2k_postfix:-"${cp2k_run
- #
- ###################################################################################
- test_types_file=${dir_base}/${cp2k_dir}/tests/TEST_TYPES
--dir_last=${dir_base}/LAST-${dir_triplet}-${cp2k_version}
-+dir_last=${dir_base}/${cp2k_dir}/LAST-${dir_triplet}-${cp2k_version}
- dirout=${dirout:-${dir_base}}
--dir_out=${dir_out}/TEST-${dir_triplet}-${cp2k_version}-${datum_short}
-+dir_out=${dir_base}/${cp2k_dir}/TEST-${dir_triplet}-${cp2k_version}-${datum_short}
- changelog=${dir_last}/ChangeLog
- changelog_diff=${changelog}.diff
- changelog_new=${changelog}.new
-@@ -424,6 +424,7 @@ function run_regtest_dir() {
-      test_tolerance=`grep -v "#" TEST_FILES | ${awk} -v itest=$itest -v def_err_tol=$default_err_tolerance '{c=c+1;if (c==itest) if (NF >= 3) { print $3 } else { print def_err_tol } }'`
-      test_ref_value=`grep -v "#" TEST_FILES | ${awk} -v itest=$itest '{c=c+1;if (c==itest) if (NF == 4) { print $4 } }'`
+ %.o: %.c
+diff -up cp2k-dbf7a770d1541ba72a4652ee218de80c0484db2d/tools/regtesting/do_regtest.r cp2k-dbf7a770d1541ba72a4652ee218de80c0484db2d/tools/regtesting/do_regtest
+--- cp2k-dbf7a770d1541ba72a4652ee218de80c0484db2d/tools/regtesting/do_regtest.r	2020-09-25 17:01:47.000000000 +0200
++++ cp2k-dbf7a770d1541ba72a4652ee218de80c0484db2d/tools/regtesting/do_regtest	2020-09-29 13:59:45.419222477 +0200
+@@ -383,6 +383,7 @@ function run_regtest_dir() {
+      test_tolerance=`grep '^\s*\w' TEST_FILES | ${awk} -v itest=$itest -v def_err_tol=$default_err_tolerance '{c=c+1;if (c==itest) if (NF >= 3) { print $3 } else { print def_err_tol } }'`
+      test_ref_value=`grep '^\s*\w' TEST_FILES | ${awk} -v itest=$itest '{c=c+1;if (c==itest) if (NF == 4) { print $4 } }'`
  
 +     echo "Running ${input_file}"
-      output_file=${dir_out}/${dir}/${input_file}.out
+      output_file=${dir_test}/${dir}/${input_file}.out
       output_last=${dir_last}/${dir}/${input_file}.out
  
+@@ -1201,7 +1202,7 @@ EOF
+    if (( n_leaks > 0 )); then
+        REPORT_SUMMARY+=$(printf "; memleaks: %d" ${n_leaks})
+    fi
+-   REPORT_SUMMARY+=$(python -c "print('; %.0fmin'%(${full_timing_all}/60.0))")
++   REPORT_SUMMARY+=$(python3 -c "print('; %.0fmin'%(${full_timing_all}/60.0))")
+    echo -e "\nSummary: ${REPORT_SUMMARY}"
+ 
+    if ((n_wrong_results > 0)) || ((n_runtime_error > 0)) || ((n_leaks > 0)); then
