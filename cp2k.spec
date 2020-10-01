@@ -137,9 +137,9 @@ rm tools/build_utils/fypp
 # Generate necessary symlinks
 TARGET=Linux-%{_target_cpu}-gfortran
 ln -s Linux-x86-64-gfortran.ssmp arch/${TARGET}.ssmp
-    for m in mpich openmpi ; do
+for m in mpich openmpi ; do
     ln -s Linux-x86-64-gfortran.psmp arch/${TARGET}-${m}.psmp
-    done
+done
 
 # fix crashes in fftw on i686. Need to run on original file, otherwise symlinks will be replaced with copies.
 %ifarch i686
@@ -161,12 +161,12 @@ export PYTHON=%{_bindir}/python3
 TARGET=Linux-%{_target_cpu}-gfortran
 OPTFLAGS_COMMON="%(echo %{optflags} | sed -e 's/ -Werror=format-security//g') -fPIC -I%{_fmoddir} -fallow-argument-mismatch"
 make OPTFLAGS="${OPTFLAGS_COMMON}" DISTLDFLAGS="%{__global_ldflags} -Wl,-rpath,%{_libdir}/cp2k" %{?_smp_mflags} ARCH="${TARGET}" VERSION="ssmp"
-    %{_openmpi_load}
+%{_openmpi_load}
 make OPTFLAGS="${OPTFLAGS_COMMON} -I%{_fmoddir}/openmpi" DISTLDFLAGS="%{__global_ldflags} -Wl,-rpath,${MPI_LIB}/cp2k" %{?_smp_mflags} ARCH="${TARGET}-openmpi" VERSION="psmp"
-    %{_openmpi_unload}
-    %{_mpich_load}
+%{_openmpi_unload}
+%{_mpich_load}
 make OPTFLAGS="${OPTFLAGS_COMMON} -I%{_fmoddir}/mpich" DISTLDFLAGS="%{__global_ldflags} -Wl,-rpath,${MPI_LIB}/cp2k" %{?_smp_mflags} ARCH="${TARGET}-mpich" VERSION="psmp"
-    %{_mpich_unload}
+%{_mpich_unload}
 
 %install
 TARGET=Linux-%{_target_cpu}-gfortran
@@ -177,7 +177,7 @@ ln -s cp2k.ssmp %{buildroot}%{_bindir}/cp2k_shell.ssmp
 install -pm755 lib/${TARGET}/ssmp/lib*.so %{buildroot}%{_libdir}/cp2k/
 install -pm755 lib/${TARGET}/ssmp/exts/dbcsr/libdbcsr.so %{buildroot}%{_libdir}/cp2k/
 %{_openmpi_load}
-    mkdir -p %{buildroot}{${MPI_BIN},${MPI_LIB}/cp2k}
+mkdir -p %{buildroot}{${MPI_BIN},${MPI_LIB}/cp2k}
 install -pm755 exe/${TARGET}-openmpi/cp2k.psmp %{buildroot}${MPI_BIN}/cp2k.psmp_openmpi
 ln -s cp2k.psmp_openmpi %{buildroot}${MPI_BIN}/cp2k.popt_openmpi
 ln -s cp2k.psmp_openmpi %{buildroot}${MPI_BIN}/cp2k_shell.psmp_openmpi
@@ -185,7 +185,7 @@ install -pm755 lib/${TARGET}-openmpi/psmp/lib*.so %{buildroot}${MPI_LIB}/cp2k/
 install -pm755 lib/${TARGET}-openmpi/psmp/exts/dbcsr/libdbcsr.so %{buildroot}${MPI_LIB}/cp2k/
 %{_openmpi_unload}
 %{_mpich_load}
-    mkdir -p %{buildroot}{${MPI_BIN},${MPI_LIB}/cp2k}
+mkdir -p %{buildroot}{${MPI_BIN},${MPI_LIB}/cp2k}
 install -pm755 exe/${TARGET}-mpich/cp2k.psmp %{buildroot}${MPI_BIN}/cp2k.psmp_mpich
 ln -s cp2k.psmp_mpich %{buildroot}${MPI_BIN}/cp2k.popt_mpich
 ln -s cp2k.psmp_mpich %{buildroot}${MPI_BIN}/cp2k_shell.psmp_mpich
@@ -203,36 +203,36 @@ dir_base=%{_builddir}
 __EOF__
 . /etc/profile.d/modules.sh
 export CP2K_DATA_DIR=%{buildroot}%{_datadir}/cp2k/
-  for mpi in '' mpich openmpi ; do
-    if [ -n "$mpi" ]; then
-      module load mpi/${mpi}-%{_arch}
-      libdir=${MPI_LIB}/cp2k
-      mpiopts="-maxtasks 4 -mpiranks 2"
-      par=p
-      suf="-${mpi}"
-    else
-      libdir=%{_libdir}/cp2k
-      mpiopts=""
-      par=s
-      suf=""
-    fi
-    export LD_LIBRARY_PATH=%{buildroot}${libdir}
-    tools/regtesting/do_regtest \
-      -arch Linux-%{_target_cpu}-gfortran${suf} \
-      -config fedora.config \
+for mpi in '' mpich openmpi ; do
+  if [ -n "$mpi" ]; then
+    module load mpi/${mpi}-%{_arch}
+    libdir=${MPI_LIB}/cp2k
+    mpiopts="-maxtasks 4 -mpiranks 2"
+    par=p
+    suf="-${mpi}"
+  else
+    libdir=%{_libdir}/cp2k
+    mpiopts=""
+    par=s
+    suf=""
+  fi
+  export LD_LIBRARY_PATH=%{buildroot}${libdir}
+  tools/regtesting/do_regtest \
+    -arch Linux-%{_target_cpu}-gfortran${suf} \
+    -config fedora.config \
 %if %{git}
     -cp2kdir cp2k-%{commit} \
 %else
-      -cp2kdir cp2k-%{version} \
+    -cp2kdir cp2k-%{version} \
 %endif
-      ${mpiopts} \
-      -nobuild \
+    ${mpiopts} \
+    -nobuild \
     -version ${par}smp \
 
-    if [ -n "$mpi" ]; then
-      module unload mpi/${mpi}-%{_arch}
-    fi
-  done
+  if [ -n "$mpi" ]; then
+    module unload mpi/${mpi}-%{_arch}
+  fi
+done
 %endif
 
 %files common
