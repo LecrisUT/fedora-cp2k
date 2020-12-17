@@ -101,6 +101,7 @@ BuildRequires:  mpich-devel
 BuildRequires:  blacs-mpich-devel
 BuildRequires:  elpa-mpich-devel >= 2018.05.001
 BuildRequires:  scalapack-mpich-devel
+BuildRequires: make
 Provides: bundled(dbcsr) = %{dbcsr_version}
 Requires: %{name}-common = %{version}-%{release}
 # Libint may have API breakage
