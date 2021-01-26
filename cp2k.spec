@@ -19,7 +19,7 @@
 
 Name: cp2k
 Version: 7.1
-Release: 1.%{snapshot}git%{shortcommit}%{?dist}
+Release: 2.%{snapshot}git%{shortcommit}%{?dist}
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
 URL: http://cp2k.org/
@@ -263,6 +263,9 @@ done
 %{_libdir}/mpich/lib/cp2k/lib*.so
 
 %changelog
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 7.1-2.20200925gitdbf7a77
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
 * Fri Sep 25 2020 Dominik Mierzejewski <rpm@greysector.net> - 7.1-1
 - update to post-7.1 snapshot for gcc-10 compatibility (#1786794)
 - [sp]opt variants are no longer built (use OMP_NUM_THREADS=1 instead)
