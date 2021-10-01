@@ -1,10 +1,10 @@
-%global git 1
-%global snapshot 20200925
-%global commit dbf7a770d1541ba72a4652ee218de80c0484db2d
+%global git 0
+%global snapshot 20210528
+%global commit f848ba0b7a55a5943658d43e9dc204f6f1beee25
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global dbcsr_commit d2dfe6e25efde255f72ac27f542124b69c7af1c2
+%global dbcsr_commit 46cd0928465ee6bf21d82e5aac0a1970dcb54501
 %global dbcsr_shortcommit %(c=%{dbcsr_commit}; echo ${c:0:7})
-%global dbcsr_version 2.1.0-0.1.rc17
+%global dbcsr_version 2.1.0
 
 # TODO OpenCL support: -D__ACC -D__DBCSR_ACC -D__OPENCL
 
@@ -18,8 +18,8 @@
 %endif
 
 Name: cp2k
-Version: 7.1
-Release: 2.%{snapshot}git%{shortcommit}%{?dist}
+Version: 8.2
+Release: 1%{?dist}
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
 URL: http://cp2k.org/
@@ -37,9 +37,6 @@ Source4: cp2k-snapshot.sh
 # build with libint and libxc
 # build shared libraries
 Patch10: %{name}-rpm.patch
-# port to libxc 5.x
-# https://github.com/cp2k/cp2k/pull/914
-Patch12: %{name}-libxc5.patch
 BuildRequires: flexiblas-devel
 # for regtests
 BuildRequires: bc
@@ -48,7 +45,7 @@ BuildRequires: gcc-c++
 BuildRequires: gcc-gfortran
 BuildRequires: glibc-langpack-en
 BuildRequires: libint2-devel
-BuildRequires: libxc-devel >= 4.0.3
+BuildRequires: libxc-devel >= 5.1.0
 %ifarch x86_64
 # See https://bugzilla.redhat.com/show_bug.cgi?id=1515404
 BuildRequires: libxsmm-devel >= 1.8.1-3
@@ -131,7 +128,6 @@ echo git:%{shortcommit} > REVISION
 %endif
 %patch10 -p1 -b .r
 #%%patch11 -p1 -b .32bit
-%patch12 -p1 -b .xc5
 sed -i 's|@libdir@|%{_libdir}|' Makefile
 rm tools/build_utils/fypp
 
@@ -158,7 +154,6 @@ done
 pathfix.py -i "%{__python3} -Es" -p $(find . -type f -name *.py)
 
 %build
-export PYTHON=%{_bindir}/python3
 TARGET=Linux-%{_target_cpu}-gfortran
 OPTFLAGS_COMMON="%(echo %{optflags} | sed -e 's/ -Werror=format-security//g') -fPIC -I%{_fmoddir} -fallow-argument-mismatch"
 make OPTFLAGS="${OPTFLAGS_COMMON}" DISTLDFLAGS="%{__global_ldflags} -Wl,-rpath,%{_libdir}/cp2k" %{?_smp_mflags} ARCH="${TARGET}" VERSION="ssmp"
@@ -237,7 +232,7 @@ done
 %endif
 
 %files common
-%license COPYRIGHT
+%license LICENSE
 %doc README.md
 %{_datadir}/cp2k
 
@@ -263,6 +258,10 @@ done
 %{_libdir}/mpich/lib/cp2k/lib*.so
 
 %changelog
+* Thu Sep 30 2021 Dominik Mierzejewski <rpm@greysector.net> - 8.2-1
+- update to 8.2 (#1911741)
+- drop obsolete patch
+
 * Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 7.1-2.20200925gitdbf7a77
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
