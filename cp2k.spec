@@ -51,6 +51,7 @@ BuildRequires: libxc-devel >= 5.1.0
 BuildRequires: libxsmm-devel >= 1.8.1-3
 %endif
 BuildRequires: python3-fypp
+BuildRequires: spglib-devel
 BuildRequires: /usr/bin/hostname
 BuildRequires: /usr/bin/pathfix.py
 Provides: bundled(dbcsr) = %{dbcsr_version}
@@ -261,6 +262,7 @@ done
 * Thu Sep 30 2021 Dominik Mierzejewski <rpm@greysector.net> - 8.2-1
 - update to 8.2 (#1911741)
 - drop obsolete patch
+- enable spglib support
 
 * Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 7.1-2.20200925gitdbf7a77
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
