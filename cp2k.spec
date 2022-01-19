@@ -19,7 +19,7 @@
 
 Name: cp2k
 Version: 8.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
 URL: http://cp2k.org/
@@ -259,6 +259,9 @@ done
 %{_libdir}/mpich/lib/cp2k/lib*.so
 
 %changelog
+* Wed Jan 19 2022 Fedora Release Engineering <releng@fedoraproject.org> - 8.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
 * Thu Sep 30 2021 Dominik Mierzejewski <rpm@greysector.net> - 8.2-1
 - update to 8.2 (#1911741)
 - drop obsolete patch
