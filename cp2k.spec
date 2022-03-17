@@ -13,10 +13,6 @@
 
 %bcond_with check
 
-%ifarch x86_64
-%global _lto_cflags %{nil}
-%endif
-
 Name: cp2k
 Version: 9.1
 Release: 1%{?dist}
@@ -262,6 +258,7 @@ done
 %changelog
 * Wed Mar 16 2022 Dominik Mierzejewski <dominik@greysector.net> - 9.1-1
 - update to 9.1 (#2036421)
+- re-enable LTO on x86_64
 
 * Wed Jan 19 2022 Fedora Release Engineering <releng@fedoraproject.org> - 8.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
