@@ -4,7 +4,7 @@
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global dbcsr_commit 46cd0928465ee6bf21d82e5aac0a1970dcb54501
 %global dbcsr_shortcommit %(c=%{dbcsr_commit}; echo ${c:0:7})
-%global dbcsr_version 2.1.0
+%global dbcsr_version 2.2.0
 
 # TODO OpenCL support: -D__ACC -D__DBCSR_ACC -D__OPENCL
 
@@ -18,8 +18,8 @@
 %endif
 
 Name: cp2k
-Version: 8.2
-Release: 2%{?dist}
+Version: 9.1
+Release: 1%{?dist}
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
 URL: http://cp2k.org/
@@ -131,6 +131,7 @@ echo git:%{shortcommit} > REVISION
 #%%patch11 -p1 -b .32bit
 sed -i 's|@libdir@|%{_libdir}|' Makefile
 rm tools/build_utils/fypp
+rm -rv exts/dbcsr/tools/build_utils/fypp
 
 # Generate necessary symlinks
 TARGET=Linux-%{_target_cpu}-gfortran
@@ -259,6 +260,9 @@ done
 %{_libdir}/mpich/lib/cp2k/lib*.so
 
 %changelog
+* Wed Mar 16 2022 Dominik Mierzejewski <dominik@greysector.net> - 9.1-1
+- update to 9.1 (#2036421)
+
 * Wed Jan 19 2022 Fedora Release Engineering <releng@fedoraproject.org> - 8.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
