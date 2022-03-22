@@ -124,7 +124,6 @@ echo git:%{shortcommit} > REVISION
 %setup -q
 %endif
 %patch10 -p1 -b .r
-#%%patch11 -p1 -b .32bit
 sed -i 's|@libdir@|%{_libdir}|' Makefile
 rm tools/build_utils/fypp
 rm -rv exts/dbcsr/tools/build_utils/fypp
@@ -189,7 +188,7 @@ install -pm755 lib/${TARGET}-mpich/psmp/exts/dbcsr/libdbcsr.so %{buildroot}${MPI
 cp -pr data/* %{buildroot}%{_datadir}/cp2k/
 
 %if %{with check}
-# regtests take 11+ hours on armv7hl and ~72h on s390x
+# regtests take ~12 hours on aarch64 and ~48h on s390x
 %check
 cat > fedora.config << __EOF__
 export LC_ALL=C
