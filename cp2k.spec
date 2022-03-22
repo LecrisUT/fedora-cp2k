@@ -15,7 +15,7 @@
 
 Name: cp2k
 Version: 9.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
 URL: http://cp2k.org/
@@ -209,7 +209,7 @@ for mpi in '' mpich openmpi ; do
     par=s
     suf=""
   fi
-  export LD_LIBRARY_PATH=%{buildroot}${libdir}
+  export LD_LIBRARY_PATH=%{buildroot}${libdir}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
   tools/regtesting/do_regtest \
     -arch Linux-%{_target_cpu}-gfortran${suf} \
     -config fedora.config \
@@ -255,6 +255,9 @@ done
 %{_libdir}/mpich/lib/cp2k/lib*.so
 
 %changelog
+* Tue Mar 22 2022 Dominik Mierzejewski <dominik@greysector.net> - 9.1-2
+- fix three failing tests due to wrong LD_LIBRARY_PATH setting
+
 * Wed Mar 16 2022 Dominik Mierzejewski <dominik@greysector.net> - 9.1-1
 - update to 9.1 (#2036421)
 - re-enable LTO on x86_64
