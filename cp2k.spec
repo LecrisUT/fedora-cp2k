@@ -15,7 +15,7 @@
 
 Name: cp2k
 Version: 9.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Ab Initio Molecular Dynamics
 License: GPLv2+
 URL: http://cp2k.org/
@@ -255,6 +255,9 @@ done
 %{_libdir}/mpich/lib/cp2k/lib*.so
 
 %changelog
+* Wed Jul 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 9.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
 * Tue Mar 22 2022 Dominik Mierzejewski <dominik@greysector.net> - 9.1-2
 - fix three failing tests due to wrong LD_LIBRARY_PATH setting
 
