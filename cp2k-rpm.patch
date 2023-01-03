@@ -1,6 +1,6 @@
-diff -up cp2k-9.1/arch/Linux-x86-64-gfortran.psmp.r cp2k-9.1/arch/Linux-x86-64-gfortran.psmp
---- cp2k-9.1/arch/Linux-x86-64-gfortran.psmp.r	2022-03-16 15:37:13.423460010 +0100
-+++ cp2k-9.1/arch/Linux-x86-64-gfortran.psmp	2022-03-16 15:41:19.423395785 +0100
+diff -up cp2k-2023.1/arch/Linux-x86-64-gfortran.psmp.r cp2k-2023.1/arch/Linux-x86-64-gfortran.psmp
+--- cp2k-2023.1/arch/Linux-x86-64-gfortran.psmp.r	2023-01-02 13:56:43.266258123 +0100
++++ cp2k-2023.1/arch/Linux-x86-64-gfortran.psmp	2023-01-02 13:56:43.266258123 +0100
 @@ -0,0 +1,48 @@
 +# Tested with: GFortran 8.3.0, MPICH 3.3, LAPACK 3.9.1, ScaLAPACK 6819b24, FFTW 3.3.9,
 +#              LIBINT 2.6.0, LIBXC 5.1.4, ELPA 2020.11.001, PLUMED 2.6.2, SPGLIB 1.16.0,
@@ -50,72 +50,41 @@ diff -up cp2k-9.1/arch/Linux-x86-64-gfortran.psmp.r cp2k-9.1/arch/Linux-x86-64-g
 +LIBS       += -ldl
 +LIBS       += -lpthread
 +LIBS       += -lstdc++
-diff -up cp2k-9.1/arch/Linux-x86-64-gfortran.ssmp.r cp2k-9.1/arch/Linux-x86-64-gfortran.ssmp
---- cp2k-9.1/arch/Linux-x86-64-gfortran.ssmp.r	2021-11-20 10:05:35.985303000 +0100
-+++ cp2k-9.1/arch/Linux-x86-64-gfortran.ssmp	2022-03-16 15:34:10.978028808 +0100
-@@ -5,33 +5,19 @@
- CC          = gcc
- FC          = gfortran
- LD          = gfortran
+diff -up cp2k-2023.1/arch/Linux-x86-64-gfortran.ssmp.r cp2k-2023.1/arch/Linux-x86-64-gfortran.ssmp
+--- cp2k-2023.1/arch/Linux-x86-64-gfortran.ssmp.r	2023-01-02 14:00:42.484316266 +0100
++++ cp2k-2023.1/arch/Linux-x86-64-gfortran.ssmp	2023-01-02 14:04:35.204397188 +0100
+@@ -0,0 +1,42 @@
++# Tested with: GFortran 8.3.0, MPICH 3.3, LAPACK 3.9.1, ScaLAPACK 6819b24, FFTW 3.3.9,
++#              LIBINT 2.6.0, LIBXC 5.1.4, ELPA 2020.11.001, PLUMED 2.6.2, SPGLIB 1.16.0,
++#              LIBVORI 210412, LIBXSMM 1.16.1, SIRIUS 7.0.2, OpenBLAS 0.3.15
++# Author: Matthias Krack (matthias.krack@psi.ch, PSI, May 2021)
++
++CC          = gcc
++FC          = gfortran
++LD          = gfortran
 +LD_SHARED   = gfortran -shared
- AR          = ar -r
- 
--FFTW_INC    = $(GNU_PATH)/fftw/3.3.9/include
--FFTW_LIB    = $(GNU_PATH)/fftw/3.3.9/lib
--
--LIBINT_INC  = $(GNU_PATH)/libint/2.6.0-lmax-6/include
--LIBINT_LIB  = $(GNU_PATH)/libint/2.6.0-lmax-6/lib
--
--LIBVORI_LIB = $(GNU_PATH)/libvori/210412/lib
--
--LIBXC_INC   = $(GNU_PATH)/libxc/5.1.7/include
--LIBXC_LIB   = $(GNU_PATH)/libxc/5.1.7/lib
--
--LIBXSMM_INC = $(GNU_PATH)/libxsmm/1.16.2/include
--LIBXSMM_LIB = $(GNU_PATH)/libxsmm/1.16.2/lib
--
--SPGLIB_INC  = $(GNU_PATH)/spglib/1.16.2/include
--SPGLIB_LIB  = $(GNU_PATH)/spglib/1.16.2/lib
--
--CFLAGS      = -O2 -fopenmp -fopenmp-simd -ftree-vectorize -funroll-loops -g -march=native -mtune=native
++AR          = ar -r
++
 +OPTFLAGS    = -O2 -ftree-vectorize -funroll-loops -g -march=native -mtune=native
 +CFLAGS      = $(OPTFLAGS) -fopenmp -fopenmp-simd
- 
- DFLAGS      = -D__FFTW3
- DFLAGS     += -D__LIBINT
--DFLAGS     += -D__LIBVORI
- DFLAGS     += -D__LIBXC
--DFLAGS     += -D__LIBXSMM
++
++DFLAGS      = -D__FFTW3
++DFLAGS     += -D__LIBINT
++DFLAGS     += -D__LIBXC
 +DFLAGS     += @LIBSMM_DEFS@
- DFLAGS     += -D__SPGLIB
++DFLAGS     += -D__SPGLIB
 +DFLAGS     += -D__HAS_IEEE_EXCEPTIONS
 +DFLAGS     += -D__MAX_CONTR=4
- 
- FCFLAGS     = $(CFLAGS) $(DFLAGS)
- FCFLAGS    += -fbacktrace
-@@ -39,23 +25,16 @@ FCFLAGS    += -ffree-form
- FCFLAGS    += -ffree-line-length-none
- FCFLAGS    += -fno-omit-frame-pointer
- FCFLAGS    += -std=f2008
--FCFLAGS    += -I$(FFTW_INC)
--FCFLAGS    += -I$(LIBINT_INC)
--FCFLAGS    += -I$(LIBXC_INC)
--FCFLAGS    += -I$(LIBXSMM_INC)
- 
--LDFLAGS     = $(FCFLAGS) -static
++
++FCFLAGS     = $(CFLAGS) $(DFLAGS)
++FCFLAGS    += -fbacktrace
++FCFLAGS    += -ffree-form
++FCFLAGS    += -ffree-line-length-none
++FCFLAGS    += -fno-omit-frame-pointer
++FCFLAGS    += -std=f2008
++
 +LDFLAGS     = $(FCFLAGS) $(DISTLDFLAGS)
- 
--LIBS        = $(LIBVORI_LIB)/libvori.a
--LIBS       += $(LIBXC_LIB)/libxcf03.a
--LIBS       += $(LIBXC_LIB)/libxc.a
--LIBS       += $(LIBINT_LIB)/libint2.a
--LIBS       += $(SPGLIB_LIB)/libsymspg.a
--LIBS       += $(FFTW_LIB)/libfftw3_omp.a
--LIBS       += $(FFTW_LIB)/libfftw3.a
--LIBS       += $(LIBXSMM_LIB)/libxsmmf.a
--LIBS       += $(LIBXSMM_LIB)/libxsmm.a
--LIBS       += $(LIBPATH)/liblapack.a
--LIBS       += $(LIBPATH)/libblas.a
++
 +LIBS        = -lxcf03
 +LIBS       += -lxc
 +LIBS       += -lint2
@@ -124,11 +93,12 @@ diff -up cp2k-9.1/arch/Linux-x86-64-gfortran.ssmp.r cp2k-9.1/arch/Linux-x86-64-g
 +LIBS       += -lfftw3_omp
 +LIBS       += @LIBSMM_LIBS@
 +LIBS       += -lflexiblas
- LIBS       += -ldl
- LIBS       += -lstdc++
-diff -up cp2k-9.1/exts/build_dbcsr/Makefile.r cp2k-9.1/exts/build_dbcsr/Makefile
---- cp2k-9.1/exts/build_dbcsr/Makefile.r	2021-12-31 10:25:44.499215100 +0100
-+++ cp2k-9.1/exts/build_dbcsr/Makefile	2022-03-16 16:16:47.759473924 +0100
++LIBS       += -ldl
++LIBS       += -lpthread
++LIBS       += -lstdc++
+diff -up cp2k-2023.1/exts/build_dbcsr/Makefile.r cp2k-2023.1/exts/build_dbcsr/Makefile
+--- cp2k-2023.1/exts/build_dbcsr/Makefile.r	2022-12-31 10:53:17.602869500 +0100
++++ cp2k-2023.1/exts/build_dbcsr/Makefile	2023-01-02 13:56:43.266258123 +0100
 @@ -47,7 +47,7 @@ MAKEFILE     := $(DBCSRCP2K)/Makefile
  LIBDIR       := $(DBCSRHOME)/lib
  OBJDIR       := $(DBCSRHOME)/obj
@@ -138,9 +108,9 @@ diff -up cp2k-9.1/exts/build_dbcsr/Makefile.r cp2k-9.1/exts/build_dbcsr/Makefile
  SRCDIR       := $(DBCSRHOME)/src
  TESTSDIR     := $(DBCSRHOME)/tests
  ARCHFILE     :=
-diff -up cp2k-9.1/Makefile.r cp2k-9.1/Makefile
---- cp2k-9.1/Makefile.r	2021-11-20 10:05:35.985303000 +0100
-+++ cp2k-9.1/Makefile	2022-03-16 15:34:10.980028824 +0100
+diff -up cp2k-2023.1/Makefile.r cp2k-2023.1/Makefile
+--- cp2k-2023.1/Makefile.r	2022-12-31 11:06:14.064502500 +0100
++++ cp2k-2023.1/Makefile	2023-01-02 13:56:43.267258119 +0100
 @@ -16,7 +16,7 @@ export VERSION=ssmp
  
  MAKEFILE     := $(CP2KHOME)/Makefile
@@ -150,7 +120,7 @@ diff -up cp2k-9.1/Makefile.r cp2k-9.1/Makefile
  MAINEXEDIR   := $(CP2KHOME)/exe
  MAINLIBDIR   := $(CP2KHOME)/lib
  MAINOBJDIR   := $(CP2KHOME)/obj
-@@ -527,7 +527,7 @@ FCFLAGS += -D__COMPILE_ARCH="\"$(ARCH)\"
+@@ -515,7 +515,7 @@ FCFLAGS += -D__COMPILE_ARCH="\"$(ARCH)\"
  FYPPFLAGS ?= -n
  
  %.o: %.F
@@ -159,12 +129,12 @@ diff -up cp2k-9.1/Makefile.r cp2k-9.1/Makefile
  	$(FC) -c $(FCFLAGS) -D__SHORT_FILE__="\"$(subst $(SRCDIR)/,,$<)\"" -I'$(dir $<)' $(OBJEXTSINCL) $*.F90 $(FCLOGPIPE)
  
  %.o: %.c
-diff -up cp2k-9.1/tools/regtesting/do_regtest.r cp2k-9.1/tools/regtesting/do_regtest
---- cp2k-9.1/tools/regtesting/do_regtest.r	2021-11-20 10:05:36.155893000 +0100
-+++ cp2k-9.1/tools/regtesting/do_regtest	2022-03-16 15:34:10.978028808 +0100
+diff -up cp2k-2023.1/tools/regtesting/do_regtest.r cp2k-2023.1/tools/regtesting/do_regtest
+--- cp2k-2023.1/tools/regtesting/do_regtest.r	2023-01-02 13:56:43.267258119 +0100
++++ cp2k-2023.1/tools/regtesting/do_regtest	2023-01-02 13:59:33.397591133 +0100
 @@ -378,6 +378,7 @@ function run_regtest_dir() {
-      test_tolerance=`grep '^\s*\w' TEST_FILES | ${awk} -v itest=$itest -v def_err_tol=$default_err_tolerance '{c=c+1;if (c==itest) if (NF >= 3) { print $3 } else { print def_err_tol } }'`
-      test_ref_value=`grep '^\s*\w' TEST_FILES | ${awk} -v itest=$itest '{c=c+1;if (c==itest) if (NF == 4) { print $4 } }'`
+      test_tolerance=$(grep '^\s*\w' TEST_FILES | ${awk} -v itest=$itest -v def_err_tol=$default_err_tolerance '{c=c+1;if (c==itest) if (NF >= 3) { print $3 } else { print def_err_tol } }')
+      test_ref_value=$(grep '^\s*\w' TEST_FILES | ${awk} -v itest=$itest '{c=c+1;if (c==itest) if (NF == 4) { print $4 } }')
  
 +     echo "Running ${input_file}"
       output_file=${dir_test}/${dir}/${input_file}.out
