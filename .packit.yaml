@@ -1,0 +1,58 @@
+specfile_path: cp2k.spec
+
+files_to_sync:
+    - cp2k.spec
+    - .packit.yaml
+
+actions:
+  # TODO: This would not work on specific commit
+  create-archive:
+    - spectool -g cp2k.spec
+    - sh -c "ls cp2k-*.tar.bz2"
+
+upstream_package_name: cp2k
+downstream_package_name: cp2k
+update_release: false
+upstream_project_url: https://github.com/LecrisUT/Fedora-cp2k
+
+jobs:
+  - job: copr_build
+    trigger: pull_request
+    owner: lecris
+    project: cp2k
+    targets:
+      - fedora-all
+      - epel-9
+  - job: tests
+    trigger: pull_request
+    targets:
+      - fedora-all
+      - epel-9
+  - job: copr_build
+    trigger: commit
+    owner: lecris
+    project: cp2k
+    targets:
+      - fedora-all
+      - epel-9
+  - job: tests
+    trigger: commit
+    targets:
+      - fedora-all
+      - epel-9
+  - job: pull_from_upstream
+    trigger: release
+    dist_git_branches:
+      - fedora-all
+      - epel-9
+  - job: koji_build
+    trigger: commit
+    dist_git_branches:
+      - fedora-all
+      - epel-9
+  - job: bodhi_update
+    trigger: commit
+    dist_git_branches:
+      - fedora-branched
+      - epel-9
+
