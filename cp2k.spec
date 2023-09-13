@@ -1,61 +1,54 @@
 %global git 0
 %global snapshot 20210528
-%global commit f848ba0b7a55a5943658d43e9dc204f6f1beee25
+%global commit 056df937c4510a5ec8564bca4ce4b33f44aec9b8
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global dbcsr_commit 46cd0928465ee6bf21d82e5aac0a1970dcb54501
-%global dbcsr_shortcommit %(c=%{dbcsr_commit}; echo ${c:0:7})
-%global dbcsr_version 2.2.0
 
-# TODO OpenCL support: -D__ACC -D__DBCSR_ACC -D__OPENCL
+# TODO: Filter tests and enable by default
+%bcond_without check
 
-%global __provides_exclude_from ^%{_libdir}/(cp2k/lib|(mpich|openmpi)/lib/cp2k).*\\.so$
-%global __requires_exclude ^lib(cp2k|clsmm|dbcsr|micsmm).*\\.so.*$
+Name:     cp2k
+Version:  2023.2
+Release:  %autorelease
+Summary:  Ab Initio Molecular Dynamics
+License:  GPL-2.0-or-later
+URL:      https://cp2k.org/
 
-%bcond_with check
-
-Name: cp2k
-Version: 2023.1
-Release: %autorelease
-Summary: Ab Initio Molecular Dynamics
-License: GPLv2+
-URL: http://cp2k.org/
 %if %{git}
-Source0: https://github.com/cp2k/cp2k/archive/%{commit}/%{name}-%{shortcommit}.tar.gz
-Source1: https://github.com/cp2k/dbcsr/archive/%{dbcsr_commit}/dbcsr-%{dbcsr_shortcommit}.tar.gz
+Source: https://github.com/cp2k/cp2k/archive/%{commit}/cp2k-%{shortcommit}.tar.gz
 %else
-Source0: https://github.com/cp2k/cp2k/releases/download/v%{version}/cp2k-%{version}.tar.bz2
+Source: https://github.com/cp2k/cp2k/releases/download/v%{version}/cp2k-%{version}.tar.bz2
 %endif
-Source4: cp2k-snapshot.sh
-# Fedora patches
-# patch to:
-# use rpm optflags
-# link with flexiblas instead of vanilla blas/lapack
-# build with libint and libxc
-# build shared libraries
-Patch10: %{name}-rpm.patch
+
 BuildRequires: flexiblas-devel
 # for regtests
-BuildRequires: bc
+BuildRequires: libomp-devel
 BuildRequires: fftw-devel
+BuildRequires: gcc
 BuildRequires: gcc-c++
 BuildRequires: gcc-gfortran
-BuildRequires: glibc-langpack-en
-BuildRequires: libint2-devel
-BuildRequires: libxc-devel >= 5.1.0
-%ifarch x86_64
-# See https://bugzilla.redhat.com/show_bug.cgi?id=1515404
-BuildRequires: libxsmm-devel >= 1.8.1-3
-%endif
+BuildRequires: ninja-build
+BuildRequires: libxc-devel
+BuildRequires: libxsmm-devel
 BuildRequires: python3-fypp
 BuildRequires: spglib-devel
-BuildRequires: /usr/bin/hostname
-BuildRequires: python3-devel
-Provides: bundled(dbcsr) = %{dbcsr_version}
+BuildRequires: dbcsr-devel
+# TODO: Add python bindings
+#BuildRequires: python3-devel
+# openmpi
+BuildRequires:  openmpi-devel
+BuildRequires:  dbcsr-openmpi-devel
+BuildRequires:  elpa-openmpi-devel
+## TODO: Add scalapack support
+#BuildRequires:  scalapack-openmpi-devel
+# mpich
+BuildRequires:  mpich-devel
+BuildRequires:  dbcsr-mpich-devel
+BuildRequires:  elpa-mpich-devel
+## TODO: Add scalapack support
+#BuildRequires:  scalapack-mpich-devel
 
 # Libint can break the API between releases
-Requires: libint2(api)%{?_isa} = %{_libint2_apiversion}
-
-Requires: %{name}-common = %{version}-%{release}
+Requires: cp2k-common = %{version}-%{release}
 
 %global cp2k_desc_base \
 CP2K is a freely available (GPL) program, written in Fortran 95, to\
@@ -74,14 +67,7 @@ This package contains the non-MPI single process and multi-threaded versions.
 
 %package openmpi
 Summary: Molecular simulations software - openmpi version
-BuildRequires:  openmpi-devel
-BuildRequires:  blacs-openmpi-devel
-BuildRequires:  elpa-openmpi-devel >= 2018.05.001
-BuildRequires:  scalapack-openmpi-devel
-Provides: bundled(dbcsr) = %{dbcsr_version}
-Requires: %{name}-common = %{version}-%{release}
-# Libint may have API breakage
-Requires: libint2(api)%{?_isa} = %{_libint2_apiversion}
+Requires: cp2k-common = %{version}-%{release}
 
 %description openmpi
 %{cp2k_desc_base}
@@ -91,15 +77,7 @@ using OpenMPI.
 
 %package mpich
 Summary: Molecular simulations software - mpich version
-BuildRequires:  mpich-devel
-BuildRequires:  blacs-mpich-devel
-BuildRequires:  elpa-mpich-devel >= 2018.05.001
-BuildRequires:  scalapack-mpich-devel
-BuildRequires: make
-Provides: bundled(dbcsr) = %{dbcsr_version}
-Requires: %{name}-common = %{version}-%{release}
-# Libint may have API breakage
-Requires: libint2(api)%{?_isa} = %{_libint2_apiversion}
+Requires: cp2k-common = %{version}-%{release}
 
 %description mpich
 %{cp2k_desc_base}
@@ -115,116 +93,57 @@ Summary: Molecular simulations software - common files
 
 This package contains the documentation and the manual.
 
+
 %prep
 %if %{git}
-%setup -q -n %{name}-%{commit}
-tar xzf %{S:1} -C exts/dbcsr --strip-components=1
-echo git:%{shortcommit} > REVISION
+%autosetup -n cp2k-%{commit}
 %else
-%setup -q
+%autosetup -n cp2k-%{version}
 %endif
-%patch10 -p1 -b .r
-sed -i 's|@libdir@|%{_libdir}|' Makefile
+# Remove bundled fypp and dbcsr so that it is not accidentally picked up
 rm tools/build_utils/fypp
-rm -rv exts/dbcsr/tools/build_utils/fypp
+rm -r exts/dbcsr
 
-# Generate necessary symlinks
-TARGET=Linux-%{_target_cpu}-gfortran
-ln -s Linux-x86-64-gfortran.ssmp arch/${TARGET}.ssmp
-for m in mpich openmpi ; do
-    ln -s Linux-x86-64-gfortran.psmp arch/${TARGET}-${m}.psmp
-done
-
-# fix crashes in fftw on i686. Need to run on original file, otherwise symlinks will be replaced with copies.
-%ifarch i686
-sed -i 's/-D__FFTW3/-D__FFTW3 -D__FFTW3_UNALIGNED/g' arch/Linux-x86-64-gfortran*
-%endif
-
-for f in arch/Linux-x86-64-gfortran.{psmp,ssmp}; do
-%ifarch x86_64
- sed -i 's|@LIBSMM_DEFS@|-D__LIBXSMM|;s|@LIBSMM_LIBS@|-lxsmmf -lxsmm|' $f
-%else
- sed -i 's|@LIBSMM_DEFS@||;s|@LIBSMM_LIBS@||' $f
-%endif
-done
-
-%{__python3} %{_rpmconfigdir}/redhat/pathfix.py -i "%{__python3} -Es" -p $(find . -type f -name *.py)
 
 %build
-TARGET=Linux-%{_target_cpu}-gfortran
-OPTFLAGS_COMMON="%(echo %{optflags} | sed -e 's/ -Werror=format-security//g') -fPIC -I%{_fmoddir} -fallow-argument-mismatch"
-make OPTFLAGS="${OPTFLAGS_COMMON}" DISTLDFLAGS="%{__global_ldflags} -Wl,-rpath,%{_libdir}/cp2k" %{?_smp_mflags} ARCH="${TARGET}" VERSION="ssmp"
-%{_openmpi_load}
-make OPTFLAGS="${OPTFLAGS_COMMON} -I%{_fmoddir}/openmpi" DISTLDFLAGS="%{__global_ldflags} -Wl,-rpath,${MPI_LIB}/cp2k" %{?_smp_mflags} ARCH="${TARGET}-openmpi" VERSION="psmp"
-%{_openmpi_unload}
-%{_mpich_load}
-make OPTFLAGS="${OPTFLAGS_COMMON} -I%{_fmoddir}/mpich" DISTLDFLAGS="%{__global_ldflags} -Wl,-rpath,${MPI_LIB}/cp2k" %{?_smp_mflags} ARCH="${TARGET}-mpich" VERSION="psmp"
-%{_mpich_unload}
+# Prepare for mpi
+source /etc/profile.d/modules.sh
+# Note: The following works beause:
+# - %%global: macros are evaluated explicitly at definition, $variables are not expanded
+# - %%define: macros are evaluated in-place, $variables are also expanded
+%global _vpath_builddir %{_target_platform}_${mpi:-serial}
+
+for mpi in '' openmpi mpich; do
+  %{?$mpi:%{_${mpi}_load}}
+  # TODO: Remove CP2K_BUILD_DBSCR when dbscr is packaged
+  %cmake \
+    -G Ninja \
+    -DCP2K_BLAS_VENDOR=FlexiBLAS \
+    -DCP2K_USE_LIBXC=ON \
+    -DCP2K_USE_SPGLIB=ON \
+    -DCP2K_USE_LIBXSMM=ON \
+    %{?$mpi:-DCP2K_USE_ELPA=ON} \
+    -DCP2K_USE_FFTW3=ON \
+    -DCP2K_USE_MPI=%{?$mpi:ON}%{!?$mpi:OFF} \
+    %{?$mpi:-DCMAKE_INSTALL_LIBDIR=$MPI_LIB}
+  %cmake_build
+  %{?$mpi:%{_${mpi}_unload}}
+done
+
 
 %install
-TARGET=Linux-%{_target_cpu}-gfortran
-mkdir -p %{buildroot}{%{_bindir},%{_libdir}/cp2k,%{_datadir}/cp2k}
-install -pm755 exe/${TARGET}/cp2k.ssmp %{buildroot}%{_bindir}
-ln -s cp2k.ssmp %{buildroot}%{_bindir}/cp2k.sopt
-ln -s cp2k.ssmp %{buildroot}%{_bindir}/cp2k_shell.ssmp
-install -pm755 lib/${TARGET}/ssmp/lib*.so %{buildroot}%{_libdir}/cp2k/
-install -pm755 lib/${TARGET}/ssmp/exts/dbcsr/libdbcsr.so %{buildroot}%{_libdir}/cp2k/
-%{_openmpi_load}
-mkdir -p %{buildroot}{${MPI_BIN},${MPI_LIB}/cp2k}
-install -pm755 exe/${TARGET}-openmpi/cp2k.psmp %{buildroot}${MPI_BIN}/cp2k.psmp_openmpi
-ln -s cp2k.psmp_openmpi %{buildroot}${MPI_BIN}/cp2k.popt_openmpi
-ln -s cp2k.psmp_openmpi %{buildroot}${MPI_BIN}/cp2k_shell.psmp_openmpi
-install -pm755 lib/${TARGET}-openmpi/psmp/lib*.so %{buildroot}${MPI_LIB}/cp2k/
-install -pm755 lib/${TARGET}-openmpi/psmp/exts/dbcsr/libdbcsr.so %{buildroot}${MPI_LIB}/cp2k/
-%{_openmpi_unload}
-%{_mpich_load}
-mkdir -p %{buildroot}{${MPI_BIN},${MPI_LIB}/cp2k}
-install -pm755 exe/${TARGET}-mpich/cp2k.psmp %{buildroot}${MPI_BIN}/cp2k.psmp_mpich
-ln -s cp2k.psmp_mpich %{buildroot}${MPI_BIN}/cp2k.popt_mpich
-ln -s cp2k.psmp_mpich %{buildroot}${MPI_BIN}/cp2k_shell.psmp_mpich
-install -pm755 lib/${TARGET}-mpich/psmp/lib*.so %{buildroot}${MPI_LIB}/cp2k/
-install -pm755 lib/${TARGET}-mpich/psmp/exts/dbcsr/libdbcsr.so %{buildroot}${MPI_LIB}/cp2k/
-%{_mpich_unload}
-cp -pr data/* %{buildroot}%{_datadir}/cp2k/
+for mpi in '' openmpi mpich; do
+  %cmake_install
+done
+
 
 %if %{with check}
 # regtests take ~12 hours on aarch64 and ~48h on s390x
 %check
-cat > fedora.config << __EOF__
-export LC_ALL=C
-dir_base=%{_builddir}
-__EOF__
-. /etc/profile.d/modules.sh
-export CP2K_DATA_DIR=%{buildroot}%{_datadir}/cp2k/
-for mpi in '' mpich openmpi ; do
-  if [ -n "$mpi" ]; then
-    module load mpi/${mpi}-%{_arch}
-    libdir=${MPI_LIB}/cp2k
-    mpiopts="-maxtasks 4 -mpiranks 2"
-    par=p
-    suf="-${mpi}"
-  else
-    libdir=%{_libdir}/cp2k
-    mpiopts=""
-    par=s
-    suf=""
-  fi
-  export LD_LIBRARY_PATH=%{buildroot}${libdir}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
-  tools/regtesting/do_regtest \
-    -arch Linux-%{_target_cpu}-gfortran${suf} \
-    -config fedora.config \
-%if %{git}
-    -cp2kdir cp2k-%{commit} \
-%else
-    -cp2kdir cp2k-%{version} \
-%endif
-    ${mpiopts} \
-    -nobuild \
-    -version ${par}smp \
-
-  if [ -n "$mpi" ]; then
-    module unload mpi/${mpi}-%{_arch}
-  fi
+for mpi in '' openmpi mpich; do
+  %{?$mpi:%{_${mpi}_load}}
+  %ctest
+  %{?$mpi:%{_${mpi}_unload}}
 done
 %endif
 
