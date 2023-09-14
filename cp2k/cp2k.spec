@@ -114,7 +114,8 @@ source /etc/profile.d/modules.sh
 %global _vpath_builddir %{_target_platform}_${mpi:-serial}
 
 for mpi in %{mpi_list} ''; do
-  %{?$mpi:%{_${mpi}_load}}
+  %define mpi $mpi
+  %{?mpi:%{_%{mpi}_load}}
   # TODO: Remove CP2K_BUILD_DBSCR when dbscr is packaged
   %cmake \
     -G Ninja \
@@ -125,10 +126,11 @@ for mpi in %{mpi_list} ''; do
     -DCP2K_USE_LIBXSMM=ON \
     %{?$mpi:-DCP2K_USE_ELPA=ON} \
     -DCP2K_USE_FFTW3=ON \
-    -DCP2K_USE_MPI=%{?$mpi:ON}%{!?$mpi:OFF} \
-    %{?$mpi:-DCMAKE_INSTALL_LIBDIR=$MPI_LIB}
+    -DCP2K_USE_MPI=%{?mpi:ON}%{!?mpi:OFF} \
+    %{?mpi:-DCMAKE_INSTALL_LIBDIR=$MPI_LIB}
   %cmake_build
-  %{?$mpi:%{_${mpi}_unload}}
+  %{?mpi:%{_%{mpi}_unload}}
+  %undefine mpi
 done
 
 
@@ -142,9 +144,11 @@ done
 # regtests take ~12 hours on aarch64 and ~48h on s390x
 %check
 for mpi in %{mpi_list} ''; do
-  %{?$mpi:%{_${mpi}_load}}
+  %define mpi $mpi
+  %{?mpi:%{_%{mpi}_load}}
   %ctest
-  %{?$mpi:%{_${mpi}_unload}}
+  %{?mpi:%{_%{mpi}_unload}}
+  %undefine mpi
 done
 %endif
 
