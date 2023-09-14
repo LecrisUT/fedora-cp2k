@@ -1,0 +1,26 @@
+commit f3aecba943ca14c45f63ece3d825579d073d506c
+Author: Orion Poplawski <orion@nwra.com>
+Date:   Thu Sep 7 22:11:48 2023 -0600
+
+    Allow specification of an alternate Fortran module install directory
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index d5196c595c..16cf97cfc0 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -304,10 +304,13 @@ install(
+   EXPORT DBCSRTargets
+   LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+   ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}")
++if (NOT CMAKE_INSTALL_Fortran_MODULES)
++  set(CMAKE_INSTALL_Fortran_MODULES "${CMAKE_INSTALL_INCLUDEDIR}")
++endif ()
+ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/dbcsr_api.mod"
+-        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
++        DESTINATION "${CMAKE_INSTALL_Fortran_MODULES}")
+ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/dbcsr_tensor_api.mod"
+-        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
++        DESTINATION "${CMAKE_INSTALL_Fortran_MODULES}")
+ 
+ if (WITH_C_API)
+   install(

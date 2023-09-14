@@ -1,0 +1,10 @@
+diff -up dbcsr-4d60929fea25d66ef58ab66eaced315242d8c029/cmake/CompilerConfiguration.cmake.flags dbcsr-4d60929fea25d66ef58ab66eaced315242d8c029/cmake/CompilerConfiguration.cmake
+--- dbcsr-4d60929fea25d66ef58ab66eaced315242d8c029/cmake/CompilerConfiguration.cmake.flags	2023-09-05 01:34:45.000000000 -0600
++++ dbcsr-4d60929fea25d66ef58ab66eaced315242d8c029/cmake/CompilerConfiguration.cmake	2023-09-07 21:25:47.150790959 -0600
+@@ -1,5 +1,5 @@
+ if (CMAKE_Fortran_COMPILER_ID STREQUAL "GNU")
+-  set(CMAKE_Fortran_FLAGS          "-ffree-form -std=f2008ts -fimplicit-none -Werror=aliasing -Werror=ampersand -Werror=c-binding-type -Werror=intrinsic-shadow -Werror=intrinsics-std -Werror=line-truncation -Werror=tabs -Werror=target-lifetime -Werror=underflow -Werror=unused-but-set-parameter -Werror=unused-but-set-variable -Werror=unused-variable -Werror=unused-dummy-argument -Werror=conversion -Werror=zerotrip -Werror=uninitialized -Wno-maybe-uninitialized -Werror=unused-parameter")
++  set(CMAKE_Fortran_FLAGS          "${CMAKE_Fortran_FLAGS} -ffree-form -std=f2008ts -fimplicit-none -Werror=aliasing -Werror=ampersand -Werror=c-binding-type -Werror=intrinsic-shadow -Werror=intrinsics-std -Werror=line-truncation -Werror=tabs -Werror=target-lifetime -Werror=underflow -Werror=unused-but-set-parameter -Werror=unused-but-set-variable -Werror=unused-variable -Werror=unused-dummy-argument -Werror=conversion -Werror=zerotrip -Werror=uninitialized -Wno-maybe-uninitialized -Werror=unused-parameter")
+   if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10)
+     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -Werror=argument-mismatch")  # gcc 10+ has this automatically
+    else ()

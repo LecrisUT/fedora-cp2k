@@ -1,17 +1,34 @@
-specfile_path: cp2k.spec
+packages:
+  cp2k:
+    paths: [ "./cp2k" ]
+    specfile_path: cp2k.spec
+    files_to_sync:
+        - cp2k.spec
+        - ../.packit.yaml
+    actions:
+      # TODO: This would not work on specific commit
+      create-archive:
+        - spectool -g cp2k.spec
+        - sh -c "ls cp2k-*.tar.bz2"
 
-files_to_sync:
-    - cp2k.spec
-    - .packit.yaml
+    upstream_package_name: cp2k
+    downstream_package_name: cp2k
+  dbcsr:
+    paths: [ "./dbcsr" ]
+    specfile_path: dbcsr.spec
+    files_to_sync:
+      - dbcsr.spec
+      - dbcsr-flags.patch
+      - dbcsr-fmoddir.patch
+      - ../.packit.yaml
+    actions:
+      # TODO: This would not work on specific commit
+      create-archive:
+        - spectool -g dbcsr.spec
+        - sh -c "ls dbcsr-*.tar.gz"
 
-actions:
-  # TODO: This would not work on specific commit
-  create-archive:
-    - spectool -g cp2k.spec
-    - sh -c "ls cp2k-*.tar.bz2"
-
-upstream_package_name: cp2k
-downstream_package_name: cp2k
+    upstream_package_name: dbcsr
+    downstream_package_name: dbcsr
 update_release: false
 upstream_project_url: https://github.com/LecrisUT/Fedora-cp2k
 
