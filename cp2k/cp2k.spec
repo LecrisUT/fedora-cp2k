@@ -33,8 +33,6 @@ BuildRequires: spglib-devel
 BuildRequires: dbcsr-devel
 ## TODO: Add python bindings
 #BuildRequires: python3-devel
-## TODO: Add scalapack support
-#BuildRequires:  scalapack-openmpi-devel
 
 # Libint can break the API between releases
 Requires: cp2k-common = %{version}-%{release}
@@ -65,10 +63,12 @@ Summary: %{_summary_base} - %{-m*} version
 BuildRequires:  %{-m*}-devel
 BuildRequires:  dbcsr-%{-m*}-devel
 BuildRequires:  elpa-%{-m*}-devel
+BuildRequires:  scalapack-%{-m*}-devel
 Requires:       %{-m*}
 Requires:       dbcsr-%{-m*}
 Requires:       elpa-%{-m*}
-Requires: cp2k-common = %{version}-%{release}
+Requires:       scalapack-%{-m*}
+Requires:       cp2k-common = %{version}-%{release}
 
 %description %{-m*}
 %{_description_base}
@@ -108,7 +108,7 @@ source /etc/profile.d/modules.sh
 # - %%define: macros are evaluated in-place, $variables are also expanded
 %global _vpath_builddir %{_target_platform}_${mpi:-serial}
 
-for mpi in %{mpi_list} ''; do
+for mpi in '' %{mpi_list}; do
   if [ -n "$mpi" ]; then
     module load mpi/$mpi-%{_arch}
     cmake_use_mpi=ON
@@ -120,6 +120,7 @@ for mpi in %{mpi_list} ''; do
     -G Ninja \
     -DCMAKE_C_STANDARD=17 \
     -DCP2K_BLAS_VENDOR=FlexiBLAS \
+    ${mpi:+-DCP2K_SCALAPACK_VENDOR=GENERIC} \
     -DCP2K_USE_LIBXC=ON \
     -DCP2K_USE_SPGLIB=ON \
     -DCP2K_USE_LIBXSMM=ON \
@@ -135,7 +136,7 @@ done
 
 
 %install
-for mpi in %{mpi_list} ''; do
+for mpi in '' %{mpi_list}; do
   %cmake_install
 done
 
@@ -143,7 +144,7 @@ done
 %if %{with check}
 # regtests take ~12 hours on aarch64 and ~48h on s390x
 %check
-for mpi in %{mpi_list} ''; do
+for mpi in '' %{mpi_list}; do
   if [ -n "$mpi" ]; then
     module load mpi/$mpi-%{_arch}
   fi
