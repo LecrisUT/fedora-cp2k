@@ -3,8 +3,8 @@
 %global commit 056df937c4510a5ec8564bca4ce4b33f44aec9b8
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
-# TODO: Filter tests and enable by default
 %bcond_without check
+%global mpi_list openmpi mpich
 
 Name:     cp2k
 Version:  2023.2
@@ -113,11 +113,12 @@ source /etc/profile.d/modules.sh
 # - %%define: macros are evaluated in-place, $variables are also expanded
 %global _vpath_builddir %{_target_platform}_${mpi:-serial}
 
-for mpi in '' openmpi mpich; do
+for mpi in %{mpi_list} ''; do
   %{?$mpi:%{_${mpi}_load}}
   # TODO: Remove CP2K_BUILD_DBSCR when dbscr is packaged
   %cmake \
     -G Ninja \
+    -DCMAKE_C_STANDARD=17 \
     -DCP2K_BLAS_VENDOR=FlexiBLAS \
     -DCP2K_USE_LIBXC=ON \
     -DCP2K_USE_SPGLIB=ON \
@@ -132,7 +133,7 @@ done
 
 
 %install
-for mpi in '' openmpi mpich; do
+for mpi in %{mpi_list} ''; do
   %cmake_install
 done
 
@@ -140,7 +141,7 @@ done
 %if %{with check}
 # regtests take ~12 hours on aarch64 and ~48h on s390x
 %check
-for mpi in '' openmpi mpich; do
+for mpi in %{mpi_list} ''; do
   %{?$mpi:%{_${mpi}_load}}
   %ctest
   %{?$mpi:%{_${mpi}_unload}}
