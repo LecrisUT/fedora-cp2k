@@ -9,7 +9,6 @@
 Name:     cp2k
 Version:  2023.2
 Release:  %autorelease
-Summary:  Ab Initio Molecular Dynamics
 License:  GPL-2.0-or-later
 URL:      https://cp2k.org/
 
@@ -32,64 +31,61 @@ BuildRequires: libxsmm-devel
 BuildRequires: python3-fypp
 BuildRequires: spglib-devel
 BuildRequires: dbcsr-devel
-# TODO: Add python bindings
+## TODO: Add python bindings
 #BuildRequires: python3-devel
-# openmpi
-BuildRequires:  openmpi-devel
-BuildRequires:  dbcsr-openmpi-devel
-BuildRequires:  elpa-openmpi-devel
 ## TODO: Add scalapack support
 #BuildRequires:  scalapack-openmpi-devel
-# mpich
-BuildRequires:  mpich-devel
-BuildRequires:  dbcsr-mpich-devel
-BuildRequires:  elpa-mpich-devel
-## TODO: Add scalapack support
-#BuildRequires:  scalapack-mpich-devel
 
 # Libint can break the API between releases
 Requires: cp2k-common = %{version}-%{release}
 
-%global cp2k_desc_base \
-CP2K is a freely available (GPL) program, written in Fortran 95, to\
-perform atomistic and molecular simulations of solid state, liquid,\
-molecular and biological systems. It provides a general framework for\
-different methods such as e.g. density functional theory (DFT) using a\
-mixed Gaussian and plane waves approach (GPW), and classical pair and\
-many-body potentials.\
-\
-CP2K does not implement Car-Parinello Molecular Dynamics (CPMD).
+%global _summary_base %{expand:
+Ab Initio Molecular Dynamics}
 
+%global _description_base %{expand:
+CP2K is a freely available (GPL) program, written in Fortran 95, to
+perform atomistic and molecular simulations of solid state, liquid,
+molecular and biological systems. It provides a general framework for
+different methods such as e.g. density functional theory (DFT) using a
+mixed Gaussian and plane waves approach (GPW), and classical pair and
+many-body potentials.
+
+CP2K does not implement Car-Parinello Molecular Dynamics (CPMD).}
+
+Summary:  %{_summary_base}
 %description
-%{cp2k_desc_base}
+%{_description_base}
 
 This package contains the non-MPI single process and multi-threaded versions.
 
-%package openmpi
-Summary: Molecular simulations software - openmpi version
+# Would be nice if there was a macro to be fed in %%generate_buildrequires and extracted in %%install
+# Reference: %%pyproject_buildrequires %%pyrpoject_install
+%define mpi_metadata(m:) %{expand:
+%package %1
+Summary: %{_summary_base} - %1 version
+BuildRequires:  %1-devel
+BuildRequires:  dbcsr-%1-devel
+BuildRequires:  elpa-%1-devel
+Requires:       %1
+Requires:       dbcsr-%1
+Requires:       elpa-%1
 Requires: cp2k-common = %{version}-%{release}
 
-%description openmpi
-%{cp2k_desc_base}
+%description %1
+%{_description_base}
 
 This package contains the parallel single- and multi-threaded versions
-using OpenMPI.
+using %1.}
 
-%package mpich
-Summary: Molecular simulations software - mpich version
-Requires: cp2k-common = %{version}-%{release}
-
-%description mpich
-%{cp2k_desc_base}
-
-This package contains the parallel single- and multi-threaded versions
-using mpich.
+# TODO: Maybe this can be fed in a for loop?
+%mpi_metadata -m openmpi
+%mpi_metadata -m mpich
 
 %package common
-Summary: Molecular simulations software - common files
+Summary: %{_summary_base} - common files
 
 %description common
-%{cp2k_desc_base}
+%{_description_base}
 
 This package contains the documentation and the manual.
 
@@ -124,7 +120,7 @@ for mpi in %{mpi_list} ''; do
     -DCP2K_USE_LIBXC=ON \
     -DCP2K_USE_SPGLIB=ON \
     -DCP2K_USE_LIBXSMM=ON \
-    %{?$mpi:-DCP2K_USE_ELPA=ON} \
+    %{?mpi:-DCP2K_USE_ELPA=ON} \
     -DCP2K_USE_FFTW3=ON \
     -DCP2K_USE_MPI=%{?mpi:ON}%{!?mpi:OFF} \
     %{?mpi:-DCMAKE_INSTALL_LIBDIR=$MPI_LIB}
