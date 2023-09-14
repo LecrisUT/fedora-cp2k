@@ -39,8 +39,7 @@ BuildRequires: dbcsr-devel
 # Libint can break the API between releases
 Requires: cp2k-common = %{version}-%{release}
 
-%global _summary_base %{expand:
-Ab Initio Molecular Dynamics}
+%global _summary_base %{expand:Ab Initio Molecular Dynamics}
 
 %global _description_base %{expand:
 CP2K is a freely available (GPL) program, written in Fortran 95, to
@@ -61,21 +60,21 @@ This package contains the non-MPI single process and multi-threaded versions.
 # Would be nice if there was a macro to be fed in %%generate_buildrequires and extracted in %%install
 # Reference: %%pyproject_buildrequires %%pyrpoject_install
 %define mpi_metadata(m:) %{expand:
-%package %1
-Summary: %{_summary_base} - %1 version
-BuildRequires:  %1-devel
-BuildRequires:  dbcsr-%1-devel
-BuildRequires:  elpa-%1-devel
-Requires:       %1
-Requires:       dbcsr-%1
-Requires:       elpa-%1
+%package %{-m*}
+Summary: %{_summary_base} - %{-m*} version
+BuildRequires:  %{-m*}-devel
+BuildRequires:  dbcsr-%{-m*}-devel
+BuildRequires:  elpa-%{-m*}-devel
+Requires:       %{-m*}
+Requires:       dbcsr-%{-m*}
+Requires:       elpa-%{-m*}
 Requires: cp2k-common = %{version}-%{release}
 
-%description %1
+%description %{-m*}
 %{_description_base}
 
 This package contains the parallel single- and multi-threaded versions
-using %1.}
+using %{-m*}.}
 
 # TODO: Maybe this can be fed in a for loop?
 %mpi_metadata -m openmpi
@@ -110,9 +109,13 @@ source /etc/profile.d/modules.sh
 %global _vpath_builddir %{_target_platform}_${mpi:-serial}
 
 for mpi in %{mpi_list} ''; do
-  %define mpi $mpi
-  %{?mpi:%{_%{mpi}_load}}
-  # TODO: Remove CP2K_BUILD_DBSCR when dbscr is packaged
+  if [ -n "$mpi" ]; then
+    module load mpi/$mpi-%{_arch}
+    cmake_use_mpi=ON
+  else
+    cmake_use_mpi=OFF
+  fi
+
   %cmake \
     -G Ninja \
     -DCMAKE_C_STANDARD=17 \
@@ -120,13 +123,14 @@ for mpi in %{mpi_list} ''; do
     -DCP2K_USE_LIBXC=ON \
     -DCP2K_USE_SPGLIB=ON \
     -DCP2K_USE_LIBXSMM=ON \
-    %{?mpi:-DCP2K_USE_ELPA=ON} \
+    ${mpi:+-DCP2K_USE_ELPA=ON} \
     -DCP2K_USE_FFTW3=ON \
-    -DCP2K_USE_MPI=%{?mpi:ON}%{!?mpi:OFF} \
-    %{?mpi:-DCMAKE_INSTALL_LIBDIR=$MPI_LIB}
+    -DCP2K_USE_MPI=${cmake_use_mpi} \
+    ${mpi:+-DCMAKE_INSTALL_LIBDIR=$MPI_LIB}
   %cmake_build
-  %{?mpi:%{_%{mpi}_unload}}
-  %undefine mpi
+  if [ -n "$mpi" ]; then
+    module unload mpi/$mpi-%{_arch}
+  fi
 done
 
 
@@ -140,11 +144,13 @@ done
 # regtests take ~12 hours on aarch64 and ~48h on s390x
 %check
 for mpi in %{mpi_list} ''; do
-  %define mpi $mpi
-  %{?mpi:%{_%{mpi}_load}}
+  if [ -n "$mpi" ]; then
+    module load mpi/$mpi-%{_arch}
+  fi
   %ctest
-  %{?mpi:%{_%{mpi}_unload}}
-  %undefine mpi
+  if [ -n "$mpi" ]; then
+    module unload mpi/$mpi-%{_arch}
+  fi
 done
 %endif
 
