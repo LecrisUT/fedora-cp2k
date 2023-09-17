@@ -7,7 +7,7 @@
 %global mpi_list openmpi mpich
 
 Name:     cp2k
-Version:  2023.2
+Version:  2023.1
 Release:  %autorelease
 License:  GPL-2.0-or-later
 URL:      https://cp2k.org/
